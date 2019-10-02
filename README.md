@@ -1,2 +1,4 @@
 # stopwatcher
-An easy way to send webhooks for new stops and gyms in your scan area
+An easy way to send webhooks for new stops and gyms in your scan area.
+
+Still very WIP.
