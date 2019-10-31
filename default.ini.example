@@ -18,7 +18,7 @@ MAX_LAT =
 MIN_LON = 
 MAX_LON = 
 
-LOOP = True
+LOOP = True # DOES NOT WORK! Please don't change
 SECONDS_BETWEEN_LOOPS = 500
 
 [Embeds]
