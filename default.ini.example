@@ -22,18 +22,19 @@ LOOP = True
 SECONDS_BETWEEN_LOOPS = 500
 
 [Embeds]
-STOP_IMAGE = https://i.imgur.com/kY3eXhI.png
-STOP_DETAILS_USERNAME = Pokestop Details
-STOP_NO_DETAILS_USERNAME = New Pokestop!
+STOP_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/stop.png
+STOP_DETAILS_USERNAME = Pokéstop Details
+STOP_NO_DETAILS_USERNAME = New Pokéstop
 
-GYM_IMAGE = 
-GYM_DETAILS_USERNAME = New Gym!
-GYM_NO_DETAILS_USERNAME = New Gym!
+GYM_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/gym.png
+GYM_DETAILS_USERNAME = New Gym
+GYM_NO_DETAILS_USERNAME = New Gym
 
-PORTAL_IMAGE = https://www.android-user.de/wp-content/uploads/2018/11/icon-ingress-prime.png
+PORTAL_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png
 PORTAL_USERNAME = New Portal
 
 [Static Map]
+ENABLE = True
 G_API_KEY = 
 G_ZOOM = 16
 G_RESOLUTION = 400x200
