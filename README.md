@@ -1,3 +1,5 @@
+![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)
+
 # Stop Watcher
 An easy way to send webhooks for new stops and gyms in your scan area.
 
