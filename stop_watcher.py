@@ -14,21 +14,14 @@ except ImportError:
 DEFAULT_CONFIG = "default.ini"
 
 ### Queries
-QUERY_CHECK_PORTALS = """SELECT {db_portal_id}, {db_portal_lat}, {db_portal_lon}, {db_portal_name}, {db_portal_img} FROM {db_portal_dbname}.{db_portal_table}
+QUERY_CHECK = """SELECT {db_id}, {db_lat}, {db_lon}, {db_name}, {db_img} FROM {db_dbname}.{db_table}
 WHERE (
-    {db_portal_lat} >= {lat_small} AND {db_portal_lat} <= {lat_big}
+    {db_lat} >= {lat_small} AND {db_lat} <= {lat_big}
   AND
-    {db_portal_lon} >= {lon_small} AND {db_portal_lon} <= {lon_big}
+    {db_lon} >= {lon_small} AND {db_lon} <= {lon_big}
 )
 """
-QUERY_CHECK_STOPS = """SELECT {db_stop_id}, {db_stop_lat}, {db_stop_lon}, {db_stop_name}, {db_stop_img} FROM {db_dbname}.{db_stop_table}
-WHERE (
-    {db_stop_lat} >= {lat_small} AND {db_stop_lat} <= {lat_big}
-  AND
-    {db_stop_lon} >= {lon_small} AND {db_stop_lon} <= {lon_big}
-)
-"""
-QUERY_CHECK_GYMS = """SELECT {db_gymdetails_table}.{db_gym_id}, {db_gym_lat}, {db_gym_lon}, {db_gym_name}, {db_gym_img} FROM {db_dbname}.{db_gym_table}
+QUERY_CHECK_GYMS_MAD = """SELECT {db_gymdetails_table}.{db_gym_id}, {db_gym_lat}, {db_gym_lon}, {db_gym_name}, {db_gym_img} FROM {db_dbname}.{db_gym_table}
 RIGHT JOIN {db_gymdetails_table} ON {db_gym_table}.{db_gym_id} = {db_gymdetails_table}.{db_gym_id}
 WHERE (
     {db_gym_lat} >= {lat_small} AND {db_gym_lat} <= {lat_big}
@@ -160,6 +153,12 @@ def create_config(config_path):
         'Static Map',
         'G_MARKER_COLOR_PORTAL')
     ### DATABASE
+    config['db_scan_schema'] = config_raw.get(
+        'DB',
+        'SCANNER_DB')
+    config['db_portal_schema'] = config_raw.get(
+        'DB',
+        'PORTAL_DB')
     config['db_host'] = config_raw.get(
         'DB',
         'HOST')
@@ -251,6 +250,47 @@ def connect_db(config):
     cursor = mydb.cursor()
 
     return cursor
+
+def db_config(config):
+    if config['db_scan_schema'] == "mad":
+        config['db_stop_table'] = "pokestop"
+        config['db_stop_id'] = "pokestop_id"
+        config['db_stop_lat'] = "latitude"
+        config['db_stop_lon'] = "longitude"
+        config['db_stop_name'] = "name"
+        config['db_stop_img'] = "image"
+
+        config['db_gym_table'] = "gym"
+        config['db_gymdetails_table'] = "gymdetails"
+        config['db_gym_id'] = "gym_id"
+        config['db_gym_lat'] = "latitude"
+        config['db_gym_lon'] = "longitude"
+        config['db_gym_name'] = "name"
+        config['db_gym_img'] = "url"
+
+    if config['db_scan_schema'] == "rdm":
+        config['db_stop_table'] = "pokestop"
+        config['db_stop_id'] = "id"
+        config['db_stop_lat'] = "lat"
+        config['db_stop_lon'] = "lon"
+        config['db_stop_name'] = "name"
+        config['db_stop_img'] = "url"
+
+        config['db_gym_table'] = "gym"
+        config['db_gymdetails_table'] = "doesntmatter"
+        config['db_gym_id'] = "id"
+        config['db_gym_lat'] = "lat"
+        config['db_gym_lon'] = "lon"
+        config['db_gym_name'] = "name"
+        config['db_gym_img'] = "url"
+
+    if config['db_portal_schema'] == "pmsf":
+        config['db_portal_table'] = "ingress_portals"
+        config['db_portal_id'] = "external_id"
+        config['db_portal_lat'] = "lat"
+        config['db_portal_lon'] = "lon"
+        config['db_portal_name'] = "name"
+        config['db_portal_img'] = "url"
 
 def get_portals():
     return open("txt/portals.txt", "r").read().splitlines()
@@ -489,14 +529,14 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
 def check_portals(cursor, config):
     if config['send_portals']:
         print("Checking for new portals")
-        check_portals_query = QUERY_CHECK_PORTALS.format(
-            db_portal_id=config['db_portal_id'],
-            db_portal_lat=config['db_portal_lat'],
-            db_portal_lon=config['db_portal_lon'],
-            db_portal_name=config['db_portal_name'],
-            db_portal_img=config['db_portal_img'],
-            db_portal_dbname=config['db_portal_dbname'],
-            db_portal_table=config['db_portal_table'],
+        check_portals_query = QUERY_CHECK.format(
+            db_id=config['db_portal_id'],
+            db_lat=config['db_portal_lat'],
+            db_lon=config['db_portal_lon'],
+            db_name=config['db_portal_name'],
+            db_img=config['db_portal_img'],
+            db_dbname=config['db_portal_dbname'],
+            db_table=config['db_portal_table'],
             lat_small=config['lat_small'],
             lat_big=config['lat_big'],
             lon_small=config['lon_small'],
@@ -514,14 +554,14 @@ def check_portals(cursor, config):
 def update_stop_portal(cursor, config):
     if config['update_stop_portal']:
         print("Checking if a stop can be updated")
-        check_stops_query = QUERY_CHECK_STOPS.format(
-            db_stop_id=config['db_stop_id'],
-            db_stop_lat=config['db_stop_lat'],
-            db_stop_lon=config['db_stop_lon'],
-            db_stop_name=config['db_stop_name'],
-            db_stop_img=config['db_stop_img'],
+        check_stops_query = QUERY_CHECK.format(
+            db_id=config['db_stop_id'],
+            db_lat=config['db_stop_lat'],
+            db_lon=config['db_stop_lon'],
+            db_name=config['db_stop_name'],
+            db_img=config['db_stop_img'],
             db_dbname=config['db_dbname'],
-            db_stop_table=config['db_stop_table'],
+            db_table=config['db_stop_table'],
             lat_small=config['lat_small'],
             lat_big=config['lat_big'],
             lon_small=config['lon_small'],
@@ -562,14 +602,14 @@ def update_stop_portal(cursor, config):
 def check_stops(cursor, config):
     if config['send_stops']:
         print("Checking for new stops")
-        check_stops_query = QUERY_CHECK_STOPS.format(
-            db_stop_id=config['db_stop_id'],
-            db_stop_lat=config['db_stop_lat'],
-            db_stop_lon=config['db_stop_lon'],
-            db_stop_name=config['db_stop_name'],
-            db_stop_img=config['db_stop_img'],
+        check_stops_query = QUERY_CHECK.format(
+            db_id=config['db_stop_id'],
+            db_lat=config['db_stop_lat'],
+            db_lon=config['db_stop_lon'],
+            db_name=config['db_stop_name'],
+            db_img=config['db_stop_img'],
             db_dbname=config['db_dbname'],
-            db_stop_table=config['db_stop_table'],
+            db_table=config['db_stop_table'],
             lat_small=config['lat_small'],
             lat_big=config['lat_big'],
             lon_small=config['lon_small'],
@@ -593,20 +633,35 @@ def check_stops(cursor, config):
 
 def update_gyms(cursor, config):
     if config['update_gym_portal'] or config['update_gym_stop']:
-        check_gyms_query = QUERY_CHECK_GYMS.format(
-            db_gym_id=config['db_gym_id'],
-            db_gym_lat=config['db_gym_lat'],
-            db_gym_lon=config['db_gym_lon'],
-            db_gym_name=config['db_gym_name'],
-            db_gym_img=config['db_gym_img'],
-            db_dbname=config['db_dbname'],
-            db_gym_table=config['db_gym_table'],
-            db_gymdetails_table=config['db_gymdetails_table'],
-            lat_small=config['lat_small'],
-            lat_big=config['lat_big'],
-            lon_small=config['lon_small'],
-            lon_big=config['lon_big']
-        )
+        if config['db_scan_schema'] == "mad":
+            check_gyms_query = QUERY_CHECK_GYMS_MAD.format(
+                db_gym_id=config['db_gym_id'],
+                db_gym_lat=config['db_gym_lat'],
+                db_gym_lon=config['db_gym_lon'],
+                db_gym_name=config['db_gym_name'],
+                db_gym_img=config['db_gym_img'],
+                db_dbname=config['db_dbname'],
+                db_gym_table=config['db_gym_table'],
+                db_gymdetails_table=config['db_gymdetails_table'],
+                lat_small=config['lat_small'],
+                lat_big=config['lat_big'],
+                lon_small=config['lon_small'],
+                lon_big=config['lon_big']
+            )
+        else:
+            check_gym_query = QUERY_CHECK.format(
+                db_id=config['db_gym_id'],
+                db_lat=config['db_gym_lat'],
+                db_lon=config['db_gym_lon'],
+                db_name=config['db_gym_name'],
+                db_img=config['db_gym_img'],
+                db_dbname=config['db_dbname'],
+                db_table=config['db_gym_table'],
+                lat_small=config['lat_small'],
+                lat_big=config['lat_big'],
+                lon_small=config['lon_small'],
+                lon_big=config['lon_big']
+            )  
         cursor.execute(check_gyms_query)
         result_gyms = cursor.fetchall()
 
@@ -699,20 +754,35 @@ def update_gyms(cursor, config):
 def check_gyms(cursor, config):
     if config['send_gyms']:
         print("Checking for new gyms")
-        check_gyms_query = QUERY_CHECK_GYMS.format(
-            db_gym_id=config['db_gym_id'],
-            db_gym_lat=config['db_gym_lat'],
-            db_gym_lon=config['db_gym_lon'],
-            db_gym_name=config['db_gym_name'],
-            db_gym_img=config['db_gym_img'],
-            db_dbname=config['db_dbname'],
-            db_gym_table=config['db_gym_table'],
-            db_gymdetails_table=config['db_gymdetails_table'],
-            lat_small=config['lat_small'],
-            lat_big=config['lat_big'],
-            lon_small=config['lon_small'],
-            lon_big=config['lon_big']
-        )
+        if config['db_scan_schema'] == "mad":
+            check_gyms_query = QUERY_CHECK_GYMS_MAD.format(
+                db_gym_id=config['db_gym_id'],
+                db_gym_lat=config['db_gym_lat'],
+                db_gym_lon=config['db_gym_lon'],
+                db_gym_name=config['db_gym_name'],
+                db_gym_img=config['db_gym_img'],
+                db_dbname=config['db_dbname'],
+                db_gym_table=config['db_gym_table'],
+                db_gymdetails_table=config['db_gymdetails_table'],
+                lat_small=config['lat_small'],
+                lat_big=config['lat_big'],
+                lon_small=config['lon_small'],
+                lon_big=config['lon_big']
+            )
+        else:
+            check_gym_query = QUERY_CHECK.format(
+                db_id=config['db_gym_id'],
+                db_lat=config['db_gym_lat'],
+                db_lon=config['db_gym_lon'],
+                db_name=config['db_gym_name'],
+                db_img=config['db_gym_img'],
+                db_dbname=config['db_dbname'],
+                db_table=config['db_gym_table'],
+                lat_small=config['lat_small'],
+                lat_big=config['lat_big'],
+                lon_small=config['lon_small'],
+                lon_big=config['lon_big']
+            )  
         cursor.execute(check_gyms_query)
         result_gyms = cursor.fetchall()
 
@@ -739,6 +809,7 @@ def main():
     config = create_config(config_path)
 
     cursor = connect_db(config)
+    db_config(config)
 
     check_portals(cursor, config)
     update_stop_portal(cursor, config)

@@ -29,6 +29,12 @@ def create_config(config_path):
     config['send_portals'] = config_raw.getboolean(
         'Config',
         'PORTALS')
+    config['db_scan_schema'] = config_raw.get(
+        'DB',
+        'SCANNER_DB')
+    config['db_portal_schema'] = config_raw.get(
+        'DB',
+        'PORTAL_DB')
     config['db_host'] = config_raw.get(
         'DB',
         'HOST')
@@ -80,6 +86,25 @@ def connect_db(config):
     cursor = mydb.cursor()
 
     return cursor
+
+def db_config(config):
+    if config['db_scan_schema'] == "mad":
+        config['db_stop_table'] = "pokestop"
+        config['db_stop_id'] = "pokestop_id"
+
+        config['db_gym_table'] = "gym"
+        config['db_gym_id'] = "gym_id"
+
+    if config['db_scan_schema'] == "rdm":
+        config['db_stop_table'] = "pokestop"
+        config['db_stop_id'] = "id"
+
+        config['db_gym_table'] = "gym"
+        config['db_gym_id'] = "id"
+
+    if config['db_portal_schema'] == "pmsf":
+        config['db_portal_table'] = "ingress_portals"
+        config['db_portal_id'] = "external_id"
 
 def get_portals():
     return open("txt/portals.txt", "r").read().splitlines()
@@ -171,6 +196,7 @@ if __name__ == "__main__":
     config = create_config(config_path)
 
     cursor = connect_db(config)
+    db_config(config)
 
     write_portals(cursor, config)
     write_stops(cursor, config)

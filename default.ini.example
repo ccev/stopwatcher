@@ -11,14 +11,13 @@ DELETE_CONVERTED_STOP = True
 # discord webhook links
 STOP_WEBHOOK = 
 GYM_WEBHOOK = 
-PORTAL_WEBHOOK = 
+PORTAL_WEBHOOK =
 
 MIN_LAT = 
 MAX_LAT = 
 MIN_LON = 
 MAX_LON = 
 
-# LOOP OPTIONAS DO NOT WORK! Please don't change
 LOOP = True
 SECONDS_BETWEEN_LOOPS = 500
 
@@ -48,6 +47,12 @@ G_MARKER_SIZE = mid
 # tiny/small/mid
 
 [DB]
+SCANNER_DB = 
+# mad/rdm/none
+
+PORTAL_DB = pmsf
+# pmsf/none
+
 HOST = 0.0.0.0
 PORT = 3306
 USER = 
@@ -57,27 +62,25 @@ NAME =
 PORTAL_DB_NAME = 
 
 
-# prefilled for MAD
-POKESTOP_TABLE = pokestop
-POKESTOP_ID = pokestop_id
-POKESTOP_LAT = latitude
-POKESTOP_LON = longitude
-POKESTOP_NAME = name
-POKESTOP_IMAGE = image
+# ignore if you didn't put "none" for SCANNER_DB or PORTAL_DB
+POKESTOP_TABLE = 
+POKESTOP_ID = 
+POKESTOP_LAT = 
+POKESTOP_LON = 
+POKESTOP_NAME = 
+POKESTOP_IMAGE = 
 
-GYM_TABLE = gym
-GYMDETAILS_TABLE = gymdetails
-GYM_ID = gym_id
-GYM_LAT = latitude
-GYM_LON = longitude
-GYM_NAME = name
-GYM_IMAGE = url
+GYM_TABLE = 
+GYMDETAILS_TABLE = 
+GYM_ID = 
+GYM_LAT = 
+GYM_LON = 
+GYM_NAME = 
+GYM_IMAGE = 
 
-
-# prefilled for PMSF (willem fork)
-PORTAL_TABLE = ingress_portals
-PORTAL_ID = external_id
-PORTAL_LAT = lat
-PORTAL_LON = lon
-PORTAL_NAME = name
-PORTAL_IMAGE = url
+PORTAL_TABLE = 
+PORTAL_ID = 
+PORTAL_LAT = 
+PORTAL_LON = 
+PORTAL_NAME = 
+PORTAL_IMAGE = 
