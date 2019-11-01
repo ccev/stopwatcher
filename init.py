@@ -98,6 +98,7 @@ def get_gyms_full():
 
 def write_portals(cursor, config):
     if config['send_portals']:
+        print("Checking for portals to write")
         check_portals_query = QUERY_CHECK.format(
             db_id=config['db_portal_id'],
             db_dbname=config['db_portal_dbname'],
@@ -106,14 +107,16 @@ def write_portals(cursor, config):
         cursor.execute(check_portals_query)
         portals = cursor.fetchall()
 
-        for db_portal_id in portals:
-            if not portals[0][0] in get_portals():
-                print("Writing portal id", portals[0][0])
-                with open("txt/portals.txt", "a") as f:
-                    f.write(portals[0][0] + "\n")
+        for db_id in portals:
+            for var in db_id:
+                if not var in get_portals():
+                    print("Writing portal id", var)
+                    with open("txt/portals.txt", "a") as f:
+                        f.write(var + "\n")
 
 def write_stops(cursor, config):
     if config['send_stops']:
+        print("Checking for stops to write")
         check_stops_query = QUERY_CHECK.format(
             db_id=config['db_stop_id'],
             db_dbname=config['db_dbname'],
@@ -122,18 +125,22 @@ def write_stops(cursor, config):
         cursor.execute(check_stops_query)
         stops = cursor.fetchall()
 
-        for db_stop_id in stops:
-            if not stops[0][0] in get_stops_full():
-                print("Writing full stop id", stops[0][0])
-                with open("txt/stop_full.txt", "a") as f:
-                    f.write(stops[0][0] + "\n")
-            if not stops[0][0] in get_stops_unfull():
-                print("Writing unfull stop id", stops[0][0])
-                with open("txt/stop_unfull.txt", "a") as f:
-                    f.write(stops[0][0] + "\n")
+        for db_id in stops:
+            for var in db_id:
+                if not var in get_stops_full():
+                    print("Writing full stop id", var)
+                    with open("txt/stop_full.txt", "a") as f:
+                        f.write(var + "\n")
+        for db_id in stops:
+            for var in db_id:
+                if not var in get_stops_unfull():
+                    print("Writing unfull stop id", var)
+                    with open("txt/stop_unfull.txt", "a") as f:
+                        f.write(var + "\n")
 
 def write_gyms(cursor, config):
     if config['send_gyms']:
+        print("Checking for gyms to write")
         check_gyms_query = QUERY_CHECK.format(
             db_id=config['db_gym_id'],
             db_dbname=config['db_dbname'],
@@ -142,15 +149,18 @@ def write_gyms(cursor, config):
         cursor.execute(check_gyms_query)
         gyms = cursor.fetchall()
 
-        for db_gym_id in gyms:
-            if not gyms[0][0] in get_gyms_full():
-                print("Writing full gym id", gyms[0][0])
-                with open("txt/gym_full.txt", "a") as f:
-                    f.write(gyms[0][0] + "\n")
-            if not gyms[0][0] in get_gyms_unfull():
-                print("Writing unfull gym id", gyms[0][0])
-                with open("txt/gym_unfull.txt", "a") as f:
-                    f.write(gyms[0][0] + "\n")
+        for db_id in gyms:
+            for var in db_id:
+                if not var in get_gyms_full():
+                    print("Writing full gym id", var)
+                    with open("txt/gym_full.txt", "a") as f:
+                        f.write(var + "\n")
+        for db_id in gyms:
+            for var in db_id:
+                if not var in get_gyms_unfull():
+                    print("Writing unfull gym id", var)
+                    with open("txt/gym_unfull.txt", "a") as f:
+                        f.write(var + "\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
