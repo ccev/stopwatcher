@@ -599,19 +599,19 @@ def update_stop_portal(cursor, config):
                 cursor.execute(exist_portal_query)
                 result_portals = cursor.fetchall()
 
-                print("updating stop", result_portals[0][0])
-
-                update_stop_query = QUERY_UPDATE.format(
-                    db_dbname=config['db_dbname'],
-                    db_table=config['db_stop_table'],
-                    db_name=config['db_stop_name'],
-                    db_img=config['db_stop_img'],
-                    img=result_portals[0][1],
-                    name=result_portals[0][0],
-                    db_id=config['db_stop_id'],
-                    id=db_stop_id
-                )
-                cursor.execute(update_stop_query)
+                for db_portal_name, db_portal_img in result_portals:
+                    print("updating stop", db_portal_name)
+                    update_stop_query = QUERY_UPDATE.format(
+                        db_dbname=config['db_dbname'],
+                        db_table=config['db_stop_table'],
+                        db_name=config['db_stop_name'],
+                        db_img=config['db_stop_img'],
+                        img=db_portal_img,
+                        name=db_portal_name,
+                        db_id=config['db_stop_id'],
+                        id=db_stop_id
+                    )
+                    cursor.execute(update_stop_query)
 
 def check_stops(cursor, config):
     if config['send_stops']:
@@ -696,19 +696,19 @@ def update_gyms(cursor, config):
                     cursor.execute(exist_portal_query)
                     result_portals = cursor.fetchall()
 
-                    print("updating gym", result_portals[0][0], "with portal info")
-
-                    update_gym_query = QUERY_UPDATE.format(
-                        db_dbname=config['db_dbname'],
-                        db_table=config['db_gymdetails_table'],
-                        db_name=config['db_gym_name'],
-                        db_img=config['db_gym_img'],
-                        img=result_portals[0][1],
-                        name=result_portals[0][0],
-                        db_id=config['db_gym_id'],
-                        id=db_gym_id
-                    )
-                    cursor.execute(update_gym_query)
+                    for db_portal_name, db_portal_img in result_portals:
+                        print("updating gym", db_portal_name, "with portal info")
+                        update_gym_query = QUERY_UPDATE.format(
+                            db_dbname=config['db_dbname'],
+                            db_table=config['db_gymdetails_table'],
+                            db_name=config['db_gym_name'],
+                            db_img=config['db_gym_img'],
+                            img=db_portal_img,
+                            name=db_portal_name,
+                            db_id=config['db_gym_id'],
+                            id=db_gym_id
+                        )
+                        cursor.execute(update_gym_query)
 
                     if config['delete_stops']:
                         print("Deleting converted stop")
@@ -739,19 +739,19 @@ def update_gyms(cursor, config):
                     cursor.execute(exist_stop_query)
                     result_stops = cursor.fetchall()
 
-                    print("updating gym", result_stops[0][0], "with portal info")
-
-                    update_gym_query = QUERY_UPDATE.format(
-                        db_dbname=config['db_dbname'],
-                        db_table=config['db_gymdetails_table'],
-                        db_name=config['db_gym_name'],
-                        db_img=config['db_gym_img'],
-                        img=result_stops[0][1],
-                        name=result_stops[0][0],
-                        db_id=config['db_gym_id'],
-                        id=db_gym_id
-                    )
-                    cursor.execute(update_gym_query)
+                    for db_stop_name, db_stop_img in result_stops:
+                        print("updating gym", db_stop_name, "with stop info")
+                        update_gym_query = QUERY_UPDATE.format(
+                            db_dbname=config['db_dbname'],
+                            db_table=config['db_gymdetails_table'],
+                            db_name=config['db_gym_name'],
+                            db_img=config['db_gym_img'],
+                            img=db_stop_img,
+                            name=db_stop_name,
+                            db_id=config['db_gym_id'],
+                            id=db_gym_id
+                        )
+                        cursor.execute(update_gym_query)
 
                     if config['delete_stops']:
                         print("Deleting converted stop")
