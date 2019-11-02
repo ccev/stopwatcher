@@ -9,6 +9,7 @@ An easy way to send webhooks for new stops and gyms in your scan area.
 - python3.6 only
 - **DO NOT FORGET TO RUN `init.py` BEFORE RUNNING `stop_watcher.py` FOR THE FIRST TIME**!
 - I recommend having an automated Ingress Scraper running if you enable anything related to portals
+- Only Google static maps are currently supported
 
 ## Usage
 1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher`, `pip[3[.6]] install -r requirements.py`, then copy and rename `default.ini.example` to `default.ini` and configure everything. Refer to the table below if you're not sure about specific variables. 
@@ -36,11 +37,14 @@ An easy way to send webhooks for new stops and gyms in your scan area.
 | `STOP_IMAGE` | Avatar image for stop webhooks | Link |
 | `STOP_DETAILS_USERNAME` | Username for stop webhooks with known name/image | Text |
 | `STOP_NO_DETAILS_USERNAME` | Username for stop webhooks with unknown name/image | Text |
+| `STOP_COLOR` | Color for stop webhooks | Decimal value |
 | `GYM_IMAGE` | Avatar image for gym webhooks | Link |
 | `GYM_DETAILS_USERNAME` | Username for gym webhooks with known name/image | Text |
 | `GYM_NO_DETAILS_USERNAME` | Username for gym webhooks with unknown name/image | Text |
+| `GYM_COLOR` | Color for gym webhooks | Decimal value |
 | `PORTAL_IMAGE` | Avatar image for portal webhooks | Link |
 | `PORTAL_USERNAME` | Username for portal webhooks | Text |
+| `PORTAL_COLOR` | Color for portal webhooks | Decimal value |
 
 ### Static Map
 | Variable | Description | What to put in |
