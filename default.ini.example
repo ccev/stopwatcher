@@ -25,13 +25,16 @@ SECONDS_BETWEEN_LOOPS = 500
 STOP_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/stop.png
 STOP_DETAILS_USERNAME = Pokéstop Details
 STOP_NO_DETAILS_USERNAME = New Pokéstop
+STOP_COLOR = 1216493
 
 GYM_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/gym.png
 GYM_DETAILS_USERNAME = New Gym
 GYM_NO_DETAILS_USERNAME = New Gym
+GYM_COLOR = 12239045
 
 PORTAL_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png
 PORTAL_USERNAME = New Portal
+PORTAL_COLOR = 12609532
 
 [Static Map]
 ENABLE = True
@@ -39,9 +42,9 @@ G_API_KEY =
 G_ZOOM = 16
 G_RESOLUTION = 400x200
 
-G_MARKER_COLOR_STOP = 0x128fed
-G_MARKER_COLOR_GYM = 0x128fed
-G_MARKER_COLOR_PORTAL = 0xc067fc
+G_MARKER_COLOR_STOP = 128fed
+G_MARKER_COLOR_GYM = bac0c5
+G_MARKER_COLOR_PORTAL = c067fc
 
 G_MARKER_SIZE = mid
 # tiny/small/mid

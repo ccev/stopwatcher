@@ -112,6 +112,9 @@ def create_config(config_path):
     config['stop_unfull_username'] = config_raw.get(
         'Embeds',
         'STOP_NO_DETAILS_USERNAME')
+    config['embed_stop_color'] = config_raw.get(
+        'Embeds',
+        'STOP_COLOR')
     config['gym_img'] = config_raw.get(
         'Embeds',
         'GYM_IMAGE')
@@ -121,12 +124,18 @@ def create_config(config_path):
     config['gym_unfull_username'] = config_raw.get(
         'Embeds',
         'GYM_NO_DETAILS_USERNAME')
+    config['embed_gym_color'] = config_raw.get(
+        'Embeds',
+        'GYM_COLOR')
     config['portal_img'] = config_raw.get(
         'Embeds',
         'PORTAL_IMAGE')
     config['portal_username'] = config_raw.get(
         'Embeds',
         'PORTAL_USERNAME')
+    config['embed_portal_color'] = config_raw.get(
+        'Embeds',
+        'PORTAL_COLOR')
     ### Static Map
     config['google_static'] = config_raw.getboolean(
         'Static Map',
@@ -316,11 +325,12 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
     google_marker_color_portal = config['google_marker_color_portal']
     navigation = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={db_portal_lat},{db_portal_lon}) | [Intel](https://intel.ingress.com/intel?ll={db_portal_lat},{db_portal_lon}&z=15&pll={db_portal_lat},{db_portal_lon})"
     if config['google_static']:
-        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_portal_lat},{db_portal_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:{google_marker_color_portal}%7Clabel:%7C{db_portal_lat},{db_portal_lon}"
+        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_portal_lat},{db_portal_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:0x{google_marker_color_portal}%7Clabel:%7C{db_portal_lat},{db_portal_lon}"
         data = {
             "username": config['portal_username'],
             "avatar_url": config['portal_img'],
             "embeds": [{
+                "color": config['embed_portal_color'],
                 "thumbnail": {
                     "url": db_portal_img
                 },
@@ -365,11 +375,12 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
     google_marker_color_stop = config['google_marker_color_stop']
     navigation = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={db_stop_lat},{db_stop_lon})"
     if config['google_static']: 
-        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_stop_lat},{db_stop_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:{google_marker_color_stop}%7Clabel:%7C{db_stop_lat},{db_stop_lon}"
+        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_stop_lat},{db_stop_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:0x{google_marker_color_stop}%7Clabel:%7C{db_stop_lat},{db_stop_lon}"
         data = {
             "username": config['stop_full_username'],
             "avatar_url": config['stop_img'],
             "embeds": [{
+                "color": config['embed_stop_color'],
                 "thumbnail": {
                     "url": db_stop_img
                 },
@@ -414,13 +425,14 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
     google_marker_color_stop = config['google_marker_color_stop']
     navigation = f"https://www.google.com/maps/search/?api=1&query={db_stop_lat},{db_stop_lon}"
     if config['google_static']:
-        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_stop_lat},{db_stop_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:{google_marker_color_stop}%7Clabel:%7C{db_stop_lat},{db_stop_lon}"
+        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_stop_lat},{db_stop_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:0x{google_marker_color_stop}%7Clabel:%7C{db_stop_lat},{db_stop_lon}"
         data = {
             "username": config['stop_unfull_username'],
             "avatar_url": config['stop_img'],
             "embeds": [{
                 "title": "Google Maps",
                 "url": navigation,
+                "color": config['embed_stop_color'],
                 "image": {
                     "url": static_map
                 }
@@ -449,11 +461,12 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
     google_marker_color_gym = config['google_marker_color_gym']
     navigation = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={db_gym_lat},{db_gym_lon})"
     if config['google_static']:
-        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_gym_lat},{db_gym_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:{google_marker_color_gym}%7Clabel:%7C{db_gym_lat},{db_gym_lon}"
+        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_gym_lat},{db_gym_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:0x{google_marker_color_gym}%7Clabel:%7C{db_gym_lat},{db_gym_lon}"
         data = {
             "username": config['gym_full_username'],
             "avatar_url": config['gym_img'],
             "embeds": [{
+                "color": config['embed_gym_color'],
                 "thumbnail": {
                     "url": db_gym_img
                 },
@@ -499,13 +512,14 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
     navigation = f"https://www.google.com/maps/search/?api=1&query={db_gym_lat},{db_gym_lon}"
     static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_gym_lat},{db_gym_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:{google_marker_color_gym}%7Clabel:%7C{db_gym_lat},{db_gym_lon}"
     if config['google_static']:
-        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_gym_lat},{db_gym_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:{google_marker_color_gym}%7Clabel:%7C{db_gym_lat},{db_gym_lon}"
+        static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={db_gym_lat},{db_gym_lon}&zoom={google_zoom}&scale=1&size={google_res}&maptype=roadmap&key={google_api_key}&format=png&visual_refresh=true&markers=size:{google_marker_size}%7Ccolor:0x{google_marker_color_gym}%7Clabel:%7C{db_gym_lat},{db_gym_lon}"
         data = {
             "username": config['gym_unfull_username'],
             "avatar_url": config['gym_img'],
             "embeds": [{
                 "title": "Google Maps",
                 "url": navigation,
+                "color": config['embed_gym_color'],
                 "image": {
                     "url": static_map
                 }
