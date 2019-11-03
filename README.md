@@ -1,7 +1,7 @@
 ![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)
 
 # Stop Watcher
-An easy way to send webhooks for new stops and gyms in your scan area.
+Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating names/imagea and deleting Stops that turned into Gyms.
 
 ## Notes
 - This project is brand new, so very little testing has been done.
