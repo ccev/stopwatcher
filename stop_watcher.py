@@ -286,7 +286,7 @@ def db_config(config):
         config['db_stop_img'] = "url"
 
         config['db_gym_table'] = "gym"
-        config['db_gymdetails_table'] = "doesntmatter"
+        config['db_gymdetails_table'] = "gym"
         config['db_gym_id'] = "id"
         config['db_gym_lat'] = "lat"
         config['db_gym_lon'] = "lon"
