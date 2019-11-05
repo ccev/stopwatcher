@@ -663,7 +663,7 @@ def update_gyms(cursor, config):
                 lon_big=config['lon_big']
             )
         else:
-            check_gym_query = QUERY_CHECK.format(
+            check_gyms_query = QUERY_CHECK.format(
                 db_id=config['db_gym_id'],
                 db_lat=config['db_gym_lat'],
                 db_lon=config['db_gym_lon'],
@@ -784,7 +784,7 @@ def check_gyms(cursor, config):
                 lon_big=config['lon_big']
             )
         else:
-            check_gym_query = QUERY_CHECK.format(
+            check_gyms_query = QUERY_CHECK.format(
                 db_id=config['db_gym_id'],
                 db_lat=config['db_gym_lat'],
                 db_lon=config['db_gym_lon'],
