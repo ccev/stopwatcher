@@ -3,6 +3,7 @@
 import time
 import requests
 import argparse
+import init
 
 from pymysql import connect
 
@@ -600,18 +601,21 @@ def update_stop_portal(cursor, config):
                 result_portals = cursor.fetchall()
 
                 for db_portal_name, db_portal_img in result_portals:
-                    print("updating stop", db_portal_name)
-                    update_stop_query = QUERY_UPDATE.format(
-                        db_dbname=config['db_dbname'],
-                        db_table=config['db_stop_table'],
-                        db_name=config['db_stop_name'],
-                        db_img=config['db_stop_img'],
-                        img=db_portal_img,
-                        name=db_portal_name,
-                        db_id=config['db_stop_id'],
-                        id=db_stop_id
-                    )
-                    cursor.execute(update_stop_query)
+                    if db_portal_name == None or db_portal_img == None:
+                        print("Tried to update Stop at", db_stop_lat, ",", db_portal_lon, "but Portal has no image or name. Check your DB!")
+                    else:
+                        print("updating stop", db_portal_name)
+                        update_stop_query = QUERY_UPDATE.format(
+                            db_dbname=config['db_dbname'],
+                            db_table=config['db_stop_table'],
+                            db_name=config['db_stop_name'],
+                            db_img=config['db_stop_img'],
+                            img=db_portal_img,
+                            name=db_portal_name,
+                            db_id=config['db_stop_id'],
+                            id=db_stop_id
+                        )
+                        cursor.execute(update_stop_query)
 
 def check_stops(cursor, config):
     if config['send_stops']:
@@ -663,7 +667,7 @@ def update_gyms(cursor, config):
                 lon_big=config['lon_big']
             )
         else:
-            check_gyms_query = QUERY_CHECK.format(
+            check_gym_query = QUERY_CHECK.format(
                 db_id=config['db_gym_id'],
                 db_lat=config['db_gym_lat'],
                 db_lon=config['db_gym_lon'],
@@ -697,18 +701,21 @@ def update_gyms(cursor, config):
                     result_portals = cursor.fetchall()
 
                     for db_portal_name, db_portal_img in result_portals:
-                        print("updating gym", db_portal_name, "with portal info")
-                        update_gym_query = QUERY_UPDATE.format(
-                            db_dbname=config['db_dbname'],
-                            db_table=config['db_gymdetails_table'],
-                            db_name=config['db_gym_name'],
-                            db_img=config['db_gym_img'],
-                            img=db_portal_img,
-                            name=db_portal_name,
-                            db_id=config['db_gym_id'],
-                            id=db_gym_id
-                        )
-                        cursor.execute(update_gym_query)
+                        if db_portal_name == None or db_portal_img == None:
+                            print("Tried to update Gym at", db_gym_lat, ",", db_gym_lon, "using Portal info, but Portal has no image or name. Check your DB!")
+                        else:
+                            print("updating gym", db_portal_name, "with portal info")
+                            update_gym_query = QUERY_UPDATE.format(
+                                db_dbname=config['db_dbname'],
+                                db_table=config['db_gymdetails_table'],
+                                db_name=config['db_gym_name'],
+                                db_img=config['db_gym_img'],
+                                img=db_portal_img,
+                                name=db_portal_name,
+                                db_id=config['db_gym_id'],
+                                id=db_gym_id
+                            )
+                            cursor.execute(update_gym_query)
 
                     if config['delete_stops']:
                         print("Deleting converted stop")
@@ -740,18 +747,21 @@ def update_gyms(cursor, config):
                     result_stops = cursor.fetchall()
 
                     for db_stop_name, db_stop_img in result_stops:
-                        print("updating gym", db_stop_name, "with stop info")
-                        update_gym_query = QUERY_UPDATE.format(
-                            db_dbname=config['db_dbname'],
-                            db_table=config['db_gymdetails_table'],
-                            db_name=config['db_gym_name'],
-                            db_img=config['db_gym_img'],
-                            img=db_stop_img,
-                            name=db_stop_name,
-                            db_id=config['db_gym_id'],
-                            id=db_gym_id
-                        )
-                        cursor.execute(update_gym_query)
+                        if db_stop_name == None or db_stop_img == None:
+                            print("Tried to update Gym at", db_gym_lat, ",", db_gym_lon, "using Stop info, but Stop has no image or name. Check your DB!")
+                        else:
+                            print("updating gym", db_stop_name, "with stop info")
+                            update_gym_query = QUERY_UPDATE.format(
+                                db_dbname=config['db_dbname'],
+                                db_table=config['db_gymdetails_table'],
+                                db_name=config['db_gym_name'],
+                                db_img=config['db_gym_img'],
+                                img=db_stop_img,
+                                name=db_stop_name,
+                                db_id=config['db_gym_id'],
+                                id=db_gym_id
+                            )
+                            cursor.execute(update_gym_query)
 
                     if config['delete_stops']:
                         print("Deleting converted stop")
@@ -784,7 +794,7 @@ def check_gyms(cursor, config):
                 lon_big=config['lon_big']
             )
         else:
-            check_gyms_query = QUERY_CHECK.format(
+            check_gym_query = QUERY_CHECK.format(
                 db_id=config['db_gym_id'],
                 db_lat=config['db_gym_lat'],
                 db_lon=config['db_gym_lon'],
@@ -815,15 +825,7 @@ def check_gyms(cursor, config):
 
 def main():
     print("-------------------------------")
-    parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-c", "--config", default="default.ini", help="Config file to use")
-    args = parser.parse_args()
-    config_path = args.config
-    config = create_config(config_path)
-
     cursor = connect_db(config)
-    db_config(config)
 
     check_portals(cursor, config)
     update_stop_portal(cursor, config)
@@ -837,8 +839,30 @@ def main():
         print("Loop done. Waiting", config['sleeptime'], "seconds")
         time.sleep(config['sleeptime'])
 
-while True:
-    main()
-    """if config['dosleep']:
-        print("Loop done. Waiting", config['sleeptime'])
-        time.sleep(config['sleeptime'])"""
+print("First run! Parsing config and checking if your txt files are empty...")
+parser = argparse.ArgumentParser()
+parser.add_argument(
+    "-c", "--config", default="default.ini", help="Config file to use")
+args = parser.parse_args()
+config_path = args.config
+config = create_config(config_path)
+
+cursor = connect_db(config)
+db_config(config)
+
+if not get_portals():
+    init.write_portals(cursor, config)
+    print("Found an empty portals.txt file - Ran init.py on portals.")
+if not get_stops_unfull() or not get_stops_full():
+    init.write_stops(cursor, config)
+    print("Found an empty stops.txt file - Ran init.py on stops.")
+if not get_gyms_unfull() or not get_gyms_full():
+    init.write_gyms(cursor, config)
+    print("Found an empty gyms.txt file - Ran init.py on gyms.")
+
+main()
+
+while config['dosleep']:
+   main()
+else:
+    print("Looping disabled - Stopping gracefully.")
