@@ -27,7 +27,7 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 | `GYM_UPDATE_THROUGH_STOP` | Check for gyms without name/image, then copy them from the corresponding stop | True/False |
 | `GYM_UPDATE_THROUGH_PORTAL` | Check for gyms without name/image, then copy them from the corresponding portal | True/False |
 | `STOP_UPDATE_THROUGH_PORTAL` | Check for stops without name/image, then copy them from the corresponding portal | True/False |
-| `DELETE_CONVERTED_STOP` | Delete stops that turned into gyms after updating the gym info. Needs to have `GYM_UPDATE_THROUGH_STOP` or `GYM_UPDATE_THROUGH_STOP` enabled | True/False |
+| `DELETE_CONVERTED_STOP` | Delete stops that turned into gyms after updating the gym info. Needs to have `GYM_UPDATE_THROUGH_STOP` or `GYM_UPDATE_THROUGH_PORTAL` enabled | True/False |
 | `MIN_LAT` `MAX_LAT` `MIN_LON` `MAX_LON` | Defines the area the script will be touching things in | Coordinates |
 | `LOOP` | If enabled, the script will loop itself. If disabled, it will stop after running once | True/False |
 | `SECONDS_BETWEEN_LOOPS` | How many seconds to wait between loops | Amount of seconds |
