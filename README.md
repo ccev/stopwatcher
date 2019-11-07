@@ -1,7 +1,7 @@
 ![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)
 
 # Stop Watcher
-Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating names/imagea and deleting Stops that turned into Gyms.
+Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating names/images and deleting Stops that turned into Gyms.
 
 ## Notes
 - This project is brand new, so very little testing has been done.
