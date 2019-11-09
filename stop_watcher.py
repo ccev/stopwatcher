@@ -340,24 +340,24 @@ def get_gyms_full():
 def static_config(config):
     if config['static_marker_size'] == 0:
         if config['static_provider'] == "google":
-            config['static_marker_size'] = tiny
+            config['static_marker_size'] = "tiny"
         elif config['static_provider'] == "osm":
             print("Please choose a marker size between 1 and 3")
     elif config['static_marker_size'] == 1:
         if config['static_provider'] == "google":
-            config['static_marker_size'] = small
+            config['static_marker_size'] = "small"
         elif config['static_provider'] == "osm":
-            config['static_marker_size'] = sm
+            config['static_marker_size'] = "sm"
     elif config['static_marker_size'] == 2:
         if config['static_provider'] == "google":
-            config['static_marker_size'] = mid
+            config['static_marker_size'] = "mid"
         elif config['static_provider'] == "osm":
-            config['static_marker_size'] = md
+            config['static_marker_size'] = "md"
     elif config['static_marker_size'] == 3:
         if config['static_provider'] == "google":
-            config['static_marker_size'] = normal
+            config['static_marker_size'] = "normal"
         elif config['static_provider'] == "osm":
-            config['static_marker_size'] = lg
+            config['static_marker_size'] = "lg"
     else:
         print("Please choose another marker size.")
 
@@ -419,9 +419,9 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_portal'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
-    if config['static_provider'] == "osm":
+    elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_portal'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
-    if config['static_provider'] == "mapbox":
+    elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             sf_lat_min = db_poi_lat - 0.002000
             sf_lat_max = db_poi_lat + 0.002000
@@ -455,7 +455,6 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
 
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-    
     else:
         static_map = ""  
      
@@ -491,17 +490,16 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
-    if config['static_provider'] == "osm":
+    elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
-    if config['static_provider'] == "mapbox":
+    elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-    
     else:
         static_map = ""  
-     
+
     data = {
         "username": config['stop_full_username'],
         "avatar_url": config['stop_img'],
@@ -534,14 +532,13 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
-    if config['static_provider'] == "osm":
+    elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
-    if config['static_provider'] == "mapbox":
+    elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-    
     else:
         static_map = ""  
      
@@ -570,14 +567,13 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_gym'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
-    if config['static_provider'] == "osm":
+    elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_gym'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
-    if config['static_provider'] == "mapbox":
+    elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-    
     else:
         static_map = ""  
      
@@ -613,14 +609,13 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_gym'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
-    if config['static_provider'] == "osm":
+    elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_gym'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
-    if config['static_provider'] == "mapbox":
+    elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
-            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-    
+            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])  
     else:
         static_map = ""  
       
