@@ -9,7 +9,6 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 - python3.6 only
 - **DO NOT FORGET TO RUN `init.py` BEFORE RUNNING `stop_watcher.py` FOR THE FIRST TIME**!
 - I recommend having an automated Ingress Scraper running if you enable anything related to portals
-- Only Google static maps are currently supported
 - Both `stop_watcher.py` and `init.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
 
 ## Usage
@@ -17,6 +16,31 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 2. IMPORTANT: Before you even touch `stop_watcher.py`, run `init.py` once! This will fill in the cache files with all stops/gyms/portals in your database.
 3. After configuring `default.ini` and running `init.py` you can start the main script using `python[3[.6]] stop_watcher.py`
 4. Set up [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) and have it running every few hours to get working webhooks for new portals
+
+## Static Maps
+### Examples
+#### Mapbox (Super Fancy mode)
+![Super Fancy](https://i.imgur.com/AvBkt8O.png)
+#### Mapbox
+![Mapbox](https://i.imgur.com/woB2WiR.png)
+#### Google
+![Google](https://i.imgur.com/ETd8Jig.png)
+#### OSM (Mapquest)
+![Mapquest](https://i.imgur.com/X0M1Esh.png)
+### Usage
+1. Super Fancy mode:
+- I'd recommend to have Super Fancy mode enabled. It will show all surrounding Stops/Gyms in the static map. To use it, you'll need to have `SUPER_FANCY_STATIC_MAPS` enabled, have a working Imgur Client ID and use mapbox as your `PROVIDER`.
+2. Imgur:
+- Since Super Fancy Static Map URLs are likely to exceed Discord's 2000 character limit, you'll need an Imgur Client ID. I also recommend to turn on `USE_IMGUR_MIRROS_FOR_EVERYTHING` which will also mirror other types of static maps to Imgur. This will help to protect your API keys.
+- To get your Imgur Client ID, go to https://api.imgur.com/oauth2/addclient, sign in, tick `OAuth 2 authorization without a callback URL` and then fill out `Application name:`, `Email:` and `Description:`. It does not matter what you put in. Solve the captcha and click `submit`. Now copy the Client ID.
+3. Keys:
+- Mapbox: Go to https://www.mapbox.com/, click `Start mapping for free`, log in and copy the Key. Limit: 50,000
+- Google: I recommend following https://pa.readthedocs.io/en/master/miscellaneous/location-services.html to enable Google Static Maps
+- Mapquest: Go to https://developer.mapquest.com/, click `Get your Free API Key`, log in and copy the Key. Limit: 15,000/month
+4. Marker Size:
+- This, as well as the color options, are only needed for Google and OSM static Maps
+- For Google Static Map you can put numbers from 0 to 3
+- For OSM Static Map you can put numbers from 1 to 3
 
 ## Config
 | Variable | Description | What to put in |
@@ -50,14 +74,17 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 ### Static Map
 | Variable | Description | What to put in |
 |-|-|-|
-| `ENABLE` | Enable/Disable static maps | True/False |
-| `G_API_KEY` | Your Google API key | API Key |
-| `G_ZOOM` | Zoom for Google Static Maps | Number |
-| `G_RESOLUTION` | Width and height for Google Static Maps | WIDTHxHEIGHT |
-| `G_MARKER_COLOR_STOP` | Pokestop marker color for Google Static Maps | Hex color |
-| `G_MARKER_COLOR_GYM` | Gym marker color for Google Static Maps | Hex color |
-| `G_MARKER_COLOR_PORTAL` | Portal marker color for Google Static Maps | Hex color |
-| `G_MARKER_SIZE` | Marker size for Google Static Maps | tiny/small/mid |
+| `PROVIDER` | What type of Static Map you want. If put `none` Static Maps will be disabled. | mapbox/google/osm/none |
+| `SUPER_FANCY_STATIC_MAPS` | Enable/Disable Super Fancy Static Maps | True/False |
+| `USE_IMGUR_MIRROS_FOR_EVERYTHING` | Enable/Disable Imgur mirroring to all types of Static Maps | True/False |
+| `IMGUR_CLIENT_ID` | Your Imgur Client ID | Imgur Client ID |
+| `KEY` | Your API key for the Static Map service you configured | API Key |
+| `ZOOM` | Zoom for Static Maps | Number |
+| `WIDTH` `HEIGHT` | Width and height for Static Maps | Number |
+| `MARKER_COLOR_STOP` | Pokestop marker color for Google and OSM Static Maps | Hex color |
+| `MARKER_COLOR_GYM` | Gym marker color for Google and OSM Static Maps | Hex color |
+| `MARKER_COLOR_PORTAL` | Portal marker color for Google and OSM Static Maps | Hex color |
+| `MARKER_SIZE` | Marker size for Google and OSM Static Maps | 0-3 |
 
 ### DB
 | Variable | Description | What to put in |
