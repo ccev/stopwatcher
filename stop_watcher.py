@@ -361,6 +361,57 @@ def static_config(config):
     else:
         print("Please choose another marker size.")
 
+def superfancystaticmap(db_poi_lat, db_poi_lon, config):
+    sf_lat_min = db_poi_lat - 0.002000
+    sf_lat_max = db_poi_lat + 0.002000
+    sf_lon_min = db_poi_lon - 0.003000
+    sf_lon_max = db_poi_lon + 0.003000
+
+    static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
+
+    sf_query_stop = QUERY_SF.format(
+        db_dbname=config['db_dbname'],
+        db_table=config['db_stop_table'],
+        db_lat=config['db_stop_lat'],
+        db_lon=config['db_stop_lon'],
+        lat_small=sf_lat_min,
+        lat_big=sf_lat_max,
+        lon_small=sf_lon_min,
+        lon_big=sf_lon_max,
+        sf_lat=db_poi_lat,
+        sf_lon=db_poi_lon
+    )
+    cursor.execute(sf_query_stop)
+    sf_stops = cursor.fetchall()
+
+    for db_stop_lat, db_stop_lon in sf_stops:
+        static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
+
+    sf_query_gym = QUERY_SF.format(
+        db_dbname=config['db_dbname'],
+        db_table=config['db_gym_table'],
+        db_lat=config['db_gym_lat'],
+        db_lon=config['db_gym_lon'],
+        lat_small=sf_lat_min,
+        lat_big=sf_lat_max,
+        lon_small=sf_lon_min,
+        lon_big=sf_lon_max,
+        sf_lat=db_poi_lat,
+        sf_lon=db_poi_lon
+    )
+    cursor.execute(sf_query_gym)
+    sf_gyms = cursor.fetchall()
+
+    for db_gym_lat, db_gym_lon in sf_gyms:
+        static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_gray.png(" + str(db_gym_lon) + "," + str(db_gym_lat) + "),")
+    
+    static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
+    im = pyimgur.Imgur(config['client_id_imgur'])
+    uploaded_image = im.upload_image(url=static_map)
+    static_map = (uploaded_image.link)
+
+    return static_map
+
 def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img, config):
     db_poi_lat = db_portal_lat
     db_poi_lon = db_portal_lon
@@ -444,54 +495,7 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
     if config['static_provider'] == "mapbox":
         if config['static_fancy']:
-            sf_lat_min = db_poi_lat - 0.002000
-            sf_lat_max = db_poi_lat + 0.002000
-            sf_lon_min = db_poi_lon - 0.003000
-            sf_lon_max = db_poi_lon + 0.003000
-
-            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-
-            sf_query_stop = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_stop_table'],
-                db_lat=config['db_stop_lat'],
-                db_lon=config['db_stop_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_stop)
-            sf_stops = cursor.fetchall()
-
-            for db_stop_lat, db_stop_lon in sf_stops:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
-
-            sf_query_gym = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_gym_table'],
-                db_lat=config['db_gym_lat'],
-                db_lon=config['db_gym_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_gym)
-            sf_gyms = cursor.fetchall()
-
-            for db_gym_lat, db_gym_lon in sf_gyms:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_gray.png(" + str(db_gym_lon) + "," + str(db_gym_lat) + "),")
-            
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
-
+            static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     
@@ -534,54 +538,7 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
     if config['static_provider'] == "mapbox":
         if config['static_fancy']:
-            sf_lat_min = db_poi_lat - 0.002000
-            sf_lat_max = db_poi_lat + 0.002000
-            sf_lon_min = db_poi_lon - 0.003000
-            sf_lon_max = db_poi_lon + 0.003000
-
-            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-
-            sf_query_stop = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_stop_table'],
-                db_lat=config['db_stop_lat'],
-                db_lon=config['db_stop_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_stop)
-            sf_stops = cursor.fetchall()
-
-            for db_stop_lat, db_stop_lon in sf_stops:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
-
-            sf_query_gym = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_gym_table'],
-                db_lat=config['db_gym_lat'],
-                db_lon=config['db_gym_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_gym)
-            sf_gyms = cursor.fetchall()
-
-            for db_gym_lat, db_gym_lon in sf_gyms:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_gray.png(" + str(db_gym_lon) + "," + str(db_gym_lat) + "),")
-            
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
-
+            static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     
@@ -617,54 +574,7 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_gym'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
     if config['static_provider'] == "mapbox":
         if config['static_fancy']:
-            sf_lat_min = db_poi_lat - 0.002000
-            sf_lat_max = db_poi_lat + 0.002000
-            sf_lon_min = db_poi_lon - 0.003000
-            sf_lon_max = db_poi_lon + 0.003000
-
-            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-
-            sf_query_stop = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_stop_table'],
-                db_lat=config['db_stop_lat'],
-                db_lon=config['db_stop_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_stop)
-            sf_stops = cursor.fetchall()
-
-            for db_stop_lat, db_stop_lon in sf_stops:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
-
-            sf_query_gym = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_gym_table'],
-                db_lat=config['db_gym_lat'],
-                db_lon=config['db_gym_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_gym)
-            sf_gyms = cursor.fetchall()
-
-            for db_gym_lat, db_gym_lon in sf_gyms:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_gray.png(" + str(db_gym_lon) + "," + str(db_gym_lat) + "),")
-            
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
-
+            static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     
@@ -707,54 +617,7 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_gym'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
     if config['static_provider'] == "mapbox":
         if config['static_fancy']:
-            sf_lat_min = db_poi_lat - 0.002000
-            sf_lat_max = db_poi_lat + 0.002000
-            sf_lon_min = db_poi_lon - 0.003000
-            sf_lon_max = db_poi_lon + 0.003000
-
-            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-
-            sf_query_stop = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_stop_table'],
-                db_lat=config['db_stop_lat'],
-                db_lon=config['db_stop_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_stop)
-            sf_stops = cursor.fetchall()
-
-            for db_stop_lat, db_stop_lon in sf_stops:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
-
-            sf_query_gym = QUERY_SF.format(
-                db_dbname=config['db_dbname'],
-                db_table=config['db_gym_table'],
-                db_lat=config['db_gym_lat'],
-                db_lon=config['db_gym_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
-            )
-            cursor.execute(sf_query_gym)
-            sf_gyms = cursor.fetchall()
-
-            for db_gym_lat, db_gym_lon in sf_gyms:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_gray.png(" + str(db_gym_lon) + "," + str(db_gym_lat) + "),")
-            
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
-
+            static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     
