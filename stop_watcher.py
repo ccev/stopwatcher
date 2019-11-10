@@ -152,6 +152,9 @@ def create_config(config_path):
     config['static_provider'] = config_raw.get(
         'Static Map',
         'PROVIDER')
+    config['imgur_all'] = config_raw.getboolean(
+        'Static Map',
+        'USE_IMGUR_MIRRORS_FOR_EVERYTHING')
     config['static_fancy'] = config_raw.getboolean(
         'Static Map',
         'SUPER_FANCY_STATIC_MAPS')
@@ -407,6 +410,12 @@ def superfancystaticmap(db_poi_lat, db_poi_lon, config):
 
     return static_map
 
+def imgur(static_map, config):
+    im = pyimgur.Imgur(config['client_id_imgur'])
+    uploaded_image = im.upload_image(url=static_map)
+    static_map = (uploaded_image.link)
+    return static_map
+
 def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img, config):
     db_poi_lat = db_portal_lat
     db_poi_lon = db_portal_lon
@@ -444,15 +453,16 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
                 static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_gray.png(" + str(db_portal_lon) + "," + str(db_portal_lat) + "),")
  
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
+            static_map = imgur(static_map, config)
 
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     else:
         static_map = ""  
-     
+
+    if config['imgur_all'] and not config['static_fancy']:
+        static_map = imgur(static_map, config)
+
     data = {
         "username": config['portal_username'],
         "avatar_url": config['portal_img'],
@@ -491,13 +501,14 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
+            static_map = imgur(static_map, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     else:
         static_map = ""  
+
+    if config['imgur_all'] and not config['static_fancy']:
+        static_map = imgur(static_map, config)
 
     data = {
         "username": config['stop_full_username'],
@@ -537,14 +548,15 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
+            static_map = imgur(static_map, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     else:
         static_map = ""  
-     
+
+    if config['imgur_all'] and not config['static_fancy']:
+        static_map = imgur(static_map, config)
+ 
     data = {
         "username": config['stop_unfull_username'],
         "avatar_url": config['stop_img'],
@@ -576,14 +588,15 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
+            static_map = imgur(static_map, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     else:
         static_map = ""  
-     
+    
+    if config['imgur_all'] and not config['static_fancy']:
+        static_map = imgur(static_map, config)
+ 
     data = {
         "username": config['gym_full_username'],
         "avatar_url": config['gym_img'],
@@ -622,14 +635,15 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            im = pyimgur.Imgur(config['client_id_imgur'])
-            uploaded_image = im.upload_image(url=static_map)
-            static_map = (uploaded_image.link)
+            static_map = imgur(static_map, config)
         else:
             static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])  
     else:
         static_map = ""  
-      
+
+    if config['imgur_all'] and not config['static_fancy']:
+        static_map = imgur(static_map, config)
+  
     data = {
         "username": config['gym_unfull_username'],
         "avatar_url": config['gym_img'],
