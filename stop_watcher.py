@@ -709,7 +709,7 @@ def update_stop_portal(cursor, config):
 
                 for db_portal_name, db_portal_img in result_portals:
                     if db_portal_name == None or db_portal_img == None:
-                        print("Tried to update Stop at", db_stop_lat, ",", db_portal_lon, "but Portal has no image or name. Check your DB!")
+                        print("Tried to update Stop at", db_stop_lat, ",", db_stop_lon, "but Portal has no image or name. Check your DB!")
                     else:
                         print("updating stop", db_portal_name)
                         update_stop_query = QUERY_UPDATE.format(
