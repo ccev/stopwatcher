@@ -31,12 +31,13 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 1. Super Fancy mode:
 - I'd recommend to have Super Fancy mode enabled. It will show all surrounding Stops/Gyms in the static map. To use it, you'll need to have `SUPER_FANCY_STATIC_MAPS` enabled, have a working Imgur Client ID and use mapbox as your `PROVIDER`.
 2. Imgur:
-- Since Super Fancy Static Map URLs are likely to exceed Discord's 2000 character limit, you'll need an Imgur Client ID. I also recommend to turn on `USE_IMGUR_MIRRORS_FOR_EVERYTHING` which will also mirror other types of static maps to Imgur. This will help to protect your API keys.
+- Since Super Fancy Static Map URLs are likely to exceed Discord's 2000 character limit, you'll need an Imgur Client ID. I also recommend to turn on `USE_IMGUR_MIRRORS_FOR_EVERYTHING` which will also mirror other types of static maps to Imgur. This will help to protect your API keys and prevents possibly reaching the 2000 character limit.
 - To get your Imgur Client ID, go to https://api.imgur.com/oauth2/addclient, sign in, tick `OAuth 2 authorization without a callback URL` and then fill out `Application name:`, `Email:` and `Description:`. It does not matter what you put in. Solve the captcha and click `submit`. Now copy the Client ID.
-3. Keys:
+3. Providers:
 - Mapbox: Go to https://www.mapbox.com/, click `Start mapping for free`, log in and copy the Key. Limit: 50,000
 - Google: I recommend following https://pa.readthedocs.io/en/master/miscellaneous/location-services.html to enable Google Static Maps
 - Mapquest: Go to https://developer.mapquest.com/, click `Get your Free API Key`, log in and copy the Key. Limit: 15,000/month
+- tileserver-gl: https://github.com/123FLO321/SwiftTileserverCache
 4. Marker Size:
 - This, as well as the color options, are only needed for Google and OSM static Maps
 - For Google Static Map you can put numbers from 0 to 3
@@ -74,17 +75,18 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 ### Static Map
 | Variable | Description | What to put in |
 |-|-|-|
-| `PROVIDER` | What type of Static Map you want. If put `none` Static Maps will be disabled. | mapbox/google/osm/none |
+| `PROVIDER` | What type of Static Map you want. If put `none` Static Maps will be disabled. | mapbox/tileserver-gl/google/osm/none |
 | `SUPER_FANCY_STATIC_MAPS` | Enable/Disable Super Fancy Static Maps | True/False |
-| `USE_IMGUR_MIRRORS_FOR_EVERYTHING` | Enable/Disable Imgur mirroring to all types of Static Maps | True/False |
-| `IMGUR_CLIENT_ID` | Your Imgur Client ID | Imgur Client ID |
 | `KEY` | Your API key for the Static Map service you configured | API Key |
 | `ZOOM` | Zoom for Static Maps | Number |
 | `WIDTH` `HEIGHT` | Width and height for Static Maps | Number |
+| `USE_IMGUR_MIRRORS_FOR_EVERYTHING` | Enable/Disable Imgur mirroring to all types of Static Maps | True/False |
+| `IMGUR_CLIENT_ID` | Your Imgur Client ID | Imgur Client ID |
 | `MARKER_COLOR_STOP` | Pokestop marker color for Google and OSM Static Maps | Hex color |
 | `MARKER_COLOR_GYM` | Gym marker color for Google and OSM Static Maps | Hex color |
 | `MARKER_COLOR_PORTAL` | Portal marker color for Google and OSM Static Maps | Hex color |
 | `MARKER_SIZE` | Marker size for Google and OSM Static Maps | 0-3 |
+| `TILESERVER_URL` | The URL of your self hosted tileserver (only needed for `tileserver-gl`) | URL |
 
 ### DB
 | Variable | Description | What to put in |
