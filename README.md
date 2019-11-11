@@ -12,7 +12,7 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 - Both `stop_watcher.py` and `init.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
 
 ## Usage
-1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher`, `pip[3[.6]] install -r requirements.py`, then copy and rename `default.ini.example` to `default.ini` and configure everything. Refer to the table below if you're not sure about specific variables. 
+1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher`, `pip[3[.6]] install -r requirements.txt`, then copy and rename `default.ini.example` to `default.ini` and configure everything. Refer to the table below if you're not sure about specific variables. 
 2. IMPORTANT: Before you even touch `stop_watcher.py`, run `init.py` once! This will fill in the cache files with all stops/gyms/portals in your database.
 3. After configuring `default.ini` and running `init.py` you can start the main script using `python[3[.6]] stop_watcher.py`
 4. Set up [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) and have it running every few hours to get working webhooks for new portals
