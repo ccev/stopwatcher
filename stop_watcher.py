@@ -185,6 +185,9 @@ def create_config(config_path):
     config['static_marker_color_portal'] = config_raw.get(
         'Static Map',
         'MARKER_COLOR_PORTAL')
+    config['static_selfhosted_url'] = config_raw.get(
+        'Static Map',
+        'TILESERVER_URL')
     ### DATABASE
     config['db_scan_schema'] = config_raw.get(
         'DB',
@@ -425,6 +428,8 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_portal'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
     elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_portal'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
+    elif config['static_provider'] == "tileserver-gl":
+        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             sf_lat_min = db_poi_lat - 0.002000
@@ -497,6 +502,8 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
     elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
+    elif config['static_provider'] == "tileserver-gl":
+        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")    
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
@@ -544,6 +551,8 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
     elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
+    elif config['static_provider'] == "tileserver-gl":
+        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
@@ -584,6 +593,8 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_gym'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
     elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_gym'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
+    elif config['static_provider'] == "tileserver-gl":
+        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
@@ -631,6 +642,8 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_gym'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
     elif config['static_provider'] == "osm":
         static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_gym'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
+    elif config['static_provider'] == "tileserver-gl":
+        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)

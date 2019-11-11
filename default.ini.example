@@ -38,24 +38,28 @@ PORTAL_COLOR = 12609532
 
 [Static Map]
 PROVIDER = mapbox
-# mapbox/google/osm/none
+# mapbox/tileserver-gl/google/osm/none
 
 SUPER_FANCY_STATIC_MAPS = True
 # only supported for mapbox
-
-USE_IMGUR_MIRRORS_FOR_EVERYTHING = False
-IMGUR_CLIENT_ID = 
 
 KEY = 
 ZOOM = 16
 WIDTH = 500
 HEIGHT = 300
 
+USE_IMGUR_MIRRORS_FOR_EVERYTHING = False
+IMGUR_CLIENT_ID = 
+# needed for super fancy static maps, optional for all other types (highly recommended)
+
 MARKER_COLOR_STOP = 128fed
 MARKER_COLOR_GYM = bac0c5
 MARKER_COLOR_PORTAL = c067fc
-
 MARKER_SIZE = 2
+# needed for google and osm
+
+TILESERVER_URL = https://static.url.com/
+# needed for tileserver-gl
 
 [DB]
 SCANNER_DB = 
