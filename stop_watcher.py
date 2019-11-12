@@ -439,7 +439,7 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
 
             static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
 
-            sf_query_stop = QUERY_SF.format(
+            sf_query_portal = QUERY_SF.format(
                 db_dbname=config['db_portal_dbname'],
                 db_table=config['db_portal_table'],
                 db_lat=config['db_portal_lat'],
@@ -451,10 +451,10 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
                 sf_lat=db_poi_lat,
                 sf_lon=db_poi_lon
             )
-            cursor.execute(sf_query_stop)
-            sf_stops = cursor.fetchall()
+            cursor.execute(sf_query_portal)
+            sf_portals = cursor.fetchall()
 
-            for db_stop_lat, db_stop_lon in sf_stops:
+            for db_portal_lat, db_portal_lon in sf_portals:
                 static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_gray.png(" + str(db_portal_lon) + "," + str(db_portal_lat) + "),")
  
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
