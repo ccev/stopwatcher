@@ -775,7 +775,7 @@ def check_stops(cursor, config):
                 if not db_stop_id in get_stops_unfull():
 
                     print("sending unfull stop: ", db_stop_id)
-                    send_webhook_stop_unfull(result_stops, config)
+                    send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config)
                     time.sleep(1)
             else:
                 if not db_stop_id in get_stops_full():
