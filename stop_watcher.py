@@ -422,7 +422,7 @@ def imgur(static_map, config):
 def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img, config):
     db_poi_lat = db_portal_lat
     db_poi_lon = db_portal_lon
-    navigation = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={db_poi_lat},{db_poi_lon}) | [Intel](https://intel.ingress.com/intel?ll={db_poi_lat},{db_poi_lon}&z=15&pll={db_poi_lat},{db_poi_lon})"
+    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&z=15&pll=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_portal'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
@@ -488,7 +488,7 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
         }]
     }
     result = requests.post(config['webhook_url_portal'], json=data)
-    print(f"Portal Webhook: {result}")
+    print(result)
 
     with open("txt/portals.txt", "a") as f:
         f.write(db_portal_id + "\n")
@@ -579,7 +579,7 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
         }]
     }
     result = requests.post(config['webhook_url_stop'], json=data)
-    print(f"Unfull stop webhook: {result}")
+    print(result)
 
     with open("txt/stop_unfull.txt", "a") as f:
         f.write(db_stop_id + "\n")
@@ -628,7 +628,7 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
         }]
     }
     result = requests.post(config['webhook_url_gym'], json=data)
-    print(f"Full gym webhook: {result}")
+    print(result)
 
     with open("txt/gym_full.txt", "a") as f:
         f.write(db_gym_id + "\n")
@@ -670,7 +670,7 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
         }]
     }
     result = requests.post(config['webhook_url_gym'], json=data)
-    print(f"Unfull gym webhook: {result}")
+    print(result)
 
     with open("txt/gym_unfull.txt", "a") as f:
         f.write(db_gym_id + "\n")
