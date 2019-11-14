@@ -545,7 +545,7 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
 def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
     db_poi_lat = db_stop_lat
     db_poi_lon = db_stop_lon
-    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
+    navigation = ("https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon))
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
@@ -636,7 +636,7 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
 def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
     db_poi_lat = db_gym_lat
     db_poi_lon = db_gym_lon
-    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
+    navigation = ("https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon))
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_gym'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
