@@ -4,18 +4,21 @@
 Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating names/images and deleting Stops that turned into Gyms.
 
 ## Notes
-- This project is brand new, so very little testing has been done.
-- BACKUP YOUR DATABASE just in case - again; very little testing has been done.
-- python3.6 only
-- **DO NOT FORGET TO RUN `init.py` BEFORE RUNNING `stop_watcher.py` FOR THE FIRST TIME**!
-- I recommend having an automated Ingress Scraper running if you enable anything related to portals
-- Both `stop_watcher.py` and `init.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
+- This project is pretty new, so there's a high chance for errors. If you have any questions, feel free to DM me on Discord (Malte#3333)
+- Only tested for python3.6 - no idea if anything is working on other python versions
+- The Script will work perfectly fine if you don't track Portal. I do still recommend to have an extra Portal Scraper Script running.
+- `stop_watcher.py`, `edit_watcher.py` and `init.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
 
 ## Usage
 1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher`, `pip[3[.6]] install -r requirements.txt`, then copy and rename `default.ini.example` to `default.ini` and configure everything. Refer to the table below if you're not sure about specific variables. 
 2. IMPORTANT: Before you even touch `stop_watcher.py`, run `init.py` once! This will fill in the cache files with all stops/gyms/portals in your database.
 3. After configuring `default.ini` and running `init.py` you can start the main script using `python[3[.6]] stop_watcher.py`
 4. Set up [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) and have it running every few hours to get working webhooks for new portals
+
+## Edit Watcher
+There's an additional script in this repo, the `edit_watcher.py`. This will track any changes made to Portal titles, locations and images in your given area and send them to the given Webhook. Note that this only works for Portals.
+
+To enable it, go to the `[Edit Watcher]` part of your config file and fill in `EXTRA_PORTAL_DB_NAME`, `EXTRA_PORTAL_TABLE` and `WEBHOOK_URL`. The first two options are the names for an additional table needed. I recommend to put your manualdb name for `EXTRA_PORTAL_DB_NAME` and `editwatcher_portals` for `EXTRA_PORTAL_TABLE`. The Script will create the table for you. For additional info, please refer to the table below.
 
 ## Static Maps
 ### Examples
@@ -87,6 +90,18 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 | `MARKER_COLOR_PORTAL` | Portal marker color for Google and OSM Static Maps | Hex color |
 | `MARKER_SIZE` | Marker size for Google and OSM Static Maps | 0-3 |
 | `TILESERVER_URL` | The URL of your self hosted tileserver (only needed for `tileserver-gl`) | URL |
+
+### Edit Watcher
+| Variable | Description | What to put in |
+|-|-|-|
+| `ENABLE` | Enable/Disable tracking of Portal edits | True/False |
+| `EXTRA_PORTAL_DB_NAME` | Name of the DB in which your extra Portal table should be in | Text |
+| `EXTRA_PORTAL_TABLE` | The name of your extra Portal table | Text |
+| `WEBHOOK_URL` | The Webhook URL all tracked Edits will be sent to | URL |
+| `USERNAME` | Username used for Portal Edit Discord Webhooks | Text |
+| `IMAGE` | Image used for Portal Edit Discord Webhooks | Link |
+| `LOCATION_EDIT_TITLE` `TITLE_EDIT_TITLE` `IMAGE_EDIT_TITLE` | Can be used to translate your messages. The embed title will always look like this: "`[Portal Name] [Title Config Option]`" | Text |
+| `FROM` `TO` | Can be used to translate your messages. The embed text will always look like this: "`From [Previous info] \n To [New Info]`" | Text |
 
 ### DB
 | Variable | Description | What to put in |
