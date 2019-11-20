@@ -61,6 +61,21 @@ MARKER_SIZE = 2
 TILESERVER_URL = https://static.url.com/
 # needed for tileserver-gl
 
+[Edit Watcher]
+ENABLE = False
+EXTRA_PORTAL_DB_NAME = 
+EXTRA_PORTAL_TABLE = 
+
+WEBHOOK_URL = 
+USERNAME = Portal Edit
+IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png
+
+LOCATION_EDIT_TITLE = was moved
+TITLE_EDIT_TITLE = got another title
+IMAGE_EDIT_TITLE = got another image
+FROM = From
+TO = To
+
 [DB]
 SCANNER_DB = 
 # mad/rdm/none
