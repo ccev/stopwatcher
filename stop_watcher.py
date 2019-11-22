@@ -739,6 +739,7 @@ def update_stop_portal(cursor, config):
                         print("Tried to update Stop at", db_stop_lat, ",", db_stop_lon, "but Portal has no image or name. Check your DB!")
                     else:
                         print("updating stop", db_portal_name)
+                        db_portal_name = db_portal_name.replace("'", "\\'")
                         update_stop_query = QUERY_UPDATE.format(
                             db_dbname=config['db_dbname'],
                             db_table=config['db_stop_table'],
@@ -839,6 +840,7 @@ def update_gyms(cursor, config):
                             print("Tried to update Gym at", db_gym_lat, ",", db_gym_lon, "using Portal info, but Portal has no image or name. Check your DB!")
                         else:
                             print("updating gym", db_portal_name, "with portal info")
+                            db_portal_name = db_portal_name.replace("'", "\\'")
                             update_gym_query = QUERY_UPDATE.format(
                                 db_dbname=config['db_dbname'],
                                 db_table=config['db_gymdetails_table'],
@@ -885,6 +887,7 @@ def update_gyms(cursor, config):
                             print("Tried to update Gym at", db_gym_lat, ",", db_gym_lon, "using Stop info, but Stop has no image or name. Check your DB!")
                         else:
                             print("updating gym", db_stop_name, "with stop info")
+                            db_stop_name = db_stop_name.replace("'", "\\'")
                             update_gym_query = QUERY_UPDATE.format(
                                 db_dbname=config['db_dbname'],
                                 db_table=config['db_gymdetails_table'],
