@@ -52,6 +52,9 @@ USE_IMGUR_MIRRORS_FOR_EVERYTHING = False
 IMGUR_CLIENT_ID = 
 # needed for super fancy static maps, optional for all other types (highly recommended)
 
+MARKER_LIMIT = 30
+# needed for Super Fancy Static Maps. Please refer to the readme.
+
 MARKER_COLOR_STOP = 128fed
 MARKER_COLOR_GYM = bac0c5
 MARKER_COLOR_PORTAL = c067fc

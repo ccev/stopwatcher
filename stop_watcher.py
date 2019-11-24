@@ -49,15 +49,24 @@ WHERE (
     {db_stop_lat} = {lat} AND {db_stop_lon} = {lon}
 )
 """
-QUERY_SF = """SELECT {db_lat}, {db_lon} FROM {db_dbname}.{db_table}
-WHERE (
-    {db_lon} != {sf_lon} AND {db_lat} != {sf_lat}
-  AND
-    {db_lat} >= {lat_small} AND {db_lat} <= {lat_big}
-  AND
-    {db_lon} >= {lon_small} AND {db_lon} <= {lon_big}
-)
-ORDER BY {db_lat} DESC
+QUERY_SF = """(SELECT {db_lat}, {db_lon},
+  POW(69.1 * ({db_lat} - {sf_lat}), 2) + POW(69.1 * ({sf_lon} - {db_lon}) * COS({db_lat} / 57.3), 2) AS distance
+  FROM {db_dbname}.{db_table_1}
+  WHERE {db_lat} != {sf_lat} AND {db_lon} != {sf_lon})
+UNION
+  (SELECT {db_lat}, {db_lon},
+  POW(69.1 * ({db_lat} - {sf_lat}), 2) + POW(69.1 * ({sf_lon} - {db_lon}) * COS({db_lat} / 57.3), 2) AS distance
+  FROM {db_dbname}.{db_table_2}
+  WHERE {db_lat} != {sf_lat} AND {db_lon} != {sf_lon})
+ORDER BY distance ASC
+LIMIT {limit}
+"""
+QUERY_SF_PORTAL = """SELECT {db_lat}, {db_lon},
+  POW(69.1 * ({db_lat} - {sf_lat}), 2) + POW(69.1 * ({sf_lon} - {db_lon}) * COS({db_lat} / 57.3), 2) AS distance
+FROM {db_dbname}.{db_table}
+WHERE {db_lat} != {sf_lat} AND {db_lon} != {sf_lon}
+ORDER BY distance ASC
+LIMIT {limit}
 """
 
 def create_config(config_path):
@@ -161,6 +170,9 @@ def create_config(config_path):
     config['client_id_imgur'] = config_raw.get(
         'Static Map',
         'IMGUR_CLIENT_ID')
+    config['marker_limit'] = config_raw.getint(
+        'Static Map',
+        'MARKER_LIMIT')
     config['static_key'] = config_raw.get(
         'Static Map',
         'KEY')
@@ -368,48 +380,25 @@ def static_config(config):
         print("Please choose another marker size.")
 
 def superfancystaticmap(db_poi_lat, db_poi_lon, config):
-    sf_lat_min = db_poi_lat - 0.002000
-    sf_lat_max = db_poi_lat + 0.002000
-    sf_lon_min = db_poi_lon - 0.003000
-    sf_lon_max = db_poi_lon + 0.003000
-
     static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
 
-    sf_query_stop = QUERY_SF.format(
+    marker_limit = config['marker_limit'] - 1
+
+    sf_query = QUERY_SF.format(
         db_dbname=config['db_dbname'],
-        db_table=config['db_stop_table'],
+        db_table_1=config['db_stop_table'],
+        db_table_2=config['db_gym_table'],
         db_lat=config['db_stop_lat'],
         db_lon=config['db_stop_lon'],
-        lat_small=sf_lat_min,
-        lat_big=sf_lat_max,
-        lon_small=sf_lon_min,
-        lon_big=sf_lon_max,
         sf_lat=db_poi_lat,
-        sf_lon=db_poi_lon
+        sf_lon=db_poi_lon,
+        limit=marker_limit
     )
-    cursor.execute(sf_query_stop)
-    sf_stops = cursor.fetchall()
+    cursor.execute(sf_query)
+    results_sf = cursor.fetchall()
 
-    for db_stop_lat, db_stop_lon in sf_stops:
+    for db_stop_lat, db_stop_lon, distance in results_sf:
         static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
-
-    sf_query_gym = QUERY_SF.format(
-        db_dbname=config['db_dbname'],
-        db_table=config['db_gym_table'],
-        db_lat=config['db_gym_lat'],
-        db_lon=config['db_gym_lon'],
-        lat_small=sf_lat_min,
-        lat_big=sf_lat_max,
-        lon_small=sf_lon_min,
-        lon_big=sf_lon_max,
-        sf_lat=db_poi_lat,
-        sf_lon=db_poi_lon
-    )
-    cursor.execute(sf_query_gym)
-    sf_gyms = cursor.fetchall()
-
-    for db_gym_lat, db_gym_lon in sf_gyms:
-        static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fgym_gray.png(" + str(db_gym_lon) + "," + str(db_gym_lat) + "),")
 
     return static_map
 
@@ -432,29 +421,23 @@ def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_na
         static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
-            sf_lat_min = db_poi_lat - 0.002000
-            sf_lat_max = db_poi_lat + 0.002000
-            sf_lon_min = db_poi_lon - 0.003000
-            sf_lon_max = db_poi_lon + 0.003000
-
             static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
 
-            sf_query_portal = QUERY_SF.format(
+            marker_limit = config['marker_limit'] - 1
+
+            sf_query_portal = QUERY_SF_PORTAL.format(
                 db_dbname=config['db_portal_dbname'],
                 db_table=config['db_portal_table'],
                 db_lat=config['db_portal_lat'],
                 db_lon=config['db_portal_lon'],
-                lat_small=sf_lat_min,
-                lat_big=sf_lat_max,
-                lon_small=sf_lon_min,
-                lon_big=sf_lon_max,
                 sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon
+                sf_lon=db_poi_lon,
+                limit=marker_limit
             )
             cursor.execute(sf_query_portal)
             sf_portals = cursor.fetchall()
 
-            for db_portal_lat, db_portal_lon in sf_portals:
+            for db_portal_lat, db_portal_lon, distance in sf_portals:
                 static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_gray.png(" + str(db_portal_lon) + "," + str(db_portal_lat) + "),")
  
             static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
