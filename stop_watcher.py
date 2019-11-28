@@ -50,11 +50,13 @@ WHERE (
 )
 """
 QUERY_SF = """(SELECT {db_lat}, {db_lon},
+  "stop" AS type,
   POW(69.1 * ({db_lat} - {sf_lat}), 2) + POW(69.1 * ({sf_lon} - {db_lon}) * COS({db_lat} / 57.3), 2) AS distance
   FROM {db_dbname}.{db_table_1}
   WHERE {db_lat} != {sf_lat} AND {db_lon} != {sf_lon})
 UNION
   (SELECT {db_lat}, {db_lon},
+  "gym" AS type,
   POW(69.1 * ({db_lat} - {sf_lat}), 2) + POW(69.1 * ({sf_lon} - {db_lon}) * COS({db_lat} / 57.3), 2) AS distance
   FROM {db_dbname}.{db_table_2}
   WHERE {db_lat} != {sf_lat} AND {db_lon} != {sf_lon})
@@ -397,8 +399,8 @@ def superfancystaticmap(db_poi_lat, db_poi_lon, config):
     cursor.execute(sf_query)
     results_sf = cursor.fetchall()
 
-    for db_stop_lat, db_stop_lon, distance in results_sf:
-        static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
+    for db_stop_lat, db_stop_lon, type, distance in results_sf:
+        static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + type + "_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
 
     return static_map
 
