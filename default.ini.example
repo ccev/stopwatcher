@@ -48,6 +48,9 @@ ZOOM = 16
 WIDTH = 500
 HEIGHT = 300
 
+USE_GEOCODING = False
+LANGUAGE = en
+
 USE_IMGUR_MIRRORS_FOR_EVERYTHING = False
 IMGUR_CLIENT_ID = 
 # needed for super fancy static maps, optional for all other types (highly recommended)
