@@ -417,7 +417,7 @@ def imgur(static_map, config):
     static_map = (uploaded_image.link)
     return static_map
 
-def generate_static_maps(db_poi_lat, db_poi_lon, config):
+def generate_static_maps(poitype, db_poi_lat, db_poi_lon, config):
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
     elif config['static_provider'] == "osm":
@@ -427,10 +427,10 @@ def generate_static_maps(db_poi_lat, db_poi_lon, config):
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
             static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
+            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + (poitype) + "_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
             static_map = imgur(static_map, config)
         else:
-            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
+            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + (poitype) + "_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     else:
         static_map = ""  
 
@@ -529,8 +529,9 @@ def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, d
     db_poi_lat = db_stop_lat
     db_poi_lon = db_stop_lon
     navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
+    poitype = "stop"
 
-    static_map = generate_static_maps(db_poi_lat, db_poi_lon, config)
+    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
     address = generate_address(db_poi_lat, db_poi_lon, config)
 
     text = (navigation + "\n" + address)
@@ -564,8 +565,9 @@ def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
     db_poi_lat = db_stop_lat
     db_poi_lon = db_stop_lon
     navigation = ("https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon))
+    poitype = "stop"
 
-    static_map = generate_static_maps(db_poi_lat, db_poi_lon, config)
+    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
  
     data = {
         "username": config['stop_unfull_username'],
@@ -589,8 +591,9 @@ def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym
     db_poi_lat = db_gym_lat
     db_poi_lon = db_gym_lon
     navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
+    poitype = "gym"
 
-    static_map = generate_static_maps(db_poi_lat, db_poi_lon, config)
+    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
     address = generate_address(db_poi_lat, db_poi_lon, config)
     text = (navigation + "\n" + address)
  
@@ -623,8 +626,9 @@ def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
     db_poi_lat = db_gym_lat
     db_poi_lon = db_gym_lon
     navigation = ("https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon))
+    poitype = "gym"
 
-    static_map = generate_static_maps(db_poi_lat, db_poi_lon, config)
+    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
   
     data = {
         "username": config['gym_unfull_username'],
