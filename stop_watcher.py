@@ -460,7 +460,7 @@ def generate_address(db_poi_lat, db_poi_lon, config):
 def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img, config):
     db_poi_lat = db_portal_lat
     db_poi_lon = db_portal_lon
-    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&z=15&pll=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
+    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&z=22&pll=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
 
     if config['static_provider'] == "google":
         static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_portal'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
