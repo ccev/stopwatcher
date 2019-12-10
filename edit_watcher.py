@@ -26,7 +26,18 @@ WHERE (
     {db_id} = '{db_extra_id}'
 )
 """
+QUERY_CHECK_DELETED = """SELECT {db_name}, {db_img}, {db_id} FROM {db_dbname}.{db_table}
+WHERE {db_updated} < UNIX_TIMESTAMP() - {limit}
+AND
+(
+    {db_lat} >= {lat_small} AND {db_lat} <= {lat_big}
+  AND
+    {db_lon} >= {lon_small} AND {db_lon} <= {lon_big}
+)
+"""
 QUERY_EXIST_TABLE = """SHOW TABLES LIKE '{db_extra_table}'
+"""
+QUERY_CHECK_UPDATE = """select *, count(external_id) from ingress_portals where updated < UNIX_TIMESTAMP() - 86400; 
 """
 
 def create_config(config_path):
@@ -62,12 +73,21 @@ def create_config(config_path):
     config['embed_image_title'] = config_raw.get(
         'Edit Watcher',
         'IMAGE_EDIT_TITLE')
+    config['embed_deleted_title'] = config_raw.get(
+        'Edit Watcher',
+        'DELETED_TITLE')
     config['embed_from'] = config_raw.get(
         'Edit Watcher',
         'FROM')
     config['embed_to'] = config_raw.get(
         'Edit Watcher',
         'TO')
+    config['deleted_maxcount'] = config_raw.getint(
+        'Edit Watcher',
+        'DELETED_LIMIT')
+    config['deleted_maxtime'] = config_raw.get(
+        'Edit Watcher',
+        'DELETED_TIMESPAN')
 
     config['lat_small'] = config_raw.getfloat(
         'Config',
@@ -121,6 +141,9 @@ def create_config(config_path):
     config['db_portal_img'] = config_raw.get(
         'DB',
         'PORTAL_IMAGE')
+    config['db_portal_updated'] = config_raw.get(
+        'DB',
+        'PORTAL_UPDATED')
 
     return config
 
@@ -145,6 +168,7 @@ def db_config(config):
         config['db_portal_lon'] = "lon"
         config['db_portal_name'] = "name"
         config['db_portal_img'] = "url"
+        config['db_portal_updated'] = "updated"
 
     config['db_extra_id'] = config['db_portal_id']
     config['db_extra_lat'] = config['db_portal_lat']
@@ -152,8 +176,11 @@ def db_config(config):
     config['db_extra_name'] = config['db_portal_name']
     config['db_extra_img'] = config['db_portal_img']
 
+def get_deleted():
+    return open("txt/deleted.txt", "r").read().splitlines()
+
 def send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, db_portal_lon, db_extra_lat, db_extra_lon):
-    embed_desc = (config['embed_from'] + " `" + str(db_extra_lat) + "," + str(db_extra_lon) + "`\n" + config['embed_to'] + " `" + str(db_portal_lat) + "," + str(db_portal_lon) + "`")
+    embed_desc = (config['embed_from'] + " `" + str(db_extra_lat) + "," + str(db_extra_lon) + "`\n" + config['embed_to'] + " `" + str(db_portal_lat) + "," + str(db_portal_lon) + "`\n\n[Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
     embed_title = (db_portal_name + " " + config['embed_location_title'])
     data = {
         "username": config['embed_username'],
@@ -169,8 +196,8 @@ def send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, 
     result = requests.post(config['webhook'], json=data)
     print(result)
 
-def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name):
-    embed_desc = (config['embed_from'] + " `" + db_extra_name + "`\n" + config['embed_to'] + " `" + db_portal_name + "`")
+def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name, db_portal_lat, db_portal_lon):
+    embed_desc = (config['embed_from'] + " `" + db_extra_name + "`\n" + config['embed_to'] + " `" + db_portal_name + "`\n\n[Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
     embed_title = (db_extra_name + " " + config['embed_title_title'])
     data = {
         "username": config['embed_username'],
@@ -186,8 +213,8 @@ def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name):
     result = requests.post(config['webhook'], json=data)
     print(result)
 
-def send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img):
-    embed_desc = (config['embed_from'] + " [Link](" + db_extra_img + ")\n" + config['embed_to'] + " [Link](" + db_portal_img + ")")
+def send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img, db_portal_lat, db_portal_lon):
+    embed_desc = (config['embed_from'] + " [Link](" + db_extra_img + ")\n" + config['embed_to'] + " [Link](" + db_portal_img + ")\n\n[Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
     embed_title = (db_portal_name + " " + config['embed_image_title'])
     data = {
         "username": config['embed_username'],
@@ -259,10 +286,55 @@ def check_edits(config):
                 send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, db_portal_lon, db_extra_lat, db_extra_lon)
             if not db_extra_name == db_portal_name:
                 print(db_portal_name + " got another name. Sending a Webhook for it.")
-                send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name)
+                send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name, db_portal_lat, db_portal_lon)
             if not db_extra_img == db_portal_img:
                 print(db_portal_name + " got another image. Sending a Webhook for it.")
-                send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img)
+                send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img, db_portal_lat, db_portal_lon)
+
+    check_deleted_query = QUERY_CHECK_DELETED.format(
+        db_lat=config['db_portal_lat'],
+        db_lon=config['db_portal_lon'],
+        db_img=config['db_portal_img'],
+        db_id=config['db_portal_id'],
+        db_updated=config['db_portal_updated'],
+        db_name=config['db_portal_name'],
+        limit=config['deleted_maxtime'],
+        db_dbname=config['db_portal_dbname'],
+        db_table=config['db_portal_table'],
+        lat_small=config['lat_small'],
+        lat_big=config['lat_big'],
+        lon_small=config['lon_small'],
+        lon_big=config['lon_big']
+    )
+    cursor.execute(check_deleted_query)
+    result_deleted = cursor.fetchall()
+
+    if len(result_deleted) <= config['deleted_maxcount']:
+        for db_portal_name, db_portal_img, db_portal_id in result_deleted:
+            if not db_portal_id in get_deleted():
+                print("Found possible deleted Portal: " + db_portal_name)
+                embed_desc = ("[Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22)")
+                embed_title = (db_portal_name + " " + config['embed_deleted_title'])
+                data = {
+                    "username": config['embed_username'],
+                    "avatar_url": config['embed_image'],
+                    "embeds": [{
+                        "title": embed_title,
+                        "description": embed_desc,
+                        "thumbnail": {
+                            "url": db_portal_img
+                        },
+                    }]
+                }
+                result = requests.post(config['webhook'], json=data)
+                print(result)
+                with open("txt/deleted.txt", "a") as f:
+                    f.write(db_portal_id + "\n")
+    else:
+        print("Found " + str(len(result_deleted)) + " possible deleted Portals. Not going to send Webhooks for that. Please review your Scraper Cookie, Configs and Database!")
+        print("Portal ID   |   Portal Name")
+        for db_portal_name, db_portal_img, db_portal_id in result_deleted:
+            print(db_portal_id + "   |   " + db_portal_name)
 
     query_extra_drop = QUERY_DROP.format(
         db_extra_dbname=config['db_extra_dbname'],

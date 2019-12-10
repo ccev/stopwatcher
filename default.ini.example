@@ -76,9 +76,14 @@ WEBHOOK_URL =
 USERNAME = Portal Edit
 IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png
 
+DELETED_TIMESPAN = 86400
+# in seconds
+DELETED_LIMIT = 10
+
 LOCATION_EDIT_TITLE = was moved
 TITLE_EDIT_TITLE = got another title
 IMAGE_EDIT_TITLE = got another image
+DELETED_TITLE = (probably) got deleted
 FROM = From
 TO = To
 
@@ -120,3 +125,4 @@ PORTAL_LAT =
 PORTAL_LON = 
 PORTAL_NAME = 
 PORTAL_IMAGE = 
+PORTAL_UPDATED = 
