@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import time
+import json
 import requests
 import argparse
 import init
@@ -388,49 +389,62 @@ def static_config(config):
     else:
         print("Please choose another marker size.")
 
-def superfancystaticmap(db_poi_lat, db_poi_lon, config):
-    static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-
-    marker_limit = config['marker_limit'] - 1
-
-    sf_query = QUERY_SF.format(
-        db_dbname=config['db_dbname'],
-        db_table_1=config['db_stop_table'],
-        db_table_2=config['db_gym_table'],
-        db_lat=config['db_stop_lat'],
-        db_lon=config['db_stop_lon'],
-        sf_lat=db_poi_lat,
-        sf_lon=db_poi_lon,
-        limit=marker_limit
-    )
-    cursor.execute(sf_query)
-    results_sf = cursor.fetchall()
-
-    for db_stop_lat, db_stop_lon, type, distance in results_sf:
-        static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + type + "_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
-
-    return static_map
-
 def imgur(static_map, config):
     im = pyimgur.Imgur(config['client_id_imgur'])
     uploaded_image = im.upload_image(url=static_map)
     static_map = (uploaded_image.link)
     return static_map
 
-def generate_static_maps(poitype, db_poi_lat, db_poi_lon, config):
+def generate_static_map(poitype, lat, lon, config):
     if config['static_provider'] == "google":
-        static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
+        static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(lat) + "," + str(lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_stop'] + "%7Clabel:%7C" + str(lat) + "," + str(lon))
     elif config['static_provider'] == "osm":
-        static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
+        static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(lat) + "," + str(lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_stop'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
     elif config['static_provider'] == "tileserver-gl":
-        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")    
+        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(lat) + "/" + str(lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(lat) + "%2C%22longitude%22%3A%20" + str(lon) + "%7D%5D")    
     elif config['static_provider'] == "mapbox":
         if config['static_fancy']:
-            static_map = superfancystaticmap(db_poi_lat, db_poi_lon, config)
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + (poitype) + "_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
+            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
+
+            marker_limit = config['marker_limit'] - 1
+
+            if poitype == "portal":
+                sf_query_portal = QUERY_SF_PORTAL.format(
+                    db_dbname=config['db_portal_dbname'],
+                    db_table=config['db_portal_table'],
+                    db_lat=config['db_portal_lat'],
+                    db_lon=config['db_portal_lon'],
+                    sf_lat=lat,
+                    sf_lon=lon,
+                    limit=marker_limit
+                )
+                cursor.execute(sf_query_portal)
+                sf_portals = cursor.fetchall()
+
+                for db_portal_lat, db_portal_lon, distance in sf_portals:
+                    static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_gray.png(" + str(db_portal_lon) + "," + str(db_portal_lat) + "),")
+    
+            else:
+                sf_query = QUERY_SF.format(
+                    db_dbname=config['db_dbname'],
+                    db_table_1=config['db_stop_table'],
+                    db_table_2=config['db_gym_table'],
+                    db_lat=config['db_stop_lat'],
+                    db_lon=config['db_stop_lon'],
+                    sf_lat=lat,
+                    sf_lon=lon,
+                    limit=marker_limit
+                )
+                cursor.execute(sf_query)
+                results_sf = cursor.fetchall()
+
+                for db_stop_lat, db_stop_lon, type, distance in results_sf:
+                    static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + type + "_gray.png(" + str(db_stop_lon) + "," + str(db_stop_lat) + "),")
+
+            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + poitype + "_normal.png(" + str(lon) + "," + str(lat) + ")/" + str(lon) + "," + str(lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
             static_map = imgur(static_map, config)
         else:
-            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + (poitype) + "_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
+            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2F" + (poitype) + "_normal.png(" + str(lon) + "," + str(lat) + ")/" + str(lon) + "," + str(lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
     else:
         static_map = ""  
 
@@ -439,7 +453,9 @@ def generate_static_maps(poitype, db_poi_lat, db_poi_lon, config):
 
     return static_map
 
-def generate_address(db_poi_lat, db_poi_lon, config):
+def generate_text(lat, lon, config):
+    text = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(lat) + "," + str(lon) + ")")
+
     if config['geocoding']:
         if config['static_provider'] == "google":
             geocode = geocoder.google([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
@@ -450,203 +466,55 @@ def generate_address(db_poi_lat, db_poi_lon, config):
         else:
             address = ""  
 
-        address = geocode.address
+        text = (navigation + "\n" + geocode.address)
 
-    else:
-        address= ""
+    return text
 
-    return address
-
-def send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img, config):
-    db_poi_lat = db_portal_lat
-    db_poi_lon = db_portal_lon
-    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&z=22&pll=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
-
-    if config['static_provider'] == "google":
-        static_map = ("https://maps.googleapis.com/maps/api/staticmap?center=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&zoom=" + str(config['static_zoom']) + "&scale=1&size=" + str(config['static_width']) + "x" + str(config['static_height']) + "&maptype=roadmap&key=" + config['static_key'] + "&format=png&visual_refresh=true&markers=size:" + config['static_marker_size'] + "%7Ccolor:0x" + config['static_marker_color_portal'] + "%7Clabel:%7C" + str(db_poi_lat) + "," + str(db_poi_lon))
-    elif config['static_provider'] == "osm":
-        static_map = ("https://www.mapquestapi.com/staticmap/v5/map?locations=" + str(db_poi_lat) + "," + str(db_poi_lon) + "&size=" + str(config['static_width']) + "," + str(config['static_height']) + "&defaultMarker=marker-" + str(config['static_marker_size']) + "-" + config['static_marker_color_portal'] + "&zoom=" + str(config['static_zoom']) + "&key=" + config['static_key'])
-    elif config['static_provider'] == "tileserver-gl":
-        static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(db_poi_lat) + "/" + str(db_poi_lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(db_poi_lat) + "%2C%22longitude%22%3A%20" + str(db_poi_lon) + "%7D%5D")
-    elif config['static_provider'] == "mapbox":
-        if config['static_fancy']:
-            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-
-            marker_limit = config['marker_limit'] - 1
-
-            sf_query_portal = QUERY_SF_PORTAL.format(
-                db_dbname=config['db_portal_dbname'],
-                db_table=config['db_portal_table'],
-                db_lat=config['db_portal_lat'],
-                db_lon=config['db_portal_lon'],
-                sf_lat=db_poi_lat,
-                sf_lon=db_poi_lon,
-                limit=marker_limit
-            )
-            cursor.execute(sf_query_portal)
-            sf_portals = cursor.fetchall()
-
-            for db_portal_lat, db_portal_lon, distance in sf_portals:
-                static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_gray.png(" + str(db_portal_lon) + "," + str(db_portal_lat) + "),")
- 
-            static_map = static_map + ("url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-            static_map = imgur(static_map, config)
-
-        else:
-            static_map = ("https://api.mapbox.com/styles/v1/mapbox/streets-v11/static/url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fportal_normal.png(" + str(db_poi_lon) + "," + str(db_poi_lat) + ")/" + str(db_poi_lon) + "," + str(db_poi_lat) + "," + str(config['static_zoom']) + "/" + str(config['static_width']) + "x" + str(config['static_height']) + "?access_token=" + config['static_key'])
-    else:
-        static_map = ""  
-
-    if config['imgur_all'] and not config['static_fancy']:
-        static_map = imgur(static_map, config)
+def send_webhook_full(lat, lon, type, username, avatar, color, name, image, webhook, config):
+    # send_webhook(db_stop_lat, db_stop_lon, "stop", config['stop_full_username'], config['stop_img'], config['embed_stop_color'], db_stop_name, db_stop_img, config["webhook_url_stop"], config)
+    static_map = generate_static_map(type, lat, lon, config)
+    text = generate_text(lat, lon, config)
 
     data = {
-        "username": config['portal_username'],
-        "avatar_url": config['portal_img'],
+        "username": username,
+        "avatar_url": avatar,
         "embeds": [{
-            "color": config['embed_portal_color'],
+            "title": name,
+            "description": text,
+            "color": color,
             "thumbnail": {
-                "url": db_portal_img
+                "url": image
             },
-            "image": {
-                "url": static_map
-            },
-            "fields": [
-                {
-                "name": db_portal_name,
-                "value": navigation
-                }
-            ]
-        }]
-    }
-    result = requests.post(config['webhook_url_portal'], json=data)
-    print(result)
-
-    with open("txt/portals.txt", "a") as f:
-        f.write(db_portal_id + "\n")
-
-def send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, db_stop_img, config):
-    db_poi_lat = db_stop_lat
-    db_poi_lon = db_stop_lon
-    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
-    poitype = "stop"
-
-    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
-    address = generate_address(db_poi_lat, db_poi_lon, config)
-
-    text = (navigation + "\n" + address)
-
-    data = {
-        "username": config['stop_full_username'],
-        "avatar_url": config['stop_img'],
-        "embeds": [{
-            "color": config['embed_stop_color'],
-            "thumbnail": {
-                "url": db_stop_img
-            },
-            "image": {
-                "url": static_map
-            },
-            "fields": [
-                {
-                "name": db_stop_name,
-                "value": text
-                }
-            ]
-        }]
-    }
-    result = requests.post(config['webhook_url_stop'], json=data)
-    print(result)
-
-    with open("txt/stop_full.txt", "a") as f:
-        f.write(db_stop_id + "\n")
-
-def send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config):
-    db_poi_lat = db_stop_lat
-    db_poi_lon = db_stop_lon
-    navigation = ("https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon))
-    poitype = "stop"
-
-    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
- 
-    data = {
-        "username": config['stop_unfull_username'],
-        "avatar_url": config['stop_img'],
-        "embeds": [{
-            "title": "Google Maps",
-            "url": navigation,
-            "color": config['embed_stop_color'],
             "image": {
                 "url": static_map
             }
         }]
     }
-    result = requests.post(config['webhook_url_stop'], json=data)
-    print(result)
+    webhooks = json.loads(webhook)
+    for webhook in webhooks:
+        result = requests.post(webhook, json=data)
+        print(result)
 
-    with open("txt/stop_unfull.txt", "a") as f:
-        f.write(db_stop_id + "\n")
+def send_webhook_unfull(lat, lon, type, username, avatar, color, webhook, config):
+    # send_webhook(db_stop_lat, db_stop_lon, "stop", config['stop_unfull_username'], config['stop_img'], config['embed_stop_color'], config["webhook_url_stop"], config)
+    static_map = generate_static_map(type, lat, lon, config)
+    text = generate_text(lat, lon, config)
 
-def send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym_img, config):
-    db_poi_lat = db_gym_lat
-    db_poi_lon = db_gym_lon
-    navigation = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ")")
-    poitype = "gym"
-
-    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
-    address = generate_address(db_poi_lat, db_poi_lon, config)
-    text = (navigation + "\n" + address)
- 
     data = {
-        "username": config['gym_full_username'],
-        "avatar_url": config['gym_img'],
+        "username": username,
+        "avatar_url": avatar,
         "embeds": [{
-            "color": config['embed_gym_color'],
-            "thumbnail": {
-                "url": db_gym_img
-            },
-            "image": {
-                "url": static_map
-            },
-            "fields": [
-                {
-                "name": db_gym_name,
-                "value": text
-                }
-            ]
-        }]
-    }
-    result = requests.post(config['webhook_url_gym'], json=data)
-    print(result)
-
-    with open("txt/gym_full.txt", "a") as f:
-        f.write(db_gym_id + "\n")
-
-def send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config):
-    db_poi_lat = db_gym_lat
-    db_poi_lon = db_gym_lon
-    navigation = ("https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon))
-    poitype = "gym"
-
-    static_map = generate_static_maps(poitype, db_poi_lat, db_poi_lon, config)
-  
-    data = {
-        "username": config['gym_unfull_username'],
-        "avatar_url": config['gym_img'],
-        "embeds": [{
-            "title": "Google Maps",
-            "url": navigation,
-            "color": config['embed_gym_color'],
+            "description": text,
+            "color": color,
             "image": {
                 "url": static_map
             }
         }]
     }
-    result = requests.post(config['webhook_url_gym'], json=data)
-    print(result)
-
-    with open("txt/gym_unfull.txt", "a") as f:
-        f.write(db_gym_id + "\n")
+    webhooks = json.loads(webhook)
+    for webhook in webhooks:
+        result = requests.post(webhook, json=data)
+        print(result)
 
 def check_portals(cursor, config):
     if config['send_portals']:
@@ -670,7 +538,9 @@ def check_portals(cursor, config):
         for db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img in result_portals:
             if not db_portal_id in get_portals():
                 print("sending portal: ", db_portal_name)
-                send_webhook_portal(db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img, config)
+                send_webhook_full(db_portal_lat, db_portal_lon, "portal", config['portal_username'], config['portal_img'], config['embed_portal_color'], db_portal_name, db_portal_img, config["webhook_url_portal"], config)
+                with open("txt/portals.txt", "a") as f:
+                    f.write(db_portal_id + "\n")
                 time.sleep(1)
 
 def update_stop_portal(cursor, config):
@@ -749,12 +619,16 @@ def check_stops(cursor, config):
                 if not db_stop_id in get_stops_unfull():
 
                     print("sending unfull stop: ", db_stop_id)
-                    send_webhook_stop_unfull(db_stop_id, db_stop_lat, db_stop_lon, config)
+                    send_webhook_unfull(db_stop_lat, db_stop_lon, "stop", config['stop_unfull_username'], config['stop_img'], config['embed_stop_color'], config["webhook_url_stop"], config)
+                    with open("txt/stop_unfull.txt", "a") as f:
+                        f.write(db_stop_id + "\n")
                     time.sleep(1)
             else:
                 if not db_stop_id in get_stops_full():
                     print("sending full stop: ", db_stop_name)
-                    send_webhook_stop_full(db_stop_id, db_stop_lat, db_stop_lon, db_stop_name, db_stop_img, config)
+                    send_webhook_full(db_stop_lat, db_stop_lon, "stop", config['stop_full_username'], config['stop_img'], config['embed_stop_color'], db_stop_name, db_stop_img, config["webhook_url_stop"], config)
+                    with open("txt/stop_full.txt", "a") as f:
+                        f.write(db_stop_id + "\n")
                     time.sleep(1)
 
 def update_gyms(cursor, config):
@@ -923,14 +797,17 @@ def check_gyms(cursor, config):
         for db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym_img in result_gyms:
             if db_gym_name == 'unknown' or db_gym_img == None or db_gym_name == None:
                 if not db_gym_id in get_gyms_unfull():
-
                     print("sending unfull gym: ", db_gym_id)
-                    send_webhook_gym_unfull(db_gym_id, db_gym_lat, db_gym_lon, config)
+                    send_webhook_unfull(db_gym_lat, db_gym_lon, "gym", config['gym_unfull_username'], config['gym_img'], config['embed_gym_color'], config["webhook_url_gym"], config)
+                    with open("txt/gym_unfull.txt", "a") as f:
+                        f.write(db_gym_id + "\n")
                     time.sleep(1)
             else:
                 if not db_gym_id in get_gyms_full():
                     print("sending full gym: ", db_gym_name)
-                    send_webhook_gym_full(db_gym_id, db_gym_lat, db_gym_lon, db_gym_name, db_gym_img, config)
+                    send_webhook_full(db_gym_lat, db_gym_lon, "gym", config['gym_full_username'], config['gym_img'], config['embed_gym_color'], db_gym_name, db_gym_img, config["webhook_url_gym"], config)
+                    with open("txt/gym_full.txt", "a") as f:
+                        f.write(db_gym_id + "\n")
                     time.sleep(1)
 
 def main():

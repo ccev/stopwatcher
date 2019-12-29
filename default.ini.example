@@ -9,9 +9,9 @@ STOP_UPDATE_THROUGH_PORTAL = True
 DELETE_CONVERTED_STOP = True
 
 # discord webhook links
-STOP_WEBHOOK = 
-GYM_WEBHOOK = 
-PORTAL_WEBHOOK = 
+STOP_WEBHOOK = ["https://discordapp.com/api/webhooks/","https://discordapp.com/api/webhooks/"]
+GYM_WEBHOOK = [""]
+PORTAL_WEBHOOK = [""]
 
 MIN_LAT = 
 MAX_LAT = 
