@@ -466,7 +466,7 @@ def generate_text(lat, lon, config):
         else:
             address = ""  
 
-        text = (navigation + "\n" + geocode.address)
+        text = (text + "\n" + geocode.address)
 
     return text
 
