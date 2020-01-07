@@ -180,7 +180,7 @@ def get_deleted():
     return open("txt/deleted.txt", "r").read().splitlines()
 
 def send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, db_portal_lon, db_extra_lat, db_extra_lon):
-    embed_desc = (config['embed_from'] + " `" + str(db_extra_lat) + "," + str(db_extra_lon) + "`\n" + config['embed_to'] + " `" + str(db_portal_lat) + "," + str(db_portal_lon) + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
+    embed_desc = (config['embed_from'] + " `" + str(db_extra_lat) + "," + str(db_extra_lon) + "`\n" + config['embed_to'] + " `" + str(db_portal_lat) + "," + str(db_portal_lon) + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
     embed_title = (db_portal_name + " " + config['embed_location_title'])
     data = {
         "username": config['embed_username'],
@@ -197,7 +197,7 @@ def send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, 
     print(result)
 
 def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name, db_portal_lat, db_portal_lon):
-    embed_desc = (config['embed_from'] + " `" + db_extra_name + "`\n" + config['embed_to'] + " `" + db_portal_name + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
+    embed_desc = (config['embed_from'] + " `" + db_extra_name + "`\n" + config['embed_to'] + " `" + db_portal_name + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
     embed_title = (db_extra_name + " " + config['embed_title_title'])
     data = {
         "username": config['embed_username'],
@@ -214,7 +214,7 @@ def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name, db_
     print(result)
 
 def send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img, db_portal_lat, db_portal_lon):
-    embed_desc = (config['embed_from'] + " [Link](" + db_extra_img + ")\n" + config['embed_to'] + " [Link](" + db_portal_img + ")\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
+    embed_desc = (config['embed_from'] + " [Link](" + db_extra_img + ")\n" + config['embed_to'] + " [Link](" + db_portal_img + ")\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
     embed_title = (db_portal_name + " " + config['embed_image_title'])
     data = {
         "username": config['embed_username'],
@@ -313,7 +313,7 @@ def check_edits(config):
         for db_portal_name, db_portal_img, db_portal_id in result_deleted:
             if not db_portal_id in get_deleted():
                 print("Found possible deleted Portal: " + db_portal_name)
-                embed_desc = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22)")
+                embed_desc = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22)")
                 embed_title = (db_portal_name + " " + config['embed_deleted_title'])
                 data = {
                     "username": config['embed_username'],
