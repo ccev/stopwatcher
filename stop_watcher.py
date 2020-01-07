@@ -458,11 +458,11 @@ def generate_text(lat, lon, config):
 
     if config['geocoding']:
         if config['static_provider'] == "google":
-            geocode = geocoder.google([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
+            geocode = geocoder.google([lat, lon], method='reverse', key=config['static_key'], language=config['language'])
         elif config['static_provider'] == "osm":
-            geocode = geocoder.mapquest([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
+            geocode = geocoder.mapquest([lat, lon], method='reverse', key=config['static_key'], language=config['language'])
         elif config['static_provider'] == "mapbox":
-            geocode = geocoder.mapbox([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
+            geocode = geocoder.mapbox([lat, lon], method='reverse', key=config['static_key'], language=config['language'])
         else:
             address = ""  
 
