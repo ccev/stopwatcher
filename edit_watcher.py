@@ -156,9 +156,7 @@ def connect_db(config):
         port=config['db_port'],
         autocommit=True)
 
-    cursor = mydb.cursor()
-
-    return cursor
+    return mydb
 
 def db_config(config):
     if config['db_portal_schema'] == "pmsf":
@@ -352,7 +350,8 @@ if __name__ == "__main__":
     config_path = args.config
     config = create_config(config_path)
 
-    cursor = connect_db(config)
+    mydb = connect_db(config)
+    cursor = mydb.cursor()
     db_config(config)
 
     if config['docheck']:
@@ -361,3 +360,4 @@ if __name__ == "__main__":
         print("Edit checking disabled!")
 
     cursor.close()
+    mydb.close()

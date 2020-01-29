@@ -305,9 +305,7 @@ def connect_db(config):
         port=config['db_port'],
         autocommit=True)
 
-    cursor = mydb.cursor()
-
-    return cursor
+    return mydb
 
 def db_config(config):
     if config['db_scan_schema'] == "mad":
@@ -812,7 +810,8 @@ def check_gyms(cursor, config):
 
 def main():
     print("-------------------------------")
-    cursor = connect_db(config)
+    mydb = connect_db(config)
+    cursor = mydb.cursor()
 
     check_portals(cursor, config)
     update_stop_portal(cursor, config)
@@ -821,6 +820,7 @@ def main():
     check_gyms(cursor, config)
 
     cursor.close()
+    mydb.close()
     print("-------------------------------")
     if config['dosleep']:
         print("Loop done. Waiting", config['sleeptime'], "seconds")
@@ -835,7 +835,9 @@ args = parser.parse_args()
 config_path = args.config
 config = create_config(config_path)
 
-cursor = connect_db(config)
+mydb = connect_db(config)
+cursor = mydb.cursor()
+
 db_config(config)
 static_config(config)
 
@@ -848,6 +850,9 @@ if not get_stops_unfull() or not get_stops_full():
 if not get_gyms_unfull() or not get_gyms_full():
     init.write_gyms(cursor, config)
     print("Found an empty gyms.txt file - Ran init.py on gyms.")
+
+cursor.close()
+mydb.close()
 
 main()
 

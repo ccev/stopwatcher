@@ -83,9 +83,7 @@ def connect_db(config):
         port=config['db_port'],
         autocommit=True)
 
-    cursor = mydb.cursor()
-
-    return cursor
+    return mydb
 
 def db_config(config):
     if config['db_scan_schema'] == "mad":
@@ -195,7 +193,8 @@ if __name__ == "__main__":
     config_path = args.config
     config = create_config(config_path)
 
-    cursor = connect_db(config)
+    mydb = connect_db(config)
+    cursor = mydb.cursor()
     db_config(config)
 
     write_portals(cursor, config)
@@ -203,4 +202,5 @@ if __name__ == "__main__":
     write_gyms(cursor, config)
 
     cursor.close()
+    mydb.close()
     print("Done.")
