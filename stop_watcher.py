@@ -810,6 +810,7 @@ def check_gyms(cursor, config):
 
 def main():
     print("-------------------------------")
+    global cursor
     mydb = connect_db(config)
     cursor = mydb.cursor()
 
