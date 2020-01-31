@@ -1,0 +1,14 @@
+{
+    "full_stop_title": "Pokéstop Details",
+    "unfull_stop_title": "New Pokéstop",
+    "full_gym_title": "New Gym",
+    "unfull_gym_title": "New Gym",
+    "portal_title": "New Portal",
+    "edit_title": "Portal Edit",
+    "location_edit_title": "was moved",
+    "title_edit_title": "got another title",
+    "image_edit_title": "got another image",
+    "deleted_title": "(probably) got deleted",
+    "from": "From",
+    "to": "To"
+}

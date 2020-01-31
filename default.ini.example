@@ -8,33 +8,29 @@ GYM_UPDATE_THROUGH_PORTAL = True
 STOP_UPDATE_THROUGH_PORTAL = True
 DELETE_CONVERTED_STOP = True
 
-# discord webhook links
+BBOX = minlon,minlat,maxlon,maxlat
+CHAT_APP = discord
+# discord/telegram
+
+LANGUAGE = en
+# en/de/pl
+
+LOOP = True
+SECONDS_BETWEEN_LOOPS = 600
+
+[Discord]
 STOP_WEBHOOK = ["https://discordapp.com/api/webhooks/","https://discordapp.com/api/webhooks/"]
 GYM_WEBHOOK = [""]
 PORTAL_WEBHOOK = [""]
 
-MIN_LAT = 
-MAX_LAT = 
-MIN_LON = 
-MAX_LON = 
-
-LOOP = True
-SECONDS_BETWEEN_LOOPS = 500
-
-[Embeds]
 STOP_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/stop.png
-STOP_DETAILS_USERNAME = Pokéstop Details
-STOP_NO_DETAILS_USERNAME = New Pokéstop
 STOP_COLOR = 1216493
-
 GYM_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/gym.png
-GYM_DETAILS_USERNAME = New Gym
-GYM_NO_DETAILS_USERNAME = New Gym
 GYM_COLOR = 12239045
-
 PORTAL_IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png
-PORTAL_USERNAME = New Portal
 PORTAL_COLOR = 12609532
+
+
 
 [Static Map]
 PROVIDER = mapbox
@@ -49,7 +45,6 @@ WIDTH = 500
 HEIGHT = 300
 
 USE_GEOCODING = False
-LANGUAGE = en
 
 USE_IMGUR_MIRRORS_FOR_EVERYTHING = False
 IMGUR_CLIENT_ID = 
@@ -67,31 +62,27 @@ MARKER_SIZE = 2
 TILESERVER_URL = https://static.url.com/
 # needed for tileserver-gl
 
+
+
 [Edit Watcher]
 ENABLE = False
 EXTRA_PORTAL_DB_NAME = 
 EXTRA_PORTAL_TABLE = 
 
-WEBHOOK_URL = 
-USERNAME = Portal Edit
+WEBHOOK_URL = [""]
 IMAGE = https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png
 
 DELETED_TIMESPAN = 86400
 # in seconds
 DELETED_LIMIT = 10
 
-LOCATION_EDIT_TITLE = was moved
-TITLE_EDIT_TITLE = got another title
-IMAGE_EDIT_TITLE = got another image
-DELETED_TITLE = (probably) got deleted
-FROM = From
-TO = To
+
 
 [DB]
-SCANNER_DB = 
+SCANNER_DB_SCHEMA = 
 # mad/rdm/none
 
-PORTAL_DB = pmsf
+PORTAL_DB_SCHEMA = pmsf
 # pmsf/none
 
 HOST = 0.0.0.0
@@ -99,30 +90,5 @@ PORT = 3306
 USER = 
 PASSWORD = 
 
-NAME = 
+SCANNER_DB_NAME = 
 PORTAL_DB_NAME = 
-
-
-# ignore if you didn't put "none" for SCANNER_DB or PORTAL_DB
-POKESTOP_TABLE = 
-POKESTOP_ID = 
-POKESTOP_LAT = 
-POKESTOP_LON = 
-POKESTOP_NAME = 
-POKESTOP_IMAGE = 
-
-GYM_TABLE = 
-GYMDETAILS_TABLE = 
-GYM_ID = 
-GYM_LAT = 
-GYM_LON = 
-GYM_NAME = 
-GYM_IMAGE = 
-
-PORTAL_TABLE = 
-PORTAL_ID = 
-PORTAL_LAT = 
-PORTAL_LON = 
-PORTAL_NAME = 
-PORTAL_IMAGE = 
-PORTAL_UPDATED = 
