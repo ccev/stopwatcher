@@ -7,6 +7,7 @@ import argparse
 import init
 import pyimgur
 import geocoder
+import sys
 
 from pymysql import connect
 
@@ -100,67 +101,49 @@ def create_config(config_path):
     config['delete_stops'] = config_raw.getboolean(
         'Config',
         'DELETE_CONVERTED_STOP')
-    config['webhook_url_stop'] = config_raw.get(
-        'Config',
-        'STOP_WEBHOOK')
-    config['webhook_url_gym'] = config_raw.get(
-        'Config',
-        'GYM_WEBHOOK')
-    config['webhook_url_portal'] = config_raw.get(
-        'Config',
-        'PORTAL_WEBHOOK')
-    config['lat_small'] = config_raw.getfloat(
-        'Config',
-        'MIN_LAT')
-    config['lat_big'] = config_raw.getfloat(
-        'Config',
-        'MAX_LAT')
-    config['lon_small'] = config_raw.getfloat(
-        'Config',
-        'MIN_LON')
-    config['lon_big'] = config_raw.getfloat(
-        'Config',
-        'MAX_LON')
     config['dosleep'] = config_raw.getboolean(
         'Config',
         'LOOP')
     config['sleeptime'] = config_raw.getint(
         'Config',
         'SECONDS_BETWEEN_LOOPS')
-    ### Embeds
+    config['bbox'] = config_raw.get(
+        'Config',
+        'BBOX')
+    config['bbox'] = list(config['bbox'].split(','))
+    config['language'] = config_raw.get(
+        'Config',
+        'LANGUAGE')
+
+    ### Discord
+    config['webhook_url_stop'] = config_raw.get(
+        'Discord',
+        'STOP_WEBHOOK')
+    config['webhook_url_gym'] = config_raw.get(
+        'Discord',
+        'GYM_WEBHOOK')
+    config['webhook_url_portal'] = config_raw.get(
+        'Discord',
+        'PORTAL_WEBHOOK')
     config['stop_img'] = config_raw.get(
-        'Embeds',
+        'Discord',
         'STOP_IMAGE')
-    config['stop_full_username'] = config_raw.get(
-        'Embeds',
-        'STOP_DETAILS_USERNAME')
-    config['stop_unfull_username'] = config_raw.get(
-        'Embeds',
-        'STOP_NO_DETAILS_USERNAME')
     config['embed_stop_color'] = config_raw.getint(
-        'Embeds',
+        'Discord',
         'STOP_COLOR')
     config['gym_img'] = config_raw.get(
-        'Embeds',
+        'Discord',
         'GYM_IMAGE')
-    config['gym_full_username'] = config_raw.get(
-        'Embeds',
-        'GYM_DETAILS_USERNAME')
-    config['gym_unfull_username'] = config_raw.get(
-        'Embeds',
-        'GYM_NO_DETAILS_USERNAME')
     config['embed_gym_color'] = config_raw.getint(
-        'Embeds',
+        'Discord',
         'GYM_COLOR')
     config['portal_img'] = config_raw.get(
-        'Embeds',
+        'Discord',
         'PORTAL_IMAGE')
-    config['portal_username'] = config_raw.get(
-        'Embeds',
-        'PORTAL_USERNAME')
     config['embed_portal_color'] = config_raw.getint(
-        'Embeds',
+        'Discord',
         'PORTAL_COLOR')
+
     ### Static Map
     config['static_provider'] = config_raw.get(
         'Static Map',
@@ -207,16 +190,14 @@ def create_config(config_path):
     config['geocoding'] = config_raw.getboolean(
         'Static Map',
         'USE_GEOCODING')
-    config['language'] = config_raw.get(
-        'Static Map',
-        'LANGUAGE')
+
     ### DATABASE
     config['db_scan_schema'] = config_raw.get(
         'DB',
-        'SCANNER_DB')
+        'SCANNER_DB_SCHEMA')
     config['db_portal_schema'] = config_raw.get(
         'DB',
-        'PORTAL_DB')
+        'PORTAL_DB_SCHEMA')
     config['db_host'] = config_raw.get(
         'DB',
         'HOST')
@@ -234,80 +215,8 @@ def create_config(config_path):
         'PORTAL_DB_NAME')
     config['db_dbname'] = config_raw.get(
         'DB',
-        'NAME')
-    config['db_stop_table'] = config_raw.get(
-        'DB',
-        'POKESTOP_TABLE')
-    config['db_stop_id'] = config_raw.get(
-        'DB',
-        'POKESTOP_ID')
-    config['db_stop_lat'] = config_raw.get(
-        'DB',
-        'POKESTOP_LAT')
-    config['db_stop_lon'] = config_raw.get(
-        'DB',
-        'POKESTOP_LON')
-    config['db_stop_name'] = config_raw.get(
-        'DB',
-        'POKESTOP_NAME')
-    config['db_stop_img'] = config_raw.get(
-        'DB',
-        'POKESTOP_IMAGE')
-    config['db_gym_table'] = config_raw.get(
-        'DB',
-        'GYM_TABLE')
-    config['db_gymdetails_table'] = config_raw.get(
-        'DB',
-        'GYMDETAILS_TABLE')
-    config['db_gym_id'] = config_raw.get(
-        'DB',
-        'GYM_ID')
-    config['db_gym_lat'] = config_raw.get(
-        'DB',
-        'GYM_LAT')
-    config['db_gym_lon'] = config_raw.get(
-        'DB',
-        'GYM_LON')
-    config['db_gym_name'] = config_raw.get(
-        'DB',
-        'GYM_NAME')
-    config['db_gym_img'] = config_raw.get(
-        'DB',
-        'GYM_IMAGE')
-    config['db_portal_table'] = config_raw.get(
-        'DB',
-        'PORTAL_TABLE')
-    config['db_portal_id'] = config_raw.get(
-        'DB',
-        'PORTAL_ID')
-    config['db_portal_lat'] = config_raw.get(
-        'DB',
-        'PORTAL_LAT')
-    config['db_portal_lon'] = config_raw.get(
-        'DB',
-        'PORTAL_LON')
-    config['db_portal_name'] = config_raw.get(
-        'DB',
-        'PORTAL_NAME')
-    config['db_portal_img'] = config_raw.get(
-        'DB',
-        'PORTAL_IMAGE')
+        'SCANNER_DB_NAME')
 
-    return config
-
-def connect_db(config):
-    print("Connecting to DB")
-    mydb = connect(
-        host=config['db_host'],
-        user=config['db_user'],
-        passwd=config['db_pass'],
-        database=config['db_dbname'],
-        port=config['db_port'],
-        autocommit=True)
-
-    return mydb
-
-def db_config(config):
     if config['db_scan_schema'] == "mad":
         config['db_stop_table'] = "pokestop"
         config['db_stop_id'] = "pokestop_id"
@@ -348,22 +257,6 @@ def db_config(config):
         config['db_portal_name'] = "name"
         config['db_portal_img'] = "url"
 
-def get_portals():
-    return open("txt/portals.txt", "r").read().splitlines()
-
-def get_stops_full():
-    return open("txt/stop_full.txt", "r").read().splitlines()
-
-def get_stops_unfull():
-    return open("txt/stop_unfull.txt", "r").read().splitlines()
-
-def get_gyms_unfull():
-    return open("txt/gym_unfull.txt", "r").read().splitlines()
-
-def get_gyms_full():
-    return open("txt/gym_full.txt", "r").read().splitlines()
-
-def static_config(config):
     if config['static_marker_size'] == 0:
         if config['static_provider'] == "google":
             config['static_marker_size'] = "tiny"
@@ -386,6 +279,34 @@ def static_config(config):
             config['static_marker_size'] = "lg"
     else:
         print("Please choose another marker size.")
+
+    return config
+
+def connect_db(config):
+    mydb = connect(
+        host=config['db_host'],
+        user=config['db_user'],
+        passwd=config['db_pass'],
+        database=config['db_dbname'],
+        port=config['db_port'],
+        autocommit=True)
+
+    return mydb
+
+def get_portals():
+    return open("txt/portals.txt", "r").read().splitlines()
+
+def get_stops_full():
+    return open("txt/stop_full.txt", "r").read().splitlines()
+
+def get_stops_unfull():
+    return open("txt/stop_unfull.txt", "r").read().splitlines()
+
+def get_gyms_unfull():
+    return open("txt/gym_unfull.txt", "r").read().splitlines()
+
+def get_gyms_full():
+    return open("txt/gym_full.txt", "r").read().splitlines()
 
 def imgur(static_map, config):
     im = pyimgur.Imgur(config['client_id_imgur'])
@@ -456,22 +377,23 @@ def generate_text(lat, lon, config):
 
     if config['geocoding']:
         if config['static_provider'] == "google":
-            geocode = geocoder.google([lat, lon], method='reverse', key=config['static_key'], language=config['language'])
+            geocode = geocoder.google([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
         elif config['static_provider'] == "osm":
-            geocode = geocoder.mapquest([lat, lon], method='reverse', key=config['static_key'], language=config['language'])
+            geocode = geocoder.mapquest([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
         elif config['static_provider'] == "mapbox":
-            geocode = geocoder.mapbox([lat, lon], method='reverse', key=config['static_key'], language=config['language'])
+            geocode = geocoder.mapbox([db_poi_lat, db_poi_lon], method='reverse', key=config['static_key'], language=config['language'])
         else:
             address = ""  
 
-        text = (text + "\n" + geocode.address)
+        text = (navigation + "\n" + geocode.address)
 
     return text
 
 def send_webhook_full(lat, lon, type, username, avatar, color, name, image, webhook, config):
-    # send_webhook(db_stop_lat, db_stop_lon, "stop", config['stop_full_username'], config['stop_img'], config['embed_stop_color'], db_stop_name, db_stop_img, config["webhook_url_stop"], config)
     static_map = generate_static_map(type, lat, lon, config)
     text = generate_text(lat, lon, config)
+    if type == "portal":
+        text = text + " | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18)"
 
     data = {
         "username": username,
@@ -494,7 +416,6 @@ def send_webhook_full(lat, lon, type, username, avatar, color, name, image, webh
         print(result)
 
 def send_webhook_unfull(lat, lon, type, username, avatar, color, webhook, config):
-    # send_webhook(db_stop_lat, db_stop_lon, "stop", config['stop_unfull_username'], config['stop_img'], config['embed_stop_color'], config["webhook_url_stop"], config)
     static_map = generate_static_map(type, lat, lon, config)
     text = generate_text(lat, lon, config)
 
@@ -525,10 +446,10 @@ def check_portals(cursor, config):
             db_img=config['db_portal_img'],
             db_dbname=config['db_portal_dbname'],
             db_table=config['db_portal_table'],
-            lat_small=config['lat_small'],
-            lat_big=config['lat_big'],
-            lon_small=config['lon_small'],
-            lon_big=config['lon_big']
+            lat_small=config['bbox'][1],
+            lat_big=config['bbox'][3],
+            lon_small=config['bbox'][0],
+            lon_big=config['bbox'][2]
         )
         cursor.execute(check_portals_query)
         result_portals = cursor.fetchall()
@@ -536,7 +457,7 @@ def check_portals(cursor, config):
         for db_portal_id, db_portal_lat, db_portal_lon, db_portal_name, db_portal_img in result_portals:
             if not db_portal_id in get_portals():
                 print("sending portal: ", db_portal_name)
-                send_webhook_full(db_portal_lat, db_portal_lon, "portal", config['portal_username'], config['portal_img'], config['embed_portal_color'], db_portal_name, db_portal_img, config["webhook_url_portal"], config)
+                send_webhook_full(db_portal_lat, db_portal_lon, "portal", locale['portal_title'], config['portal_img'], config['embed_portal_color'], db_portal_name, db_portal_img, config["webhook_url_portal"], config)
                 with open("txt/portals.txt", "a") as f:
                     f.write(db_portal_id + "\n")
                 time.sleep(1)
@@ -552,10 +473,10 @@ def update_stop_portal(cursor, config):
             db_img=config['db_stop_img'],
             db_dbname=config['db_dbname'],
             db_table=config['db_stop_table'],
-            lat_small=config['lat_small'],
-            lat_big=config['lat_big'],
-            lon_small=config['lon_small'],
-            lon_big=config['lon_big']
+            lat_small=config['bbox'][1],
+            lat_big=config['bbox'][3],
+            lon_small=config['bbox'][0],
+            lon_big=config['bbox'][2]
         )
         cursor.execute(check_stops_query)
         result_stops = cursor.fetchall()
@@ -604,10 +525,10 @@ def check_stops(cursor, config):
             db_img=config['db_stop_img'],
             db_dbname=config['db_dbname'],
             db_table=config['db_stop_table'],
-            lat_small=config['lat_small'],
-            lat_big=config['lat_big'],
-            lon_small=config['lon_small'],
-            lon_big=config['lon_big']
+            lat_small=config['bbox'][1],
+            lat_big=config['bbox'][3],
+            lon_small=config['bbox'][0],
+            lon_big=config['bbox'][2]
         )
         cursor.execute(check_stops_query)
         result_stops = cursor.fetchall()
@@ -617,14 +538,14 @@ def check_stops(cursor, config):
                 if not db_stop_id in get_stops_unfull():
 
                     print("sending unfull stop: ", db_stop_id)
-                    send_webhook_unfull(db_stop_lat, db_stop_lon, "stop", config['stop_unfull_username'], config['stop_img'], config['embed_stop_color'], config["webhook_url_stop"], config)
+                    send_webhook_unfull(db_stop_lat, db_stop_lon, "stop", locale['unfull_stop_title'], config['stop_img'], config['embed_stop_color'], config["webhook_url_stop"], config)
                     with open("txt/stop_unfull.txt", "a") as f:
                         f.write(db_stop_id + "\n")
                     time.sleep(1)
             else:
                 if not db_stop_id in get_stops_full():
                     print("sending full stop: ", db_stop_name)
-                    send_webhook_full(db_stop_lat, db_stop_lon, "stop", config['stop_full_username'], config['stop_img'], config['embed_stop_color'], db_stop_name, db_stop_img, config["webhook_url_stop"], config)
+                    send_webhook_full(db_stop_lat, db_stop_lon, "stop", locale['full_stop_title'], config['stop_img'], config['embed_stop_color'], db_stop_name, db_stop_img, config["webhook_url_stop"], config)
                     with open("txt/stop_full.txt", "a") as f:
                         f.write(db_stop_id + "\n")
                     time.sleep(1)
@@ -641,10 +562,10 @@ def update_gyms(cursor, config):
                 db_dbname=config['db_dbname'],
                 db_gym_table=config['db_gym_table'],
                 db_gymdetails_table=config['db_gymdetails_table'],
-                lat_small=config['lat_small'],
-                lat_big=config['lat_big'],
-                lon_small=config['lon_small'],
-                lon_big=config['lon_big']
+                lat_small=config['bbox'][1],
+                lat_big=config['bbox'][3],
+                lon_small=config['bbox'][0],
+                lon_big=config['bbox'][2]
             )
         else:
             check_gyms_query = QUERY_CHECK.format(
@@ -655,10 +576,10 @@ def update_gyms(cursor, config):
                 db_img=config['db_gym_img'],
                 db_dbname=config['db_dbname'],
                 db_table=config['db_gym_table'],
-                lat_small=config['lat_small'],
-                lat_big=config['lat_big'],
-                lon_small=config['lon_small'],
-                lon_big=config['lon_big']
+                lat_small=config['bbox'][1],
+                lat_big=config['bbox'][3],
+                lon_small=config['bbox'][0],
+                lon_big=config['bbox'][2]
             )  
         cursor.execute(check_gyms_query)
         result_gyms = cursor.fetchall()
@@ -770,10 +691,10 @@ def check_gyms(cursor, config):
                 db_dbname=config['db_dbname'],
                 db_gym_table=config['db_gym_table'],
                 db_gymdetails_table=config['db_gymdetails_table'],
-                lat_small=config['lat_small'],
-                lat_big=config['lat_big'],
-                lon_small=config['lon_small'],
-                lon_big=config['lon_big']
+                lat_small=config['bbox'][1],
+                lat_big=config['bbox'][3],
+                lon_small=config['bbox'][0],
+                lon_big=config['bbox'][2]
             )
         else:
             check_gyms_query = QUERY_CHECK.format(
@@ -784,10 +705,10 @@ def check_gyms(cursor, config):
                 db_img=config['db_gym_img'],
                 db_dbname=config['db_dbname'],
                 db_table=config['db_gym_table'],
-                lat_small=config['lat_small'],
-                lat_big=config['lat_big'],
-                lon_small=config['lon_small'],
-                lon_big=config['lon_big']
+                lat_small=config['bbox'][1],
+                lat_big=config['bbox'][3],
+                lon_small=config['bbox'][0],
+                lon_big=config['bbox'][2]
             )  
         cursor.execute(check_gyms_query)
         result_gyms = cursor.fetchall()
@@ -796,14 +717,14 @@ def check_gyms(cursor, config):
             if db_gym_name == 'unknown' or db_gym_img == None or db_gym_name == None:
                 if not db_gym_id in get_gyms_unfull():
                     print("sending unfull gym: ", db_gym_id)
-                    send_webhook_unfull(db_gym_lat, db_gym_lon, "gym", config['gym_unfull_username'], config['gym_img'], config['embed_gym_color'], config["webhook_url_gym"], config)
+                    send_webhook_unfull(db_gym_lat, db_gym_lon, "gym", locale['unfull_gym_title'], config['gym_img'], config['embed_gym_color'], config["webhook_url_gym"], config)
                     with open("txt/gym_unfull.txt", "a") as f:
                         f.write(db_gym_id + "\n")
                     time.sleep(1)
             else:
                 if not db_gym_id in get_gyms_full():
                     print("sending full gym: ", db_gym_name)
-                    send_webhook_full(db_gym_lat, db_gym_lon, "gym", config['gym_full_username'], config['gym_img'], config['embed_gym_color'], db_gym_name, db_gym_img, config["webhook_url_gym"], config)
+                    send_webhook_full(db_gym_lat, db_gym_lon, "gym", locale['full_gym_title'], config['gym_img'], config['embed_gym_color'], db_gym_name, db_gym_img, config["webhook_url_gym"], config)
                     with open("txt/gym_full.txt", "a") as f:
                         f.write(db_gym_id + "\n")
                     time.sleep(1)
@@ -823,41 +744,39 @@ def main():
     cursor.close()
     mydb.close()
     print("-------------------------------")
-    if config['dosleep']:
+
+if __name__ == "__main__":
+    print("-------------------------------")
+    print("First run! Checking if your txt files are empty...")
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--config", default="default.ini", help="Config file to use")
+    args = parser.parse_args()
+    config_path = args.config
+    config = create_config(config_path)
+
+    mydb = connect_db(config)
+    cursor = mydb.cursor()
+
+    with open(f"locale/{config['language']}.json") as localejson:
+        locale = json.load(localejson)
+
+    if not get_portals():
+        init.write_portals(cursor, config)
+        print("Found an empty portals.txt file - Ran init.py on portals.")
+    if not get_stops_unfull() or not get_stops_full():
+        init.write_stops(cursor, config)
+        print("Found an empty stops.txt file - Ran init.py on stops.")
+    if not get_gyms_unfull() or not get_gyms_full():
+        init.write_gyms(cursor, config)
+        print("Found an empty gyms.txt file - Ran init.py on gyms.")
+    
+    cursor.close()
+    mydb.close()
+
+    while config['dosleep']:
+        main()
         print("Loop done. Waiting", config['sleeptime'], "seconds")
         time.sleep(config['sleeptime'])
-
-print("-------------------------------")
-print("First run! Parsing config and checking if your txt files are empty...")
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "-c", "--config", default="default.ini", help="Config file to use")
-args = parser.parse_args()
-config_path = args.config
-config = create_config(config_path)
-
-mydb = connect_db(config)
-cursor = mydb.cursor()
-
-db_config(config)
-static_config(config)
-
-if not get_portals():
-    init.write_portals(cursor, config)
-    print("Found an empty portals.txt file - Ran init.py on portals.")
-if not get_stops_unfull() or not get_stops_full():
-    init.write_stops(cursor, config)
-    print("Found an empty stops.txt file - Ran init.py on stops.")
-if not get_gyms_unfull() or not get_gyms_full():
-    init.write_gyms(cursor, config)
-    print("Found an empty gyms.txt file - Ran init.py on gyms.")
-
-cursor.close()
-mydb.close()
-
-main()
-
-while config['dosleep']:
-   main()
-else:
-    print("Looping disabled - Stopping gracefully.")
+    else:
+        main()
+        print("Looping disabled - Stopping gracefully.")

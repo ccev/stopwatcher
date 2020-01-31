@@ -31,10 +31,10 @@ def create_config(config_path):
         'PORTALS')
     config['db_scan_schema'] = config_raw.get(
         'DB',
-        'SCANNER_DB')
+        'SCANNER_DB_SCHEMA')
     config['db_portal_schema'] = config_raw.get(
         'DB',
-        'PORTAL_DB')
+        'PORTAL_DB:SCHEMA')
     config['db_host'] = config_raw.get(
         'DB',
         'HOST')
@@ -53,24 +53,6 @@ def create_config(config_path):
     config['db_dbname'] = config_raw.get(
         'DB',
         'NAME')
-    config['db_stop_table'] = config_raw.get(
-        'DB',
-        'POKESTOP_TABLE')
-    config['db_stop_id'] = config_raw.get(
-        'DB',
-        'POKESTOP_ID')
-    config['db_gym_table'] = config_raw.get(
-        'DB',
-        'GYM_TABLE')
-    config['db_gym_id'] = config_raw.get(
-        'DB',
-        'GYM_ID')
-    config['db_portal_table'] = config_raw.get(
-        'DB',
-        'PORTAL_TABLE')
-    config['db_portal_id'] = config_raw.get(
-        'DB',
-        'PORTAL_ID')
     return config
 
 def connect_db(config):
@@ -82,6 +64,8 @@ def connect_db(config):
         database=config['db_dbname'],
         port=config['db_port'],
         autocommit=True)
+
+    cursor = mydb.cursor()
 
     return mydb
 
@@ -193,8 +177,8 @@ if __name__ == "__main__":
     config_path = args.config
     config = create_config(config_path)
 
+    cursor = connect_db(config)
     mydb = connect_db(config)
-    cursor = mydb.cursor()
     db_config(config)
 
     write_portals(cursor, config)

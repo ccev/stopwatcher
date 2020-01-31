@@ -1,6 +1,7 @@
 import time
 import requests
 import argparse
+import json
 
 from pymysql import connect
 
@@ -58,56 +59,30 @@ def create_config(config_path):
     config['webhook'] = config_raw.get(
         'Edit Watcher',
         'WEBHOOK_URL')
-    config['embed_username'] = config_raw.get(
-        'Edit Watcher',
-        'USERNAME')
     config['embed_image'] = config_raw.get(
         'Edit Watcher',
         'IMAGE')
-    config['embed_location_title'] = config_raw.get(
-        'Edit Watcher',
-        'LOCATION_EDIT_TITLE')
-    config['embed_title_title'] = config_raw.get(
-        'Edit Watcher',
-        'TITLE_EDIT_TITLE')
-    config['embed_image_title'] = config_raw.get(
-        'Edit Watcher',
-        'IMAGE_EDIT_TITLE')
-    config['embed_deleted_title'] = config_raw.get(
-        'Edit Watcher',
-        'DELETED_TITLE')
-    config['embed_from'] = config_raw.get(
-        'Edit Watcher',
-        'FROM')
-    config['embed_to'] = config_raw.get(
-        'Edit Watcher',
-        'TO')
     config['deleted_maxcount'] = config_raw.getint(
         'Edit Watcher',
         'DELETED_LIMIT')
     config['deleted_maxtime'] = config_raw.get(
         'Edit Watcher',
         'DELETED_TIMESPAN')
+    config['language'] = config_raw.get(
+        'Config',
+        'LANGUAGE')
 
-    config['lat_small'] = config_raw.getfloat(
+    config['bbox'] = config_raw.get(
         'Config',
-        'MIN_LAT')
-    config['lat_big'] = config_raw.getfloat(
-        'Config',
-        'MAX_LAT')
-    config['lon_small'] = config_raw.getfloat(
-        'Config',
-        'MIN_LON')
-    config['lon_big'] = config_raw.getfloat(
-        'Config',
-        'MAX_LON')
+        'BBOX')
+    config['bbox'] = list(config['bbox'].split(','))
 
     config['db_scan_schema'] = config_raw.get(
         'DB',
-        'SCANNER_DB')
+        'SCANNER_DB_SCHEMA')
     config['db_portal_schema'] = config_raw.get(
         'DB',
-        'PORTAL_DB')
+        'PORTAL_DB_SCHEMA')
     config['db_host'] = config_raw.get(
         'DB',
         'HOST')
@@ -123,27 +98,6 @@ def create_config(config_path):
     config['db_portal_dbname'] = config_raw.get(
         'DB',
         'PORTAL_DB_NAME')
-    config['db_portal_table'] = config_raw.get(
-        'DB',
-        'PORTAL_TABLE')
-    config['db_portal_id'] = config_raw.get(
-        'DB',
-        'PORTAL_ID')
-    config['db_portal_lat'] = config_raw.get(
-        'DB',
-        'PORTAL_LAT')
-    config['db_portal_lon'] = config_raw.get(
-        'DB',
-        'PORTAL_LON')
-    config['db_portal_name'] = config_raw.get(
-        'DB',
-        'PORTAL_NAME')
-    config['db_portal_img'] = config_raw.get(
-        'DB',
-        'PORTAL_IMAGE')
-    config['db_portal_updated'] = config_raw.get(
-        'DB',
-        'PORTAL_UPDATED')
 
     return config
 
@@ -155,6 +109,8 @@ def connect_db(config):
         database=config['db_extra_dbname'],
         port=config['db_port'],
         autocommit=True)
+
+    cursor = mydb.cursor()
 
     return mydb
 
@@ -178,10 +134,10 @@ def get_deleted():
     return open("txt/deleted.txt", "r").read().splitlines()
 
 def send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, db_portal_lon, db_extra_lat, db_extra_lon):
-    embed_desc = (config['embed_from'] + " `" + str(db_extra_lat) + "," + str(db_extra_lon) + "`\n" + config['embed_to'] + " `" + str(db_portal_lat) + "," + str(db_portal_lon) + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
-    embed_title = (db_portal_name + " " + config['embed_location_title'])
+    embed_desc = (locale['from'] + " `" + str(db_extra_lat) + "," + str(db_extra_lon) + "`\n" + locale['to'] + " `" + str(db_portal_lat) + "," + str(db_portal_lon) + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
+    embed_title = (db_portal_name + " " + locale['location_edit_title'])
     data = {
-        "username": config['embed_username'],
+        "username": locale['edit_title'],
         "avatar_url": config['embed_image'],
         "embeds": [{
             "title": embed_title,
@@ -191,14 +147,16 @@ def send_webhook_location(config, db_portal_img, db_portal_name, db_portal_lat, 
             },
         }]
     }
-    result = requests.post(config['webhook'], json=data)
-    print(result)
+    webhooks = json.loads(config['webhook'])
+    for webhook in webhooks:
+        result = requests.post(webhook, json=data)
+        print(result)
 
 def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name, db_portal_lat, db_portal_lon):
-    embed_desc = (config['embed_from'] + " `" + db_extra_name + "`\n" + config['embed_to'] + " `" + db_portal_name + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
-    embed_title = (db_extra_name + " " + config['embed_title_title'])
+    embed_desc = (locale['from'] + " `" + db_extra_name + "`\n" + locale['to'] + " `" + db_portal_name + "`\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
+    embed_title = (db_extra_name + " " + locale['title_edit_title'])
     data = {
-        "username": config['embed_username'],
+        "username": locale['edit_title'],
         "avatar_url": config['embed_image'],
         "embeds": [{
             "title": embed_title,
@@ -208,14 +166,16 @@ def send_webhook_title(config, db_portal_img, db_portal_name, db_extra_name, db_
             },
         }]
     }
-    result = requests.post(config['webhook'], json=data)
-    print(result)
+    webhooks = json.loads(config['webhook'])
+    for webhook in webhooks:
+        result = requests.post(webhook, json=data)
+        print(result)
 
 def send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img, db_portal_lat, db_portal_lon):
-    embed_desc = (config['embed_from'] + " [Link](" + db_extra_img + ")\n" + config['embed_to'] + " [Link](" + db_portal_img + ")\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
-    embed_title = (db_portal_name + " " + config['embed_image_title'])
+    embed_desc = (locale['from'] + " [Link](" + db_extra_img + ")\n" + locale['to'] + " [Link](" + db_portal_img + ")\n\n[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18&pll=" + str(db_portal_lat) + "," + str(db_portal_lon) + ")")
+    embed_title = (db_portal_name + " " + locale['image_edit_title'])
     data = {
-        "username": config['embed_username'],
+        "username": locale['edit_title'],
         "avatar_url": config['embed_image'],
         "embeds": [{
             "title": embed_title,
@@ -225,8 +185,10 @@ def send_webhook_image(config, db_portal_img, db_portal_name, db_extra_img, db_p
             },
         }]
     }
-    result = requests.post(config['webhook'], json=data)
-    print(result)
+    webhooks = json.loads(config['webhook'])
+    for webhook in webhooks:
+        result = requests.post(webhook, json=data)
+        print(result)
 
 def check_edits(config):
     query_extra_create = QUERY_CREATE_EXTRA.format(
@@ -256,10 +218,10 @@ def check_edits(config):
         db_img=config['db_extra_img'],
         db_dbname=config['db_extra_dbname'],
         db_table=config['db_extra_table'],
-        lat_small=config['lat_small'],
-        lat_big=config['lat_big'],
-        lon_small=config['lon_small'],
-        lon_big=config['lon_big']
+        lat_small=config['bbox'][1],
+        lat_big=config['bbox'][3],
+        lon_small=config['bbox'][0],
+        lon_big=config['bbox'][2]
     )
     cursor.execute(check_extra_query)
     result_extra = cursor.fetchall()
@@ -299,10 +261,10 @@ def check_edits(config):
         limit=config['deleted_maxtime'],
         db_dbname=config['db_portal_dbname'],
         db_table=config['db_portal_table'],
-        lat_small=config['lat_small'],
-        lat_big=config['lat_big'],
-        lon_small=config['lon_small'],
-        lon_big=config['lon_big']
+        lat_small=config['bbox'][1],
+        lat_big=config['bbox'][3],
+        lon_small=config['bbox'][0],
+        lon_big=config['bbox'][2]
     )
     cursor.execute(check_deleted_query)
     result_deleted = cursor.fetchall()
@@ -311,10 +273,10 @@ def check_edits(config):
         for db_portal_name, db_portal_img, db_portal_id in result_deleted:
             if not db_portal_id in get_deleted():
                 print("Found possible deleted Portal: " + db_portal_name)
-                embed_desc = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=22)")
-                embed_title = (db_portal_name + " " + config['embed_deleted_title'])
+                embed_desc = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18)")
+                embed_title = (db_portal_name + " " + locale['deleted_title'])
                 data = {
-                    "username": config['embed_username'],
+                    "username": locale['edit_title'],
                     "avatar_url": config['embed_image'],
                     "embeds": [{
                         "title": embed_title,
@@ -324,8 +286,10 @@ def check_edits(config):
                         },
                     }]
                 }
-                result = requests.post(config['webhook'], json=data)
-                print(result)
+                webhooks = json.loads(config['webhook'])
+                for webhook in webhooks:
+                    result = requests.post(webhook, json=data)
+                    print(result)
                 with open("txt/deleted.txt", "a") as f:
                     f.write(db_portal_id + "\n")
     else:
@@ -353,6 +317,9 @@ if __name__ == "__main__":
     mydb = connect_db(config)
     cursor = mydb.cursor()
     db_config(config)
+
+    with open(f"locale/{config['language']}.json") as localejson:
+        locale = json.load(localejson)
 
     if config['docheck']:
         check_edits(config)
