@@ -18,6 +18,8 @@ LANGUAGE = en
 LOOP = True
 SECONDS_BETWEEN_LOOPS = 600
 
+
+
 [Discord]
 STOP_WEBHOOK = ["https://discordapp.com/api/webhooks/","https://discordapp.com/api/webhooks/"]
 GYM_WEBHOOK = [""]
