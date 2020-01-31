@@ -110,8 +110,6 @@ def connect_db(config):
         port=config['db_port'],
         autocommit=True)
 
-    cursor = mydb.cursor()
-
     return mydb
 
 def db_config(config):
