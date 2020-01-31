@@ -393,7 +393,7 @@ def send_webhook_full(lat, lon, type, username, avatar, color, name, image, webh
     static_map = generate_static_map(type, lat, lon, config)
     text = generate_text(lat, lon, config)
     if type == "portal":
-        text = text + " | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18)"
+        text = text + " | [Intel](https://intel.ingress.com/intel?ll=" + str(lat) + "," + str(lon) + "&z=18)"
 
     data = {
         "username": username,
