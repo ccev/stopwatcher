@@ -34,7 +34,7 @@ def create_config(config_path):
         'SCANNER_DB_SCHEMA')
     config['db_portal_schema'] = config_raw.get(
         'DB',
-        'PORTAL_DB:SCHEMA')
+        'PORTAL_DB_SCHEMA')
     config['db_host'] = config_raw.get(
         'DB',
         'HOST')
@@ -52,7 +52,7 @@ def create_config(config_path):
         'PORTAL_DB_NAME')
     config['db_dbname'] = config_raw.get(
         'DB',
-        'NAME')
+        'SCANNER_DB_NAME')
     return config
 
 def connect_db(config):
