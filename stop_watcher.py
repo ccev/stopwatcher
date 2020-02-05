@@ -480,6 +480,8 @@ def send_webhook_full(lat, lon, type, username, avatar, color, name, image, webh
     for webhook in webhooks:
         result = requests.post(webhook, json=data)
         print(result)
+        print("Waiting 20 seconds.")
+        time.sleep(20)
 
 def send_webhook_unfull(lat, lon, type, username, avatar, color, webhook, config):
     static_map = generate_static_map(type, lat, lon, config)
@@ -500,6 +502,8 @@ def send_webhook_unfull(lat, lon, type, username, avatar, color, webhook, config
     for webhook in webhooks:
         result = requests.post(webhook, json=data)
         print(result)
+        print("Waiting 20 seconds.")
+        time.sleep(20)
 
 def check_portals(cursor, config):
     if config['send_portals']:
