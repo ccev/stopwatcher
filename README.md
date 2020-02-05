@@ -8,6 +8,7 @@ Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating n
 - Tested for python3.6 - should be working on newer versions, shouldn't work with older python2
 - The Script will work perfectly fine if you don't track Portals. I do still recommend to have an extra Portal Scraper Script running.
 - `stop_watcher.py` and `edit_watcher.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
+- `stop_watcher.py` can be run with `-i` to fill out txt files. Please always do that before you set up a new area.
 
 ## Usage
 1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher`, `pip[3[.6]] install -r requirements.txt`, then copy and rename `default.ini.example` to `default.ini` and configure everything. Refer to the table below if you're not sure about specific variables. 
