@@ -836,13 +836,13 @@ if __name__ == "__main__":
 
     if not get_portals():
         write_portals(cursor, config)
-        print("Found an empty portals.txt file - Ran init.py on portals.")
+        print("Found an empty portals.txt file - Copied all missing Portal IDs into it.")
     if not get_stops_unfull() or not get_stops_full():
         write_stops(cursor, config)
-        print("Found an empty stops.txt file - Ran init.py on stops.")
+        print("Found an empty stops.txt file - Copied all missing Stop IDs into it.")
     if not get_gyms_unfull() or not get_gyms_full():
         write_gyms(cursor, config)
-        print("Found an empty gyms.txt file - Ran init.py on gyms.")
+        print("Found an empty gyms.txt file - Copied all missing Gym IDs into it.")
     
     cursor.close()
     mydb.close()
