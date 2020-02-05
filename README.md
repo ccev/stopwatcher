@@ -4,21 +4,20 @@
 Discord Webhooks for new Stops, Gyms and Portals. Will also help with updating names/images and deleting Stops that turned into Gyms.
 
 ## Notes
-- This project is pretty new, so there's a high chance for errors. If you have any questions, feel free to DM me on Discord (Malte#3333)
-- Only tested for python3.6 - no idea if anything is working on other python versions
+- Get support on the [PMSF Discord Server](https://discord.gg/AkBq4yn)
+- Tested for python3.6 - should be working on newer versions, shouldn't work with older python2
 - The Script will work perfectly fine if you don't track Portals. I do still recommend to have an extra Portal Scraper Script running.
-- `stop_watcher.py`, `edit_watcher.py` and `init.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
+- `stop_watcher.py` and `edit_watcher.py` can be run with `-c whatever.ini` to use a custom config file. Should help if you want to use the script for multiple areas or discord channels
 
 ## Usage
 1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher`, `pip[3[.6]] install -r requirements.txt`, then copy and rename `default.ini.example` to `default.ini` and configure everything. Refer to the table below if you're not sure about specific variables. 
-2. IMPORTANT: Before you even touch `stop_watcher.py`, run `init.py` once! This will fill in the cache files with all stops/gyms/portals in your database.
-3. After configuring `default.ini` and running `init.py` you can start the main script using `python[3[.6]] stop_watcher.py`
-4. Set up [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) and have it running every few hours to get working webhooks for new portals
+2. Start stopwatcher using `python[3[.6]] stop_watcher.py`
+3. Set up [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) and have it running every few hours to get working webhooks for new portals
 
 ## Edit Watcher
 There's an additional script in this repo, the `edit_watcher.py`. This will track any changes made to Portal titles, locations and images in your given area and send them to the given Webhook. Note that this only works for Portals.
 
-To enable it, go to the `[Edit Watcher]` part of your config file and fill in `EXTRA_PORTAL_DB_NAME`, `EXTRA_PORTAL_TABLE` and `WEBHOOK_URL`. The first two options are the names for an additional table needed. I recommend to put your manualdb name for `EXTRA_PORTAL_DB_NAME` and `editwatcher_portals` for `EXTRA_PORTAL_TABLE`. The Script will create the table for you. For additional info, please refer to the table below.
+To enable it, fill in the `[Edit Watcher]` part of your config. The Script will create the extra table for you in the given Database. For additional info, please refer to the table below.
 
 ## Static Maps
 ### Examples
@@ -32,7 +31,7 @@ To enable it, go to the `[Edit Watcher]` part of your config file and fill in `E
 ![Mapquest](https://i.imgur.com/X0M1Esh.png)
 ### Usage
 1. Super Fancy mode:
-- I'd recommend to have Super Fancy mode enabled. It will show all surrounding Stops/Gyms in the static map. To use it, you'll need to have `SUPER_FANCY_STATIC_MAPS` enabled, have a working Imgur Client ID and use mapbox as your `PROVIDER`.
+- I'd recommend to have Super Fancy mode enabled. It will show all surrounding Stops/Gyms in the static map. To use it, you'll need to have `SUPER_FANCY_STATIC_MAPS` enabled, a working Imgur Client ID and use mapbox as your `PROVIDER`.
 2. Imgur:
 - Since Super Fancy Static Map URLs are likely to exceed Discord's 2000 character limit, you'll need an Imgur Client ID. I also recommend to turn on `USE_IMGUR_MIRRORS_FOR_EVERYTHING` which will also mirror other types of static maps to Imgur. This will help to protect your API keys and prevents possibly reaching the 2000 character limit.
 - To get your Imgur Client ID, go to https://api.imgur.com/oauth2/addclient, sign in, tick `OAuth 2 authorization without a callback URL` and then fill out `Application name:`, `Email:` and `Description:`. It does not matter what you put in. Solve the captcha and click `submit`. Now copy the Client ID.
@@ -56,23 +55,20 @@ To enable it, go to the `[Edit Watcher]` part of your config file and fill in `E
 | `GYM_UPDATE_THROUGH_PORTAL` | Check for gyms without name/image, then copy them from the corresponding portal | True/False |
 | `STOP_UPDATE_THROUGH_PORTAL` | Check for stops without name/image, then copy them from the corresponding portal | True/False |
 | `DELETE_CONVERTED_STOP` | Delete stops that turned into gyms after updating the gym info. Needs to have `GYM_UPDATE_THROUGH_STOP` or `GYM_UPDATE_THROUGH_PORTAL` enabled | True/False |
-| `MIN_LAT` `MAX_LAT` `MIN_LON` `MAX_LON` | Defines the area the script will be touching things in | Coordinates |
+| `BBOX` | Defines the area the script will be touching things in. Go to [bboxfinder.com](http://bboxfinder.com/), draw a rectangle copy the coordinates next to `Box` in the bottom window. | bbox |
+| `CHAT_APP` | Define which chat app to send Webhooks to | discord/telegram |
+| `LANGUAGE` | What language should the messages be in? (custom languages can be created by copying locale/en.json and renaming it to whatever you put in here) | en/de/pl |
 | `LOOP` | If enabled, the script will loop itself. If disabled, it will stop after running once | True/False |
 | `SECONDS_BETWEEN_LOOPS` | How many seconds to wait between loops | Amount of seconds |
 
-### Embeds
+### Discord
 | Variable | Description | What to put in |
 |-|-|-|
 | `STOP_IMAGE` | Avatar image for stop webhooks | Link |
-| `STOP_DETAILS_USERNAME` | Username for stop webhooks with known name/image | Text |
-| `STOP_NO_DETAILS_USERNAME` | Username for stop webhooks with unknown name/image | Text |
 | `STOP_COLOR` | Color for stop webhooks | Decimal value |
 | `GYM_IMAGE` | Avatar image for gym webhooks | Link |
-| `GYM_DETAILS_USERNAME` | Username for gym webhooks with known name/image | Text |
-| `GYM_NO_DETAILS_USERNAME` | Username for gym webhooks with unknown name/image | Text |
 | `GYM_COLOR` | Color for gym webhooks | Decimal value |
 | `PORTAL_IMAGE` | Avatar image for portal webhooks | Link |
-| `PORTAL_USERNAME` | Username for portal webhooks | Text |
 | `PORTAL_COLOR` | Color for portal webhooks | Decimal value |
 
 ### Static Map
@@ -98,20 +94,18 @@ To enable it, go to the `[Edit Watcher]` part of your config file and fill in `E
 | `EXTRA_PORTAL_DB_NAME` | Name of the DB in which your extra Portal table should be in | Text |
 | `EXTRA_PORTAL_TABLE` | The name of your extra Portal table | Text |
 | `WEBHOOK_URL` | The Webhook URL all tracked Edits will be sent to | URL |
-| `USERNAME` | Username used for Portal Edit Discord Webhooks | Text |
 | `IMAGE` | Image used for Portal Edit Discord Webhooks | Link |
-| `LOCATION_EDIT_TITLE` `TITLE_EDIT_TITLE` `IMAGE_EDIT_TITLE` | Can be used to translate your messages. The embed title will always look like this: "`[Portal Name] [Title Config Option]`" | Text |
-| `FROM` `TO` | Can be used to translate your messages. The embed text will always look like this: "`From [Previous info] \n To [New Info]`" | Text |
+| `DELETED_TIMESPAN` | Edit Watcher will only consider Portals as deleted if they haven't been updated in (this many) seconds | time in s |
+| `DELETED_LIMIT` | If more than (this) many Portals haven't been updated in a while, they won't be marked as deleted. (To prevent false messages if your Scraper cookie ran out) | Number |
 
 ### DB
 | Variable | Description | What to put in |
 |-|-|-|
-| `SCANNER_DB` | The type of scanner you're using | mad/rdm/none |
-| `PORTAL_DB` | The type of db you're using for portals | pmsf/none |
+| `SCANNER_DB_SCHEMA` | The type of scanner you're using | mad/rdm/none |
+| `PORTAL_DB_SCHEMA` | The type of db you're using for portals | pmsf/none |
 | `HOST` `PORT` `USER` `PASSWORD` | Credentials used to connect to your MySQL databases | Credentials |
-| `NAME` | Name of your Scanner DB | Text |
+| `SCANNER_DB_NAME` | Name of your Scanner DB | Text |
 | `PORTAL_DB_NAME` | Name of your Portal DB | Text |
-| - | If you're not using a supported DB schema, you can put "none" for `SCANNER_DB` or `PORTAL_DB` and fill out the last section of the config with your info | - |
 
 ## Credits
 - [kittenswolf](https://github.com/kittenswolf) for making this script's base
