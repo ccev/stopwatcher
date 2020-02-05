@@ -4,7 +4,6 @@ import time
 import json
 import requests
 import argparse
-import init
 import pyimgur
 import geocoder
 import sys
@@ -26,6 +25,7 @@ WHERE (
     {db_lon} >= {lon_small} AND {db_lon} <= {lon_big}
 )
 """
+QUERY_INIT = """SELECT {db_id} FROM {db_dbname}.{db_table}"""
 QUERY_CHECK_GYMS_MAD = """SELECT {db_gymdetails_table}.{db_gym_id}, {db_gym_lat}, {db_gym_lon}, {db_gym_name}, {db_gym_img} FROM {db_dbname}.{db_gym_table}
 RIGHT JOIN {db_gymdetails_table} ON {db_gym_table}.{db_gym_id} = {db_gymdetails_table}.{db_gym_id}
 WHERE (
@@ -308,6 +308,72 @@ def get_gyms_unfull():
 def get_gyms_full():
     return open("txt/gym_full.txt", "r").read().splitlines()
 
+def write_portals(cursor, config):
+    if config['send_portals']:
+        print("Checking for portals to write")
+        check_portals_query = QUERY_INIT.format(
+            db_id=config['db_portal_id'],
+            db_dbname=config['db_portal_dbname'],
+            db_table=config['db_portal_table']
+        )
+        cursor.execute(check_portals_query)
+        portals = cursor.fetchall()
+
+        for db_id in portals:
+            for var in db_id:
+                if not var in get_portals():
+                    print("Writing portal id", var)
+                    with open("txt/portals.txt", "a") as f:
+                        f.write(var + "\n")
+
+def write_stops(cursor, config):
+    if config['send_stops']:
+        print("Checking for stops to write")
+        check_stops_query = QUERY_INIT.format(
+            db_id=config['db_stop_id'],
+            db_dbname=config['db_dbname'],
+            db_table=config['db_stop_table']
+        )
+        cursor.execute(check_stops_query)
+        stops = cursor.fetchall()
+
+        for db_id in stops:
+            for var in db_id:
+                if not var in get_stops_full():
+                    print("Writing full stop id", var)
+                    with open("txt/stop_full.txt", "a") as f:
+                        f.write(var + "\n")
+        for db_id in stops:
+            for var in db_id:
+                if not var in get_stops_unfull():
+                    print("Writing unfull stop id", var)
+                    with open("txt/stop_unfull.txt", "a") as f:
+                        f.write(var + "\n")
+
+def write_gyms(cursor, config):
+    if config['send_gyms']:
+        print("Checking for gyms to write")
+        check_gyms_query = QUERY_INIT.format(
+            db_id=config['db_gym_id'],
+            db_dbname=config['db_dbname'],
+            db_table=config['db_gym_table']
+        )
+        cursor.execute(check_gyms_query)
+        gyms = cursor.fetchall()
+
+        for db_id in gyms:
+            for var in db_id:
+                if not var in get_gyms_full():
+                    print("Writing full gym id", var)
+                    with open("txt/gym_full.txt", "a") as f:
+                        f.write(var + "\n")
+        for db_id in gyms:
+            for var in db_id:
+                if not var in get_gyms_unfull():
+                    print("Writing unfull gym id", var)
+                    with open("txt/gym_unfull.txt", "a") as f:
+                        f.write(var + "\n")
+
 def imgur(static_map, config):
     im = pyimgur.Imgur(config['client_id_imgur'])
     uploaded_image = im.upload_image(url=static_map)
@@ -385,7 +451,7 @@ def generate_text(lat, lon, config):
         else:
             address = ""  
 
-        text = (navigation + "\n" + geocode.address)
+        text = (text + "\n" + geocode.address)
 
     return text
 
@@ -750,6 +816,7 @@ if __name__ == "__main__":
     print("First run! Checking if your txt files are empty...")
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--config", default="default.ini", help="Config file to use")
+    parser.add_argument("-i", "--init", action='store_true', help="Copy every missing Stop/Gym/Portal ID into Stop Watcher's txt files")
     args = parser.parse_args()
     config_path = args.config
     config = create_config(config_path)
@@ -757,17 +824,24 @@ if __name__ == "__main__":
     mydb = connect_db(config)
     cursor = mydb.cursor()
 
+    if args.init:
+        write_portals(cursor, config)
+        write_stops(cursor, config)
+        write_gyms(cursor, config)
+        print("Succesfully copied all missing IDs into the txt files.")
+        sys.exit()
+
     with open(f"locale/{config['language']}.json") as localejson:
         locale = json.load(localejson)
 
     if not get_portals():
-        init.write_portals(cursor, config)
+        write_portals(cursor, config)
         print("Found an empty portals.txt file - Ran init.py on portals.")
     if not get_stops_unfull() or not get_stops_full():
-        init.write_stops(cursor, config)
+        write_stops(cursor, config)
         print("Found an empty stops.txt file - Ran init.py on stops.")
     if not get_gyms_unfull() or not get_gyms_full():
-        init.write_gyms(cursor, config)
+        write_gyms(cursor, config)
         print("Found an empty gyms.txt file - Ran init.py on gyms.")
     
     cursor.close()
