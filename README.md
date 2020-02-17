@@ -58,7 +58,7 @@ To enable it, fill in the `[Edit Watcher]` part of your config. The Script will 
 | `DELETE_CONVERTED_STOP` | Delete stops that turned into gyms after updating the gym info. Needs to have `GYM_UPDATE_THROUGH_STOP` or `GYM_UPDATE_THROUGH_PORTAL` enabled | True/False |
 | `BBOX` | Defines the area the script will be touching things in. Go to [bboxfinder.com](http://bboxfinder.com/), draw a rectangle copy the coordinates next to `Box` in the bottom window. | bbox |
 | `CHAT_APP` | Define which chat app to send Webhooks to | discord/telegram |
-| `LANGUAGE` | What language should the messages be in? (custom languages can be created by copying locale/en.json and renaming it to whatever you put in here) | en/de/pl |
+| `LANGUAGE` | What language should the messages be in? (custom languages can be created by copying locale/en.json and renaming it to whatever you put in here) | en/de/pl/fr |
 | `LOOP` | If enabled, the script will loop itself. If disabled, it will stop after running once | True/False |
 | `SECONDS_BETWEEN_LOOPS` | How many seconds to wait between loops | Amount of seconds |
 
