@@ -271,7 +271,7 @@ def check_edits(config):
         for db_portal_name, db_portal_img, db_portal_id in result_deleted:
             if not db_portal_id in get_deleted():
                 print("Found possible deleted Portal: " + db_portal_name)
-                embed_desc = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_poi_lat) + "," + str(db_poi_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18)")
+                embed_desc = ("[Google Maps](https://www.google.com/maps/search/?api=1&query=" + str(db_portal_lat) + "," + str(db_portal_lon) + ") | [Intel](https://intel.ingress.com/intel?ll=" + str(db_portal_lat) + "," + str(db_portal_lon) + "&z=18)")
                 embed_title = (db_portal_name + " " + locale['deleted_title'])
                 data = {
                     "username": locale['edit_title'],
