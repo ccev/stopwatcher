@@ -1,0 +1,14 @@
+{
+    "full_stop_title": "Informations du Pokéstop",
+    "unfull_stop_title": "Nouveau PokéStop",
+    "full_gym_title": "Nouvelle Arène",
+    "unfull_gym_title": "Nouvelle Arène",
+    "portal_title": "Nouveau Portail",
+    "edit_title": "Modifier le Portail",
+    "location_edit_title": "a été déplacé",
+    "title_edit_title": "a changé de nom",
+    "image_edit_title": "a changé d'image",
+    "deleted_title": "a (probablement) été supprimé",
+    "from": "De",
+    "to": "À"
+}
