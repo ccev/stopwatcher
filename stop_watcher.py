@@ -376,7 +376,7 @@ def write_gyms(cursor, config):
 
 def imgur(static_map, config):
     imgursuccess = 0
-    while imgursuccess = 0
+    while imgursuccess == 0:
         try:
             im = pyimgur.Imgur(config['client_id_imgur'])
             uploaded_image = im.upload_image(url=static_map)
