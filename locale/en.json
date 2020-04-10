@@ -1,14 +1,13 @@
 {
-    "full_stop_title": "Pokéstop Details",
-    "unfull_stop_title": "New Pokéstop",
-    "full_gym_title": "New Gym",
-    "unfull_gym_title": "New Gym",
-    "portal_title": "New Portal",
-    "edit_title": "Portal Edit",
-    "location_edit_title": "was moved",
-    "title_edit_title": "got another title",
-    "image_edit_title": "got another image",
-    "deleted_title": "(probably) got deleted",
-    "from": "From",
-    "to": "To"
+    "stop_name": "New Pokéstop",
+    "gym_name": "New Gym",
+    "portal_name": "New Portal",
+    "portal_edit_name": "Portal Edit",
+    "stop_edit_name": "Pokéstop Edit",
+    "gym_edit_name": "Gym Edit",
+    "location_edit_title": "{name} was moved",
+    "name_edit_title": "{name} got another title",
+    "img_edit_title": "{name} got another image",
+    "deleted_title": "{name} (probably) got deleted",
+    "edit_text": "From {old}\nTo {new}"
 }

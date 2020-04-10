@@ -1,0 +1,25 @@
+[
+    {
+        "area": "area_name",
+        "send": ["stops", "gyms"],
+        "update": ["stops", "gyms"],
+        "delete_converted_stops": true,
+        "send_empty": true,
+        "webhook": "https://www.url.com/"
+    },
+    {
+        "area": "area_name",
+        "send": ["portals"],
+        "update": ["stops", "gyms"],
+        "delete_converted_stops": true,
+        "chat_id": "83726478934",
+        "bot_id": "7823648432"
+    },
+    {
+        "area": "area_name",
+        "edits": ["portals", "stops", "gyms"],
+        "edit_types": ["location", "name", "image"],
+        "chat_id": "83726478934",
+        "bot_id": "7823648432"
+    }
+]
