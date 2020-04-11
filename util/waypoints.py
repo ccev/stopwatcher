@@ -175,11 +175,13 @@ class waypoint():
                     payload = {"chat_id": str(chat_id), "photo": image}
                     result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendPhoto", params = payload)
                     print(f"Result {result.status_code} for Photo")
+                    print(result.text)
                 if not text == "":
                     text = f"\n\n{text}"
                 payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){links}"}
                 result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendMessage", params = payload)
                 print(f"Result {result.status_code} for Text")
+                print(result.text)
                 time.sleep(2)
 
     def send_location_edit(self, fil, old_lat, old_lon):
