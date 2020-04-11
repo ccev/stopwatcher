@@ -112,18 +112,17 @@ class create_queries():
     
     def get_full_stop_by_id(self, w_id):
         if self.schema == "mad":
-            self.cursor.execute(f"SELECT latitude, longitude name, image FROM pokestop WHERE pokestop_id = '{w_id}';")
+            self.cursor.execute(f"SELECT latitude, longitude, name, image FROM pokestop WHERE pokestop_id = '{w_id}';")
         elif self.schema == "rdm":
             self.cursor.execute(f"SELECT lat, lon, name, url FROM pokestop WHERE id = '{w_id}';")
         stops = self.cursor.fetchone()
         return stops
 
     def get_full_gym_by_id(self, w_id):
-        self.convert_area(area)
         if self.schema == "mad":
-            self.cursor.execute(f"SELECT latitude, longitude, name, url FROM gym LEFT JOIN gymdetails on gym.gym_id = gymdetails.gym_id WHERE gym.gym_id = {w_id};")
+            self.cursor.execute(f"SELECT latitude, longitude, name, url FROM gym LEFT JOIN gymdetails on gym.gym_id = gymdetails.gym_id WHERE gym.gym_id = '{w_id}';")
         elif self.schema == "rdm":
-            self.cursor.execute(f"SELECT lat, lon, name, url FROM gym WHERE id = {w_id};")
+            self.cursor.execute(f"SELECT lat, lon, name, url FROM gym WHERE id = '{w_id}';")
         gyms = self.cursor.fetchone()
         return gyms
 
@@ -136,21 +135,22 @@ class create_queries():
             edit_list["portals"] = []
         
         try:
-            stops = self.get_portals("")
+            stops = self.get_stops("")
             for s_id, s_lat, s_lon, s_name, s_img in stops:
-                edit_list["stops"].append([s_id, s_lat, s_lon, s_name, s_img])
+                if s_name is not None:
+                    edit_list["stops"].append([s_id, s_lat, s_lon, s_name, s_img])
         except:
             edit_list["stops"] = []
         
         try:
             gyms = self.get_gyms("")
             for g_id, g_lat, g_lon, g_name, g_img in gyms:
-                edit_list["gyms"].append([g_id, g_lat, g_lon, g_name, g_img])
+                if (g_name is not None) and (g_name != "unknown"):
+                    edit_list["gyms"].append([g_id, g_lat, g_lon, g_name, g_img])
         except:
             edit_list["gyms"] = []
         
         return edit_list
-
 
     def static_portals(self, limit, lat, lon):
         self.cursor.execute(f"SELECT lat, lon, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM {self.portal}.ingress_portals WHERE lat != {lat} AND lon != {lon} ORDER BY distance ASC LIMIT {limit};")

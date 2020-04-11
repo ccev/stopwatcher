@@ -1,0 +1,31 @@
+{
+    "style": "osm-bright",
+    "latitude": {{lat}},
+    "longitude": {{lon}},
+    "zoom": 17.5,
+    "width": 800,
+    "height": 500,
+    "scale": 1,
+    "markers": [
+        {% if pointjson %}
+        {% for wp in pointjson %}
+        {
+            "url": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/{{wp[2]}}_gray.png",
+            "latitude": {{wp[0]}},
+            "longitude": {{wp[1]}},
+            "width": 48,
+            "height": 48,
+            "y_offset": -24
+        },
+        {% endfor %}
+        {% endif %}
+        {
+            "url": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/{{type}}_normal.png",
+            "latitude": {{lat}},
+            "longitude": {{lon}},
+            "width": 64,
+            "height": 64,
+            "y_offset": -32
+        }
+    ]
+}

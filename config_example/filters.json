@@ -1,24 +1,25 @@
 [
     {
         "area": "area_name",
-        "send": ["stops", "gyms"],
-        "update": ["stops", "gyms"],
+        "send": ["stop", "gym"],
+        "update": ["stop", "gym"],
         "delete_converted_stops": true,
         "send_empty": true,
         "webhook": "https://www.url.com/"
     },
     {
         "area": "area_name",
-        "send": ["portals"],
-        "update": ["stops", "gyms"],
+        "send": ["portal"],
+        "update": ["stop", "gym"],
         "delete_converted_stops": true,
         "chat_id": "83726478934",
         "bot_id": "7823648432"
     },
     {
         "area": "area_name",
-        "edits": ["portals", "stops", "gyms"],
+        "edits": ["portal", "stop", "gym"],
         "edit_types": ["location", "title", "photo"],
+        "webhook": "https://www.url.com/",
         "chat_id": "83726478934",
         "bot_id": "7823648432"
     }

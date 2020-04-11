@@ -175,7 +175,7 @@ for fil in config.filters:
                         stop.send_name_edit(fil, s_img)
         if "gym" in fil["edits"]:
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"]:
-                s = queries.get_full_stop_by_id(g_id)
+                g = queries.get_full_gym_by_id(g_id)
                 #0=lat, 1=lon, 2=name, 3=img
                 if (g_lat != g[0]) or (g_lon != g[1]):
                     if "location" in fil["edit_types"]:

@@ -57,6 +57,8 @@ class waypoint():
         if self.empty:
             title = ""
             image = ""
+        for char in ["_", "*", "[", "]", "(", ")", "~", "`", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
+            title = title.replace(char, f"\\{char}")
 
         # Text
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
@@ -125,8 +127,7 @@ class waypoint():
                 for lat, lon, w_type, dis in waypoints:
                     static_list.append([lat,lon,w_type])
             if len(static_list) > 0:
-                static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "\"")
-            print(static_map)
+                static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
         elif self.config.static_provider == "mapbox":
             limit = 32
             static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
@@ -139,10 +140,11 @@ class waypoint():
                 for lat, lon, w_type, dis in waypoints:
                     static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
             static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({lon},{lat})/{lon},{lat},16/800x500?access_token={self.config.static_key}"
-   
+        
         try:
             static_map = short(static_map)
-            time.sleep(5)
+            #if self.config.static_provider == "tileserver":
+            #    time.sleep(10)
         except:
             static_map = ""
 
@@ -163,25 +165,24 @@ class waypoint():
                     }
                 }]
             }
-            print(data)
             for webhook in fil["webhook"]:
                 result = requests.post(webhook, json=data)
                 print(result)
                 time.sleep(2)
 
         if "bot_id" in fil:
+            for char in ["_", "*", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
+                text = text.replace(char, f"\\{char}")
             for chat_id in fil["chat_id"]:
                 if not self.empty:
                     payload = {"chat_id": str(chat_id), "photo": image}
                     result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendPhoto", params = payload)
                     print(f"Result {result.status_code} for Photo")
-                    print(result.text)
                 if not text == "":
                     text = f"\n\n{text}"
                 payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){links}"}
                 result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendMessage", params = payload)
                 print(f"Result {result.status_code} for Text")
-                print(result.text)
                 time.sleep(2)
 
     def send_location_edit(self, fil, old_lat, old_lon):
@@ -195,6 +196,7 @@ class waypoint():
         print(f"Found edited name of {self.type} {old_name} - Sending now.")
         self.edit = True
         title = self.locale["name_edit_title"].format(name = self.name)
+
         text = self.locale["edit_text"].format(old = f"`{old_name}`", new = f"`{self.name}`")
         self.send(fil, text, title)
 
