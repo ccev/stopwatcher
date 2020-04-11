@@ -112,8 +112,21 @@ class waypoint():
             static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
         elif self.config.static_provider == "osm":
             static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=17&key={self.config.static_key}"
-        elif self.config.static_provider == "tileserver-gl":
-            static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(lat) + "/" + str(lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(lat) + "%2C%22longitude%22%3A%20" + str(lon) + "%7D%5D")    
+        elif self.config.static_provider == "tileserver":
+            limit = 10
+            static_map = f"{self.config.static_key}staticmap/stopwatcher?lat={self.lat}&lon={self.lon}&type={self.type}"
+            static_list = json.loads("[]")
+            if self.type == "portal":
+                portals = self.queries.static_portals(limit, self.lat, self.lon)
+                for lat, lon, dis in portals:
+                    static_list.append([lat,lon,"portal"])
+            else:
+                waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
+                for lat, lon, w_type, dis in waypoints:
+                    static_list.append([lat,lon,w_type])
+            if len(static_list) > 0:
+                static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "\"")
+            print(static_map)
         elif self.config.static_provider == "mapbox":
             limit = 32
             static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
@@ -126,9 +139,10 @@ class waypoint():
                 for lat, lon, w_type, dis in waypoints:
                     static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
             static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({lon},{lat})/{lon},{lat},16/800x500?access_token={self.config.static_key}"
-            
+   
         try:
             static_map = short(static_map)
+            time.sleep(5)
         except:
             static_map = ""
 
@@ -149,6 +163,7 @@ class waypoint():
                     }
                 }]
             }
+            print(data)
             for webhook in fil["webhook"]:
                 result = requests.post(webhook, json=data)
                 print(result)

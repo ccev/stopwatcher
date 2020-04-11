@@ -157,5 +157,10 @@ class create_queries():
         portals = self.cursor.fetchall()
         return portals
 
-    def static_waypoints(self, limit):
-        return
+    def static_waypoints(self, limit, lat, lon):
+        if self.schema == "mad":
+            self.cursor.execute(f"(SELECT latitude, longitude, 'stop' AS type, POW(69.1 * (latitude - {lat}), 2) + POW(69.1 * ({lon} - longitude) * COS(latitude / 57.3), 2) AS distance FROM pokestop WHERE latitude != {lat} AND longitude != {lon}) UNION (SELECT latitude, longitude, 'gym' AS type, POW(69.1 * (latitude - {lat}), 2) + POW(69.1 * ({lon} - longitude) * COS(latitude / 57.3), 2) AS distance FROM gym WHERE latitude != {lat} AND longitude != {lon}) ORDER BY distance ASC LIMIT {limit};")
+        elif self.schema == "rdm":
+            self.cursor.execute(f"SELECT lat, lon, name, url FROM pokestop WHERE id = '{w_id}';")
+        points = self.cursor.fetchall()
+        return points
