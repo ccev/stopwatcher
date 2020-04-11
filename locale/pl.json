@@ -1,0 +1,13 @@
+{
+    "stop_name": "Nowy Pokestop",
+    "gym_name": "Nowy Gym",
+    "portal_name": "Nowy Portal",
+    "portal_edit_name": "Portal został edytowany",
+    "stop_edit_name": "Pokestop został edytowany",
+    "gym_edit_name": "Gym został edytowany",
+    "location_edit_title": "{name} został przesunięty",
+    "name_edit_title": "{name} ma nową nazwę",
+    "img_edit_title": "{name} ma nowe zdjęcie",
+    "deleted_title": "{name} prawdopodobnie został usunięty",
+    "edit_text": "Wcześniej {old}\nTeraz {new}"
+}
