@@ -18,7 +18,7 @@
     {
         "area": "area_name",
         "edits": ["portals", "stops", "gyms"],
-        "edit_types": ["location", "name", "image"],
+        "edit_types": ["location", "title", "photo"],
         "chat_id": "83726478934",
         "bot_id": "7823648432"
     }

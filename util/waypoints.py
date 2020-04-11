@@ -1,5 +1,6 @@
 import requests
 import time
+import json
 
 class waypoint():
     def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = None, lon = None):
@@ -19,11 +20,32 @@ class waypoint():
             self.empty = True
 
     def update(self):
-        return
+        needs_update = True
+        if self.type == "gym":
+            try:
+                stop = self.queries.get_stop_by_id(self.id)
+                for s_name, s_img in stop:
+                    if s_name is not None:
+                        self.queries.update_waypoint(self.type, self.id, s_name, s_img)
+                        print(f"Updated {self.type} {s_name}")
+                        needs_update = False
+            except:
+                needs_update = True
+
+        if needs_update:
+            try:
+                portal = self.queries.get_portal_by_id(self.id)
+                for p_name, p_img in portal:
+                    if p_name is not None:
+                        self.queries.update_waypoint(self.type, self.id, p_name, p_img)
+                        print(f"Updated {self.type} {p_name}")
+                        needs_update = False
+            except:
+                needs_update = True
 
     def delete(self):
         print(f"Deleting converted {self.type} {self.name} from your DB")
-        queries.delete_stop(self.id)
+        self.queries.delete_stop(self.id)
 
     def send(self, fil, text = "", title = ""):     
         # Title + image
@@ -57,9 +79,7 @@ class waypoint():
                     map_url = f"{self.config.map_url}@gym/:{self.id}"
             elif self.config.map_provider == "rmad":
                 map_url = f"{self.config.map_url}?lat={self.lat}&lon={self.lon}&zoom=18"
-            links = f"{links} | [{self.config.map_name}]({map_url})"
- 
-        text = f"{text}\n\n{links}"
+            links = f"{links} \\| [{self.config.map_name}]({map_url})"
 
         # WP specific stuff
         if self.type == "portal":
@@ -102,7 +122,7 @@ class waypoint():
                 "avatar_url": embed_avatar,
                 "embeds": [{
                     "title": title,
-                    "description": text,
+                    "description": f"{text}\n\n{links}",
                     "color": embed_color,
                     "thumbnail": {
                         "url": image
@@ -115,6 +135,19 @@ class waypoint():
             for webhook in fil["webhook"]:
                 result = requests.post(webhook, json=data)
                 print(result)
+                time.sleep(2)
+
+        if "bot_id" in fil:
+            for chat_id in fil["chat_id"]:
+                if not self.empty:
+                    payload = {"chat_id": str(chat_id), "photo": image}
+                    result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendPhoto", params = payload)
+                    print(f"Result {result.status_code} for Photo")
+                if not text == "":
+                    text = f"\n{text}"
+                payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){links}"}
+                result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendMessage", params = payload)
+                print(f"Result {result.status_code} for Text")
                 time.sleep(2)
 
     def send_location_edit(self, fil, old_lat, old_lon):
@@ -143,3 +176,28 @@ class waypoint():
         self.edit = True
         title = self.locale["deleted_title"].format(name = self.name)
         self.send(fil, "", title)
+
+class init():
+    def __init__(self, queries):
+        self.queries = queries
+    
+    def write_portals(self, portal_cache):
+        portals = self.queries.get_portals("")
+        for p_id, p_lat, p_lon, p_name, p_img in portals:
+            if not p_id in portal_cache:
+                portal_cache.append(p_id)
+        return portal_cache
+
+    def write_stops(self, stop_cache):
+        stops = self.queries.get_stops("")
+        for s_id, s_lat, s_lon, s_name, s_img in stops:
+            if not s_id in stop_cache:
+                stop_cache.append(s_id)
+        return stop_cache
+
+    def write_gyms(self, gym_cache):
+        gyms = self.queries.get_gyms("")
+        for g_id, g_lat, g_lon, g_name, g_img in gyms:
+            if not g_id in gym_cache:
+                gym_cache.append(g_id)
+        return gym_cache

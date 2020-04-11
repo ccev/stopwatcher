@@ -6,8 +6,8 @@
     "stop_edit_name": "Pokéstop Edit",
     "gym_edit_name": "Gym Edit",
     "location_edit_title": "{name} was moved",
-    "name_edit_title": "{name} got another title",
-    "img_edit_title": "{name} got another image",
-    "deleted_title": "{name} (probably) got deleted",
+    "name_edit_title": "{name}'s title changed",
+    "img_edit_title": "{name} got a new photo",
+    "deleted_title": "{name} (probably) got removed",
     "edit_text": "From {old}\nTo {new}"
 }

@@ -28,7 +28,6 @@ class create_config:
         self.scan_type = config_file.get("DB", "scanner").lower()
         self.db_name_scan = config_file.get("DB", "scanner_db_name")
         self.db_name_portal = config_file.get("DB", "portal_db_name")
-        self.db_name_extra = config_file.get("DB", "stopwatcher_db_name")
 
         self.db_host = config_file.get("DB", "host")
         self.db_port = config_file.getint("DB", "port")

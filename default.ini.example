@@ -21,8 +21,6 @@ geocoding_provider = google
 scanner = mad
 scanner_db_name = maddb
 portal_db_name = manualdb
-stopwatcher_db_name = stopwatcher
-# An extra DB is only needed for Edit checking. Check readme!
 
 host = 0.0.0.0
 port = 3306
