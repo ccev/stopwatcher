@@ -1,6 +1,7 @@
 import requests
 import time
 import json
+import pyshorteners
 
 class waypoint():
     def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = None, lon = None):
@@ -60,7 +61,7 @@ class waypoint():
         # Text
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
-            links = f"{links} | [Intel](https://intel.ingress.com/intel?ll={self.lat},{self.lon}&z=18&pll={self.lat},{self.lon})"
+            links = f"{links} \\| [Intel](https://intel.ingress.com/intel?ll={self.lat},{self.lon}&z=18&pll={self.lat},{self.lon})"
 
         if self.config.use_map:
             map_url = ""
@@ -86,34 +87,50 @@ class waypoint():
             static_color = "c067fc"
             embed_color = 12609532
             embed_username = self.locale["portal_name"]
-            embed_avatar = "https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/portal.png"
+            embed_avatar = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/portal.png"
             if self.edit:
                 embed_username = self.locale["portal_edit_name"]
         elif self.type == "stop":
             static_color = "128fed"
             embed_color = 1216493
             embed_username = self.locale["stop_name"]
-            embed_avatar = "https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/stop.png"
+            embed_avatar = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/stop.png"
             if self.edit:
                 embed_username = self.locale["stop_edit_name"]
         elif self.type == "gym":
             static_color = "bac0c5"
             embed_color = 12239045
             embed_username = self.locale["gym_name"]
-            embed_avatar = "https://raw.githubusercontent.com/ccev/stopwatcher/master/icons/gym.png"
+            embed_avatar = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/gym.png"
             if self.edit:
                 embed_username = self.locale["gym_edit_name"]
 
         # Static Map
         static_map = ""
+        short = pyshorteners.Shortener().tinyurl.short
         if self.config.static_provider == "google":
-            static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=18&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
+            static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
         elif self.config.static_provider == "osm":
-            static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=18&key={self.config.static_key}"
+            static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=17&key={self.config.static_key}"
         elif self.config.static_provider == "tileserver-gl":
             static_map = (config['static_selfhosted_url'] + "static/klokantech-basic/" + str(lat) + "/" + str(lon) + "/" + str(config['static_zoom']) + "/" + str(config['static_width']) + "/" + str(config['static_height']) + "/1/png?markers=%5B%7B%22url%22%3A%22https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher%2Fmaster%2Ficons%2Fstaticmap%2Fstop_normal.png%22%2C%22height%22%3A128%2C%22width%22%3A128%2C%22x_offset%22%3A0%2C%22y_offset%22%3A0%2C%22latitude%22%3A%20" + str(lat) + "%2C%22longitude%22%3A%20" + str(lon) + "%7D%5D")    
         elif self.config.static_provider == "mapbox":
-            return
+            limit = 32
+            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
+            if self.type == "portal":
+                portals = self.queries.static_portals(limit, self.lat, self.lon)
+                for lat, lon, dis in portals:
+                    static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2Fportal_gray.png({lon},{lat}),"
+            else:
+                waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
+                for lat, lon, w_type, dis in waypoints:
+                    static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
+            static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({lon},{lat})/{lon},{lat},16/800x500?access_token={self.config.static_key}"
+            
+        try:
+            static_map = short(static_map)
+        except:
+            static_map = ""
 
         # Send
         if "webhook" in fil:
@@ -144,7 +161,7 @@ class waypoint():
                     result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendPhoto", params = payload)
                     print(f"Result {result.status_code} for Photo")
                 if not text == "":
-                    text = f"\n{text}"
+                    text = f"\n\n{text}"
                 payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){links}"}
                 result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendMessage", params = payload)
                 print(f"Result {result.status_code} for Text")

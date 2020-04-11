@@ -4,7 +4,6 @@ class create_queries():
     def __init__(self, config, cursor):
         self.cursor = cursor
         self.portal = config.db_name_portal
-        self.extra = config.db_name_extra
         self.schema = config.scan_type
         self.geofences = config.geofences
 
@@ -151,3 +150,12 @@ class create_queries():
             edit_list["gyms"] = []
         
         return edit_list
+
+
+    def static_portals(self, limit, lat, lon):
+        self.cursor.execute(f"SELECT lat, lon, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM {self.portal}.ingress_portals WHERE lat != {lat} AND lon != {lon} ORDER BY distance ASC LIMIT {limit};")
+        portals = self.cursor.fetchall()
+        return portals
+
+    def static_waypoints(self, limit):
+        return

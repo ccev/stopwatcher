@@ -1,7 +1,5 @@
 [Config]
 language = en
-loop = False
-seconds_between_loops = 600
 portal_scraper_interval = 3600
 
 [Maps]

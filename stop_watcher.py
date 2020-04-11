@@ -159,7 +159,7 @@ for fil in config.filters:
                         portal.send_name_edit(fil, p_img)
         if "stop" in fil["edits"]:
             for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"]:
-                s = queries.get_full_stos_by_id(s_id)
+                s = queries.get_full_stop_by_id(s_id)
                 #0=lat, 1=lon, 2=name, 3=img
                 if (s_lat != s[0]) or (s_lon != s[1]):
                     if "location" in fil["edit_types"]:
@@ -175,7 +175,7 @@ for fil in config.filters:
                         stop.send_name_edit(fil, s_img)
         if "gym" in fil["edits"]:
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"]:
-                s = queries.get_full_stog_by_id(g_id)
+                s = queries.get_full_stop_by_id(g_id)
                 #0=lat, 1=lon, 2=name, 3=img
                 if (g_lat != g[0]) or (g_lon != g[1]):
                     if "location" in fil["edit_types"]:

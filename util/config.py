@@ -7,8 +7,6 @@ class create_config:
         config_file.read(config_path)
 
         self.language = config_file.get("Config", "language").lower()
-        self.loop = config_file.getboolean("Config", "loop")
-        self.loop_wait = config_file.getint("Config", "seconds_between_loops")
         self.scraper_wait = config_file.getint("Config", "portal_scraper_interval")
 
 
