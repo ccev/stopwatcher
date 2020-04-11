@@ -143,8 +143,8 @@ class waypoint():
         
         try:
             static_map = short(static_map)
-            #if self.config.static_provider == "tileserver":
-            #    time.sleep(10)
+            if self.config.static_provider == "tileserver":
+                time.sleep(5)
         except:
             static_map = ""
 
