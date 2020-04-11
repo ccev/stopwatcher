@@ -5,22 +5,22 @@
         "update": ["stop", "gym"],
         "delete_converted_stops": true,
         "send_empty": true,
-        "webhook": "https://www.url.com/"
+        "webhook": ["https://www.url.com/"]
     },
     {
         "area": "area_name",
         "send": ["portal"],
         "update": ["stop", "gym"],
         "delete_converted_stops": true,
-        "chat_id": "83726478934",
+        "chat_id": ["83726478934","83726478934"],
         "bot_id": "7823648432"
     },
     {
         "area": "area_name",
         "edits": ["portal", "stop", "gym"],
         "edit_types": ["location", "title", "photo"],
-        "webhook": "https://www.url.com/",
-        "chat_id": "83726478934",
+        "webhook": ["https://www.url.com/","https://www.url.com/"],
+        "chat_id": ["83726478934"],
         "bot_id": "7823648432"
     }
 ]
