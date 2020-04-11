@@ -115,7 +115,7 @@ class waypoint():
         elif self.config.static_provider == "osm":
             static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=17&key={self.config.static_key}"
         elif self.config.static_provider == "tileserver":
-            limit = 10
+            limit = 30
             static_map = f"{self.config.static_key}staticmap/stopwatcher?lat={self.lat}&lon={self.lon}&type={self.type}"
             static_list = json.loads("[]")
             if self.type == "portal":
