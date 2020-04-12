@@ -128,6 +128,7 @@ class waypoint():
                     static_list.append([lat,lon,w_type])
             if len(static_list) > 0:
                 static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+            requests.get(static_map)
         elif self.config.static_provider == "mapbox":
             limit = 32
             static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
@@ -143,12 +144,9 @@ class waypoint():
         
         try:
             static_map = short(static_map)
-            if self.config.static_provider == "tileserver":
-                time.sleep(5)
         except:
             static_map = ""
 
-        print(static_map)
         # Send
         if "webhook" in fil:
             data = {
