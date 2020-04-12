@@ -82,11 +82,11 @@ if (len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"])
     print("Found empty Edit Cache. Trying to fill it now.")
     edit_list = queries.create_edit_list(empty_edit_list)
 
-new_portal_cache = portal_cache
-new_full_stop_cache = full_stop_cache
-new_empty_stop_cache = empty_stop_cache
-new_full_gym_cache = full_gym_cache
-new_empty_gym_cache = empty_gym_cache
+new_portal_cache = portal_cache.copy()
+new_full_stop_cache = full_stop_cache.copy()
+new_empty_stop_cache = empty_stop_cache.copy()
+new_full_gym_cache = full_gym_cache.copy()
+new_empty_gym_cache = empty_gym_cache.copy()
 
 print("Ready to watch Stops")
 
