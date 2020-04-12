@@ -6,6 +6,7 @@ class create_queries():
         self.portal = config.db_name_portal
         self.schema = config.scan_type
         self.geofences = config.geofences
+        self.filters = config.filters
 
     def convert_area(self, area_name):
         stringfence = "-100 -100, -100 100, 100 100, 100 -100, -100 -100"
@@ -127,28 +128,37 @@ class create_queries():
         return gyms
 
     def create_edit_list(self, edit_list):
-        try:
-            portals = self.get_portals("")
-            for p_id, p_lat, p_lon, p_name, p_img in portals:
-                edit_list["portals"].append([p_id, p_lat, p_lon, p_name, p_img])
-        except:
-            edit_list["portals"] = []
-        
-        try:
-            stops = self.get_stops("")
-            for s_id, s_lat, s_lon, s_name, s_img in stops:
-                if s_name is not None:
-                    edit_list["stops"].append([s_id, s_lat, s_lon, s_name, s_img])
-        except:
-            edit_list["stops"] = []
-        
-        try:
-            gyms = self.get_gyms("")
-            for g_id, g_lat, g_lon, g_name, g_img in gyms:
-                if (g_name is not None) and (g_name != "unknown"):
-                    edit_list["gyms"].append([g_id, g_lat, g_lon, g_name, g_img])
-        except:
-            edit_list["gyms"] = []
+        area_list = []
+        for fil in self.filters:
+            if not fil["area"] in area_list:
+                area_list.append(fil["area"])
+        for area in area_list:
+            edit_list["portals"][area] = []
+            edit_list["stops"][area] = []
+            edit_list["gyms"][area] = []
+
+            try:
+                portals = self.get_portals(area)
+                for p_id, p_lat, p_lon, p_name, p_img in portals:
+                    edit_list["portals"][area].append([p_id, p_lat, p_lon, p_name, p_img])
+            except:
+                edit_list["portals"] = []
+            
+            try:
+                stops = self.get_stops(area)
+                for s_id, s_lat, s_lon, s_name, s_img in stops:
+                    if s_name is not None:
+                        edit_list["stops"][area].append([s_id, s_lat, s_lon, s_name, s_img])
+            except:
+                edit_list["stops"] = []
+            
+            try:
+                gyms = self.get_gyms(area)
+                for g_id, g_lat, g_lon, g_name, g_img in gyms:
+                    if (g_name is not None) and (g_name != "unknown"):
+                        edit_list["gyms"][area].append([g_id, g_lat, g_lon, g_name, g_img])
+            except:
+                edit_list["gyms"] = []
         
         return edit_list
 

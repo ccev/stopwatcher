@@ -157,7 +157,7 @@ for fil in config.filters:
     if "edits" in fil:
         if "portal" in fil["edits"]:
             print("Looking for Portal Edits")
-            for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"]:
+            for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"][fil["area"]]:
                 p = queries.get_full_portal_by_id(p_id)
                 #0=lat, 1=lon, 2=name, 3=img
                 if (p_lat != p[0]) or (p_lon != p[1]):
@@ -174,7 +174,7 @@ for fil in config.filters:
                         portal.send_img_edit(fil, p_img)
         if "stop" in fil["edits"]:
             print("Looking for Stop Edits")
-            for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"]:
+            for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"][fil["area"]]:
                 s = queries.get_full_stop_by_id(s_id)
                 #0=lat, 1=lon, 2=name, 3=img
                 if (s_lat != s[0]) or (s_lon != s[1]):
@@ -191,7 +191,7 @@ for fil in config.filters:
                         stop.send_img_edit(fil, s_img)
         if "gym" in fil["edits"]:
             print("Looking for Gym Edits")
-            for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"]:
+            for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"][fil["area"]]:
                 g = queries.get_full_gym_by_id(g_id)
                 #0=lat, 1=lon, 2=name, 3=img
                 if (g_lat != g[0]) or (g_lon != g[1]):
