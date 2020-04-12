@@ -24,23 +24,23 @@ with open(f"locale/{config.language}.json", encoding="utf-8") as f:
 
 with open("config/cache/portals.json", encoding="utf-8") as f:
     portal_cache = json.load(f)
-    new_portal_cache = json.load(f)
+new_portal_cache = portal_cache
 
 with open("config/cache/stops_full.json", encoding="utf-8") as f:
     full_stop_cache = json.load(f)
-    new_full_stop_cache = json.load(f)
+new_full_stop_cache = full_stop_cache
 
 with open("config/cache/stops_empty.json", encoding="utf-8") as f:
     empty_stop_cache = json.load(f)
-    new_empty_stop_cache = json.load(f)
+new_empty_stop_cache = empty_stop_cache
 
 with open("config/cache/gyms_full.json", encoding="utf-8") as f:
     full_gym_cache = json.load(f)
-    new_full_gym_cache = json.load(f)
+new_full_gym_cache = full_gym_cache
 
 with open("config/cache/gyms_empty.json", encoding="utf-8") as f:
     empty_gym_cache = json.load(f)
-    new_empty_gym_cache = json.load(f)
+new_empty_gym_cache = empty_gym_cache
 
 with open("config/cache/edits.json", encoding="utf-8") as f:
     edit_list = json.load(f)
