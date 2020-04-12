@@ -375,9 +375,16 @@ def write_gyms(cursor, config):
                         f.write(var + "\n")
 
 def imgur(static_map, config):
-    im = pyimgur.Imgur(config['client_id_imgur'])
-    uploaded_image = im.upload_image(url=static_map)
-    static_map = (uploaded_image.link)
+    imgursuccess = 0
+    while imgursuccess == 0:
+        try:
+            im = pyimgur.Imgur(config['client_id_imgur'])
+            uploaded_image = im.upload_image(url=static_map)
+            static_map = (uploaded_image.link)
+            imgursuccess = 1
+        except:
+            print("Imgur error. Sleeping 1 hour")
+            time.sleep(3600)
     return static_map
 
 def generate_static_map(poitype, lat, lon, config):
