@@ -83,7 +83,7 @@ if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
     except:
         print("Error while doing that. Just skipping it.")
 
-if len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"]):
+if len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"]) == 6:
     print("Found empty Edit Cache. Trying to fill it now.")
     edit_list = queries.create_edit_list(empty_edit_list)
 
