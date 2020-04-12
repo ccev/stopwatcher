@@ -64,7 +64,7 @@ class create_queries():
         if self.schema == "mad":
             self.cursor.execute(f"SELECT pokestop_id, name FROM pokestop WHERE pokestop_id IN (SELECT gym_id FROM gym) AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(latitude, longitude));")
         elif self.schema == "rdm":
-            self.cursor.execute(f"SELECT id, name FROM pokestop WHERE (SELECT id FROM gym) AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+            self.cursor.execute(f"SELECT id, name FROM pokestop WHERE id IN (SELECT id FROM gym) AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
         stops = self.cursor.fetchall()
         return stops
 

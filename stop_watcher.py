@@ -171,7 +171,7 @@ for fil in config.filters:
                 if p_img != p[3]:
                     if "photo" in fil["edit_types"]:
                         portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
-                        portal.send_name_edit(fil, p_img)
+                        portal.send_img_edit(fil, p_img)
         if "stop" in fil["edits"]:
             print("Looking for Stop Edits")
             for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"]:
@@ -188,7 +188,7 @@ for fil in config.filters:
                 if s_img != s[3]:
                     if "photo" in fil["edit_types"]:
                         stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                        stop.send_name_edit(fil, s_img)
+                        stop.send_img_edit(fil, s_img)
         if "gym" in fil["edits"]:
             print("Looking for Gym Edits")
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"]:
@@ -205,7 +205,7 @@ for fil in config.filters:
                 if g_img != g[3]:
                     if "photo" in fil["edit_types"]:
                         gym = waypoint(queries, config, "gym", g_id, g[2], g[3], g[0], g[1])
-                        gym.send_name_edit(fil, g_img)
+                        gym.send_img_edit(fil, g_img)
 
 if any("edits" in i for i in config.filters):
     print("Updating Edit Cache")

@@ -148,6 +148,7 @@ class waypoint():
         except:
             static_map = ""
 
+        print(static_map)
         # Send
         if "webhook" in fil:
             data = {
@@ -204,7 +205,7 @@ class waypoint():
         print(f"Found new image for {self.type} {self.name} - Sending now.")
         self.edit = True
         title = self.locale["img_edit_title"].format(name = self.name)
-        text = self.locale["edit_text"].format(old = f"[Link]({old_img})", new = f"`[Link]({self.img})")
+        text = self.locale["edit_text"].format(old = f"[Link]({old_img})", new = f"[Link]({self.img})")
         self.send(fil, text, title)
 
     def send_deleted(self, fil):
