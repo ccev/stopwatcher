@@ -24,18 +24,23 @@ with open(f"locale/{config.language}.json", encoding="utf-8") as f:
 
 with open("config/cache/portals.json", encoding="utf-8") as f:
     portal_cache = json.load(f)
+    new_portal_cache = json.load(f)
 
 with open("config/cache/stops_full.json", encoding="utf-8") as f:
     full_stop_cache = json.load(f)
+    new_full_stop_cache = json.load(f)
 
 with open("config/cache/stops_empty.json", encoding="utf-8") as f:
     empty_stop_cache = json.load(f)
+    new_empty_stop_cache = json.load(f)
 
 with open("config/cache/gyms_full.json", encoding="utf-8") as f:
     full_gym_cache = json.load(f)
+    new_full_gym_cache = json.load(f)
 
 with open("config/cache/gyms_empty.json", encoding="utf-8") as f:
     empty_gym_cache = json.load(f)
+    new_empty_gym_cache = json.load(f)
 
 with open("config/cache/edits.json", encoding="utf-8") as f:
     edit_list = json.load(f)
@@ -111,7 +116,7 @@ for fil in config.filters:
                 if not p_id in portal_cache:
                     portal = waypoint(queries, config, "portal", p_id, p_name, p_img, p_lat, p_lon)
                     portal.send(fil)
-                    portal_cache.append(p_id)
+                    new_portal_cache.append(p_id)
         if "stop" in fil["send"]:
             stops = queries.get_stops(fil["area"])
             for s_id, s_lat, s_lon, s_name, s_img in stops:
@@ -121,11 +126,11 @@ for fil in config.filters:
                         continue
                     if not stop.id in empty_stop_cache:
                         stop.send(fil)
-                        empty_stop_cache.append(stop.id)
+                        new_empty_stop_cache.append(stop.id)
                 else:
                     if not stop.id in full_stop_cache:                       
                         stop.send(fil)
-                        full_stop_cache.append(stop.id)
+                        new_full_stop_cache.append(stop.id)
         if "gym" in fil["send"]:
             gyms = queries.get_gyms(fil["area"])
             for g_id, g_lat, g_lon, g_name, g_img in gyms:
@@ -135,11 +140,11 @@ for fil in config.filters:
                         continue
                     if not gym.id in empty_gym_cache:
                         gym.send(fil)
-                        empty_gym_cache.append(g_id)
+                        new_empty_gym_cache.append(g_id)
                 else:
                     if not gym.id in full_gym_cache:
                         gym.send(fil)
-                        full_gym_cache.append(g_id) 
+                        new_full_gym_cache.append(g_id) 
     if "edits" in fil:
         if "portal" in fil["edits"]:
             for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"]:
@@ -197,19 +202,19 @@ cursor.close()
 mydb.close()
 
 with open("config/cache/portals.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(portal_cache, indent=4))
+    f.write(json.dumps(new_portal_cache, indent=4))
 
 with open("config/cache/stops_full.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(full_stop_cache, indent=4))
+    f.write(json.dumps(new_full_stop_cache, indent=4))
 
 with open("config/cache/stops_empty.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(empty_stop_cache, indent=4))
+    f.write(json.dumps(new_empty_stop_cache, indent=4))
 
 with open("config/cache/gyms_full.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(full_gym_cache, indent=4))
+    f.write(json.dumps(new_full_gym_cache, indent=4))
 
 with open("config/cache/gyms_empty.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(empty_gym_cache, indent=4))
+    f.write(json.dumps(new_empty_gym_cache, indent=4))
 
 with open("config/cache/edits.json", "w", encoding="utf-8") as f:
     f.write(json.dumps(edit_list, indent=4))
