@@ -123,7 +123,8 @@ for fil in config.filters:
                 if not p_id in portal_cache:
                     portal = waypoint(queries, config, "portal", p_id, p_name, p_img, p_lat, p_lon)
                     portal.send(fil)
-                    new_portal_cache.append(p_id)
+                    if not portal.id in new_portal_cache:
+                        new_portal_cache.append(p_id)
         if "stop" in fil["send"]:
             print("Looking for new Stops")
             stops = queries.get_stops(fil["area"])
@@ -134,11 +135,13 @@ for fil in config.filters:
                         continue
                     if not stop.id in empty_stop_cache:
                         stop.send(fil)
-                        new_empty_stop_cache.append(stop.id)
+                        if not stop.id in new_empty_stop_cache:
+                            new_empty_stop_cache.append(stop.id)
                 else:
                     if not stop.id in full_stop_cache:                       
                         stop.send(fil)
-                        new_full_stop_cache.append(stop.id)
+                        if not stop.id in new_full_stop_cache:
+                            new_full_stop_cache.append(stop.id)
         if "gym" in fil["send"]:
             print("Looking for new Gyms")
             gyms = queries.get_gyms(fil["area"])
@@ -149,11 +152,13 @@ for fil in config.filters:
                         continue
                     if not gym.id in empty_gym_cache:
                         gym.send(fil)
-                        new_empty_gym_cache.append(g_id)
+                        if not gym.id in new_empty_gym_cache:
+                            new_empty_gym_cache.append(g_id)
                 else:
                     if not gym.id in full_gym_cache:
                         gym.send(fil)
-                        new_full_gym_cache.append(g_id) 
+                        if not gym.id in new_full_gym_cache:
+                            new_full_gym_cache.append(g_id) 
     if "edits" in fil:
         if "portal" in fil["edits"]:
             print("Looking for Portal Edits")
