@@ -139,7 +139,7 @@ class waypoint():
                 waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
                 for lat, lon, w_type, dis in waypoints:
                     static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
-            static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({lon},{lat})/{lon},{lat},16/800x500?access_token={self.config.static_key}"
+            static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({self.lon},{self.lat})/{self.lon},{self.lat},16/800x500?access_token={self.config.static_key}"
         
         try:
             static_map = short(static_map)
