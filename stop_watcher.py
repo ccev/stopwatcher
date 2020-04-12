@@ -206,6 +206,7 @@ for fil in config.filters:
                     if "photo" in fil["edit_types"]:
                         gym = waypoint(queries, config, "gym", g_id, g[2], g[3], g[0], g[1])
                         gym.send_img_edit(fil, g_img)
+    print("")
 
 if any("edits" in i for i in config.filters):
     print("Updating Edit Cache")

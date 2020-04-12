@@ -171,6 +171,6 @@ class create_queries():
         if self.schema == "mad":
             self.cursor.execute(f"(SELECT latitude, longitude, 'stop' AS type, POW(69.1 * (latitude - {lat}), 2) + POW(69.1 * ({lon} - longitude) * COS(latitude / 57.3), 2) AS distance FROM pokestop WHERE latitude != {lat} AND longitude != {lon}) UNION (SELECT latitude, longitude, 'gym' AS type, POW(69.1 * (latitude - {lat}), 2) + POW(69.1 * ({lon} - longitude) * COS(latitude / 57.3), 2) AS distance FROM gym WHERE latitude != {lat} AND longitude != {lon}) ORDER BY distance ASC LIMIT {limit};")
         elif self.schema == "rdm":
-            self.cursor.execute(f"SELECT lat, lon, name, url FROM pokestop WHERE id = '{w_id}';")
+            self.cursor.execute(f"(SELECT lat, lon, 'stop' AS type, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM pokestop WHERE lat != {lat} AND lon != {lon}) UNION (SELECT lat, lon, 'gym' AS type, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(latitude / 57.3), 2) AS distance FROM gym WHERE lat != {lat} AND lon != {lon}) ORDER BY distance ASC LIMIT {limit};")
         points = self.cursor.fetchall()
         return points
