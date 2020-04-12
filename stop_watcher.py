@@ -24,23 +24,18 @@ with open(f"locale/{config.language}.json", encoding="utf-8") as f:
 
 with open("config/cache/portals.json", encoding="utf-8") as f:
     portal_cache = json.load(f)
-new_portal_cache = portal_cache
 
 with open("config/cache/stops_full.json", encoding="utf-8") as f:
     full_stop_cache = json.load(f)
-new_full_stop_cache = full_stop_cache
 
 with open("config/cache/stops_empty.json", encoding="utf-8") as f:
     empty_stop_cache = json.load(f)
-new_empty_stop_cache = empty_stop_cache
 
 with open("config/cache/gyms_full.json", encoding="utf-8") as f:
     full_gym_cache = json.load(f)
-new_full_gym_cache = full_gym_cache
 
 with open("config/cache/gyms_empty.json", encoding="utf-8") as f:
     empty_gym_cache = json.load(f)
-new_empty_gym_cache = empty_gym_cache
 
 with open("config/cache/edits.json", encoding="utf-8") as f:
     edit_list = json.load(f)
@@ -70,22 +65,28 @@ if len(portal_cache) == 0:
 if len(full_stop_cache) == 0 or len(empty_stop_cache) == 0:
     print("Found empty Stop Cache. Trying to fill it now.")
     try:
-        full_stop_cache = init.write_stops(full_stop_cache) 
-        empty_stop_cache = full_stop_cache  
+        full_stop_cache = init.write_stops(full_stop_cache)
+        empty_stop_cache = full_stop_cache
     except:
         print("Error while doing that. Just skipping it.")   
 
 if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
     print("Found empty Gym Cache. Trying to fill it now.")
     try:
-        full_gym_cache = init.write_gyms(full_gym_cache) 
-        empty_gym_cache = full_gym_cache   
+        full_gym_cache = init.write_gyms(full_gym_cache)
+        empty_gym_cache = full_gym_cache
     except:
         print("Error while doing that. Just skipping it.")
 
 if (len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"])) == 0:
     print("Found empty Edit Cache. Trying to fill it now.")
     edit_list = queries.create_edit_list(empty_edit_list)
+
+new_portal_cache = portal_cache
+new_full_stop_cache = full_stop_cache
+new_empty_stop_cache = empty_stop_cache
+new_full_gym_cache = full_gym_cache
+new_empty_gym_cache = empty_gym_cache
 
 print("Ready to watch Stops")
 
