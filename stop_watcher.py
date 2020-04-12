@@ -86,7 +86,10 @@ if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
 print("Ready to watch Stops")
 
 for fil in config.filters:
-    print(f"Looking for things in {fil['area']}")
+    print("----------------------------")
+    print(f"Going through {fil['area']}")
+    print("")
+
     dont_send_empty = True
     if "send_empty" in fil:
         if fil["send_empty"]:
@@ -94,23 +97,27 @@ for fil in config.filters:
 
     if "update" in fil:
         if "stop" in fil["update"]:
+            print("Looking for Stops to update")
             stops = queries.get_empty_stops(fil["area"])
             for s_id in stops:
                 stop = waypoint(queries, config, "stop", s_id[0])
                 stop.update()
         if "gym" in fil["update"]:
+            print("Looking for Gyms to update")
             gyms = queries.get_empty_gyms(fil["area"])
             for g_id in gyms:
                 gym = waypoint(queries, config, "gym", g_id[0])
                 gym.update()
     if "delete_converted_stops" in fil:
         if fil["delete_converted_stops"]:
+            print("Looking for converted Stops to delete")
             stops = queries.get_converted_stops(fil["area"])
             for s_id, s_name in stops:
                 stop = waypoint(queries, config, "stop", s_id, s_name)
                 stop.delete()
     if "send" in fil:
         if "portal" in fil["send"]:
+            print("Looking for new Portals")
             portals = queries.get_portals(fil["area"])
             for p_id, p_lat, p_lon, p_name, p_img in portals:
                 if not p_id in portal_cache:
@@ -118,6 +125,7 @@ for fil in config.filters:
                     portal.send(fil)
                     new_portal_cache.append(p_id)
         if "stop" in fil["send"]:
+            print("Looking for new Stops")
             stops = queries.get_stops(fil["area"])
             for s_id, s_lat, s_lon, s_name, s_img in stops:
                 stop = waypoint(queries, config, "stop", s_id, s_name, s_img, s_lat, s_lon)
@@ -132,6 +140,7 @@ for fil in config.filters:
                         stop.send(fil)
                         new_full_stop_cache.append(stop.id)
         if "gym" in fil["send"]:
+            print("Looking for new Gyms")
             gyms = queries.get_gyms(fil["area"])
             for g_id, g_lat, g_lon, g_name, g_img in gyms:
                 gym = waypoint(queries, config, "gym", g_id, g_name, g_img, g_lat, g_lon)
@@ -147,6 +156,7 @@ for fil in config.filters:
                         new_full_gym_cache.append(g_id) 
     if "edits" in fil:
         if "portal" in fil["edits"]:
+            print("Looking for Portal Edits")
             for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"]:
                 p = queries.get_full_portal_by_id(p_id)
                 #0=lat, 1=lon, 2=name, 3=img
@@ -163,6 +173,7 @@ for fil in config.filters:
                         portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
                         portal.send_name_edit(fil, p_img)
         if "stop" in fil["edits"]:
+            print("Looking for Stop Edits")
             for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"]:
                 s = queries.get_full_stop_by_id(s_id)
                 #0=lat, 1=lon, 2=name, 3=img
@@ -179,6 +190,7 @@ for fil in config.filters:
                         stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
                         stop.send_name_edit(fil, s_img)
         if "gym" in fil["edits"]:
+            print("Looking for Gym Edits")
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"]:
                 g = queries.get_full_gym_by_id(g_id)
                 #0=lat, 1=lon, 2=name, 3=img
@@ -196,11 +208,13 @@ for fil in config.filters:
                         gym.send_name_edit(fil, g_img)
 
 if any("edits" in i for i in config.filters):
+    print("Updating Edit Cache")
     edit_list = queries.create_edit_list(empty_edit_list)
 
 cursor.close()
 mydb.close()
 
+print("Writing Cache files")
 with open("config/cache/portals.json", "w", encoding="utf-8") as f:
     f.write(json.dumps(new_portal_cache, indent=4))
 

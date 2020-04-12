@@ -28,7 +28,7 @@ class waypoint():
                 for s_name, s_img in stop:
                     if s_name is not None:
                         self.queries.update_waypoint(self.type, self.id, s_name, s_img)
-                        print(f"Updated {self.type} {s_name}")
+                        print(f"Updated {self.type} {s_name} using Stop info")
                         needs_update = False
             except:
                 needs_update = True
@@ -39,7 +39,7 @@ class waypoint():
                 for p_name, p_img in portal:
                     if p_name is not None:
                         self.queries.update_waypoint(self.type, self.id, p_name, p_img)
-                        print(f"Updated {self.type} {p_name}")
+                        print(f"Updated {self.type} {p_name} using Portal info")
                         needs_update = False
             except:
                 needs_update = True
