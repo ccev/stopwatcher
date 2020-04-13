@@ -108,44 +108,45 @@ class waypoint():
                 embed_username = self.locale["gym_edit_name"]
 
         # Static Map
-        static_map = ""
-        short = pyshorteners.Shortener().tinyurl.short
-        if self.config.static_provider == "google":
-            static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
-        elif self.config.static_provider == "osm":
-            static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=17&key={self.config.static_key}"
-        elif self.config.static_provider == "tileserver":
-            limit = 30
-            static_map = f"{self.config.static_key}staticmap/stopwatcher?lat={self.lat}&lon={self.lon}&type={self.type}"
-            static_list = json.loads("[]")
-            if self.type == "portal":
-                portals = self.queries.static_portals(limit, self.lat, self.lon)
-                for lat, lon, dis in portals:
-                    static_list.append([lat,lon,"portal"])
-            else:
-                waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
-                for lat, lon, w_type, dis in waypoints:
-                    static_list.append([lat,lon,w_type])
-            if len(static_list) > 0:
-                static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-            requests.get(static_map)
-        elif self.config.static_provider == "mapbox":
-            limit = 32
-            static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
-            if self.type == "portal":
-                portals = self.queries.static_portals(limit, self.lat, self.lon)
-                for lat, lon, dis in portals:
-                    static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2Fportal_gray.png({lon},{lat}),"
-            else:
-                waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
-                for lat, lon, w_type, dis in waypoints:
-                    static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
-            static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({self.lon},{self.lat})/{self.lon},{self.lat},16/800x500?access_token={self.config.static_key}"
-        
-        try:
-            static_map = short(static_map)
-        except:
+        if self.config.use_static_map:
             static_map = ""
+            short = pyshorteners.Shortener().tinyurl.short
+            if self.config.static_provider == "google":
+                static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
+            elif self.config.static_provider == "osm":
+                static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=17&key={self.config.static_key}"
+            elif self.config.static_provider == "tileserver":
+                limit = 30
+                static_map = f"{self.config.static_key}staticmap/stopwatcher?lat={self.lat}&lon={self.lon}&type={self.type}"
+                static_list = json.loads("[]")
+                if self.type == "portal":
+                    portals = self.queries.static_portals(limit, self.lat, self.lon)
+                    for lat, lon, dis in portals:
+                        static_list.append([lat,lon,"portal"])
+                else:
+                    waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
+                    for lat, lon, w_type, dis in waypoints:
+                        static_list.append([lat,lon,w_type])
+                if len(static_list) > 0:
+                    static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+                requests.get(static_map)
+            elif self.config.static_provider == "mapbox":
+                limit = 32
+                static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
+                if self.type == "portal":
+                    portals = self.queries.static_portals(limit, self.lat, self.lon)
+                    for lat, lon, dis in portals:
+                        static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2Fportal_gray.png({lon},{lat}),"
+                else:
+                    waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
+                    for lat, lon, w_type, dis in waypoints:
+                        static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
+                static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({self.lon},{self.lat})/{self.lon},{self.lat},16/800x500?access_token={self.config.static_key}"
+            
+            try:
+                static_map = short(static_map)
+            except:
+                static_map = ""
 
         # Send
         if "webhook" in fil:
@@ -194,7 +195,7 @@ class waypoint():
     def send_name_edit(self, fil, old_name):
         print(f"Found edited name of {self.type} {old_name} - Sending now.")
         self.edit = True
-        title = self.locale["name_edit_title"].format(name = self.name)
+        title = self.locale["name_edit_title"].format(name = old_name)
 
         text = self.locale["edit_text"].format(old = f"`{old_name}`", new = f"`{self.name}`")
         self.send(fil, text, title)
