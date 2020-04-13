@@ -108,8 +108,8 @@ class waypoint():
                 embed_username = self.locale["gym_edit_name"]
 
         # Static Map
-        if self.config.use_static_map:
-            static_map = ""
+        static_map = ""
+        if self.config.use_static_map:           
             short = pyshorteners.Shortener().tinyurl.short
             if self.config.static_provider == "google":
                 static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
