@@ -51,9 +51,9 @@ parser.add_argument("-i", "--init", action='store_true', help="Copy every missin
 args = parser.parse_args()
 
 if args.init:
-    portal_cache = json.loads("[]")
-    full_stop_cache = json.loads("[]")
-    full_gym_cache = json.loads("[]")
+    portal_cache = []
+    full_stop_cache = []
+    full_gym_cache = []
 
 if len(portal_cache) == 0:
     print("Found empty Portal Cache. Trying to fill it now.")
@@ -130,6 +130,9 @@ for fil in config.filters:
                     portal.send(fil)
                     if not portal.id in new_portal_cache:
                         new_portal_cache.append(p_id)
+            with open("config/cache/portals.json", "w", encoding="utf-8") as f:
+                f.write(json.dumps(new_portal_cache, indent=4))
+
         if "stop" in fil["send"]:
             print("Looking for new Stops")
             stops = queries.get_stops(fil["area"])
@@ -147,6 +150,12 @@ for fil in config.filters:
                         stop.send(fil)
                         if not stop.id in new_full_stop_cache:
                             new_full_stop_cache.append(stop.id)
+            with open("config/cache/stops_full.json", "w", encoding="utf-8") as f:
+                f.write(json.dumps(new_full_stop_cache, indent=4))
+
+            with open("config/cache/stops_empty.json", "w", encoding="utf-8") as f:
+                f.write(json.dumps(new_empty_stop_cache, indent=4))
+
         if "gym" in fil["send"]:
             print("Looking for new Gyms")
             gyms = queries.get_gyms(fil["area"])
@@ -163,7 +172,13 @@ for fil in config.filters:
                     if not gym.id in full_gym_cache:
                         gym.send(fil)
                         if not gym.id in new_full_gym_cache:
-                            new_full_gym_cache.append(g_id) 
+                            new_full_gym_cache.append(g_id)
+            with open("config/cache/gyms_full.json", "w", encoding="utf-8") as f:
+                f.write(json.dumps(new_full_gym_cache, indent=4))
+
+            with open("config/cache/gyms_empty.json", "w", encoding="utf-8") as f:
+                f.write(json.dumps(new_empty_gym_cache, indent=4))
+
     if "edits" in fil:
         if "portal" in fil["edits"]:
             print("Looking for Portal Edits")
@@ -219,27 +234,11 @@ for fil in config.filters:
     print("")
 
 if any("edits" in i for i in config.filters):
-    print("Updating Edit Cache")
+    print("Writing Edit Cache")
     edit_list = queries.create_edit_list(empty_edit_list)
 
 cursor.close()
 mydb.close()
-
-print("Writing Cache files")
-with open("config/cache/portals.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(new_portal_cache, indent=4))
-
-with open("config/cache/stops_full.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(new_full_stop_cache, indent=4))
-
-with open("config/cache/stops_empty.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(new_empty_stop_cache, indent=4))
-
-with open("config/cache/gyms_full.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(new_full_gym_cache, indent=4))
-
-with open("config/cache/gyms_empty.json", "w", encoding="utf-8") as f:
-    f.write(json.dumps(new_empty_gym_cache, indent=4))
 
 with open("config/cache/edits.json", "w", encoding="utf-8") as f:
     f.write(json.dumps(edit_list, indent=4))
