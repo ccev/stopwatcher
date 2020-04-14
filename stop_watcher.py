@@ -202,18 +202,19 @@ for fil in config.filters:
             for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"][fil["area"]]:
                 s = queries.get_full_stop_by_id(s_id)
                 #0=lat, 1=lon, 2=name, 3=img
-                if (s_lat != s[0]) or (s_lon != s[1]):
-                    if "location" in fil["edit_types"]:
-                        stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                        stop.send_location_edit(fil, s_lat, s_lon)
-                if s_name != s[2]:
-                    if "title" in fil["edit_types"]:
-                        stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                        stop.send_name_edit(fil, s_name)
-                if s_img != s[3]:
-                    if "photo" in fil["edit_types"]:
-                        stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                        stop.send_img_edit(fil, s_img)
+                if s is not None:
+                    if (s_lat != s[0]) or (s_lon != s[1]):
+                        if "location" in fil["edit_types"]:
+                            stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
+                            stop.send_location_edit(fil, s_lat, s_lon)
+                    if s_name != s[2]:
+                        if "title" in fil["edit_types"]:
+                            stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
+                            stop.send_name_edit(fil, s_name)
+                    if s_img != s[3]:
+                        if "photo" in fil["edit_types"]:
+                            stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
+                            stop.send_img_edit(fil, s_img)
         if "gym" in fil["edits"]:
             print("Looking for Gym Edits")
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"][fil["area"]]:
