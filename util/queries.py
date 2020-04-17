@@ -1,4 +1,5 @@
 from pymysql import connect
+from datetime import datetime, timedelta 
 
 class create_queries():
     def __init__(self, config, cursor):
@@ -9,7 +10,7 @@ class create_queries():
         self.filters = config.filters
 
     def convert_area(self, area_name):
-        stringfence = "-100 -100, -100 100, 100 100, 100 -100, -100 -100"
+        stringfence = "-200 -200, -200 200, 200 200, 200 -200, -200 -200"
         for area in self.geofences:
             if area['name'].lower() == area_name.lower():
                 stringfence = ""
@@ -174,3 +175,34 @@ class create_queries():
             self.cursor.execute(f"(SELECT lat, lon, 'stop' AS type, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM pokestop WHERE lat != {lat} AND lon != {lon}) UNION (SELECT lat, lon, 'gym' AS type, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM gym WHERE lat != {lat} AND lon != {lon}) ORDER BY distance ASC LIMIT {limit};")
         points = self.cursor.fetchall()
         return points
+
+    def get_deleted_portals(self, minutes, area):
+        time = (datetime.utcnow() - timedelta(minutes = minutes)).timestamp()
+        self.convert_area(area)
+        self.cursor.execute(f"SELECT external_id, lat, lon, name, url FROM {self.portal}.ingress_portals WHERE updated < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+        portals = self.cursor.fetchall()
+        return portals
+
+    def get_deleted_stops(self, minutes, area):
+        self.convert_area(area)
+        if self.schema == "mad":
+            time = datetime.utcnow() - timedelta(minutes = minutes)
+            self.cursor.execute(f"SELECT pokestop_id, latitude, longitude, name, image FROM pokestop WHERE last_updated < '{time}' AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(latitude, longitude));")
+            print(f"SELECT pokestop_id, latitude, longitude, name, image FROM pokestop WHERE last_updated < '{time}' AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(latitude, longitude));")
+
+        elif self.schema == "rdm":
+            time = (datetime.utcnow() - timedelta(minutes = minutes)).timestamp()
+            self.cursor.execute(f"SELECT id, lat, lon, name, url FROM pokestop WHERE updates < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+        stops = self.cursor.fetchall()
+        return stops
+
+    def get_deleted_gyms(self, minutes, area):
+        self.convert_area(area)
+        if self.schema == "mad":
+            time = datetime.utcnow() - timedelta(minutes = minutes)
+            self.cursor.execute(f"SELECT gymdetails.gym_id, latitude, longitude, name, url FROM gym LEFT JOIN gymdetails on gym.gym_id = gymdetails.gym_id WHERE gym.last_scanned < '{time}' AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(latitude, longitude));")
+        elif self.schema == "rdm":
+            time = (datetime.utcnow() - timedelta(minutes = minutes)).timestamp()
+            self.cursor.execute(f"SELECT id, lat, lon, name, url FROM gym WHERE updated < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+        gyms = self.cursor.fetchall()
+        return gyms

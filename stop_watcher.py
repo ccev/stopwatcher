@@ -40,6 +40,9 @@ with open("config/cache/gyms_empty.json", encoding="utf-8") as f:
 with open("config/cache/edits.json", encoding="utf-8") as f:
     edit_list = json.load(f)
 
+with open("config/cache/deleted.json", encoding="utf-8") as f:
+    deleted_cache = json.load(f)
+
 with open("config_example/cache/edits.json", encoding="utf-8") as f:
     empty_edit_list = json.load(f)
 
@@ -87,6 +90,7 @@ new_full_stop_cache = full_stop_cache.copy()
 new_empty_stop_cache = empty_stop_cache.copy()
 new_full_gym_cache = full_gym_cache.copy()
 new_empty_gym_cache = empty_gym_cache.copy()
+new_deleted_cache = deleted_cache.copy()
 
 print("Ready to watch Stops")
 
@@ -99,6 +103,22 @@ for fil in config.filters:
     if "send_empty" in fil:
         if fil["send_empty"]:
             dont_send_empty = False
+
+    deleted_max_portals = 5
+    deleted_timespan_portals = ((4*config.scraper_wait) / 60)
+    deleted_max_stops = 5
+    deleted_timespan_stops = 120
+    if "deleted" in fil:
+        if "max" in fil["deleted"]:
+            if "scraper" in fil["deleted"]["max"]:
+                deleted_max_portals = fil["deleted"]["max"]["scraper"]
+            if "scanner" in fil["deleted"]["max"]:
+                deleted_max_stops = fil["deleted"]["max"]["scanner"]
+        if "timespan" in fil["deleted"]:
+            if "scraper" in fil["deleted"]["timespan"]:
+                deleted_timespan_portals = fil["deleted"]["timespan"]["scraper"]
+            if "scanner" in fil["deleted"]["max"]:
+                deleted_timespan_stops = fil["deleted"]["timespan"]["scanner"]
 
     if "update" in fil:
         if "stop" in fil["update"]:
@@ -197,6 +217,19 @@ for fil in config.filters:
                     if "photo" in fil["edit_types"]:
                         portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
                         portal.send_img_edit(fil, p_img)
+            if "removal" in fil["edit_types"]:
+                print("Looking for Portal Removals")
+                portals = queries.get_deleted_portals(deleted_timespan_portals, fil["area"])
+                if len(portals) <= deleted_max_portals:
+                    for p_id, p_lat, p_lon, p_name, p_img in portals:
+                        if not p_id in deleted_cache["portals"]:
+                            portal = waypoint(queries, config, "portal", p_id, p_name, p_img, p_lat, p_lon)
+                            portal.send_deleted(fil)
+                            if not p_id in new_deleted_cache["portals"]:
+                                new_deleted_cache["portals"].append(p_id)
+                else:
+                    print(f"Deleted Portal amount exceeded the limit of {deleted_max_portals} - Check your Cookie")
+              
         if "stop" in fil["edits"]:
             print("Looking for Stop Edits")
             for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"][fil["area"]]:
@@ -215,6 +248,18 @@ for fil in config.filters:
                         if "photo" in fil["edit_types"]:
                             stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
                             stop.send_img_edit(fil, s_img)
+            if "removal" in fil["edit_types"]:
+                print("Looking for Stop Removals")
+                stops = queries.get_deleted_stops(deleted_timespan_stops, fil["area"])
+                if len(stops) <= deleted_max_stops:
+                    for s_id, s_lat, s_lon, s_name, s_img in stops:
+                        if not s_id in deleted_cache["stops"]:
+                            stop = waypoint(queries, config, "stop", s_id, s_name, s_img, s_lat, s_lon)
+                            stop.send_deleted(fil)
+                            if not s_id in new_deleted_cache["stops"]:
+                                new_deleted_cache["stops"].append(s_id)
+                else:
+                    print(f"Stop amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
         if "gym" in fil["edits"]:
             print("Looking for Gym Edits")
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"][fil["area"]]:
@@ -232,6 +277,18 @@ for fil in config.filters:
                     if "photo" in fil["edit_types"]:
                         gym = waypoint(queries, config, "gym", g_id, g[2], g[3], g[0], g[1])
                         gym.send_img_edit(fil, g_img)
+            if "removal" in fil["edit_types"]:
+                print("Looking for Gym Removals")
+                gyms = queries.get_deleted_gyms(deleted_timespan_stops, fil["area"])
+                if len(gyms) <= deleted_max_stops:
+                    for g_id, g_lat, g_lon, g_name, g_img in gyms:
+                        if not g_id in deleted_cache["gyms"]:
+                            gym = waypoint(queries, config, "gym", g_id, g_name, g_img, g_lat, g_lon)
+                            gym.send_deleted(fil)
+                            if not g_id in new_deleted_cache["gyms"]:
+                                new_deleted_cache["gyms"].append(g_id)
+                else:
+                    print(f"Gym amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
     print("")
 
 if any("edits" in i for i in config.filters):
@@ -243,3 +300,6 @@ mydb.close()
 
 with open("config/cache/edits.json", "w", encoding="utf-8") as f:
     f.write(json.dumps(edit_list, indent=4))
+
+with open("config/cache/deleted.json", "w", encoding="utf-8") as f:
+    f.write(json.dumps(new_deleted_cache, indent=4))
