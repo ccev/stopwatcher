@@ -2,6 +2,7 @@ import requests
 import time
 import json
 import pyshorteners
+import geocoder
 
 class waypoint():
     def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = None, lon = None):
@@ -83,6 +84,16 @@ class waypoint():
             elif self.config.map_provider == "rmad":
                 map_url = f"{self.config.map_url}?lat={self.lat}&lon={self.lon}&zoom=18"
             links = f"{links} \\| [{self.config.map_name}]({map_url})"
+        
+        address = ""
+        if self.config.use_geocoding:
+            if self.config.geocoding_provider == "google":
+                geocode = geocoder.google([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+            elif self.config.geocoding_provider == "osm":
+                geocode = geocoder.mapquest([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+            elif self.config.geocoding_provider == "mapbox":
+                geocode = geocoder.mapbox([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+            address = f"{geocode}\n"
 
         # WP specific stuff
         if self.type == "portal":
@@ -155,7 +166,7 @@ class waypoint():
                 "avatar_url": embed_avatar,
                 "embeds": [{
                     "title": title,
-                    "description": f"{text}\n\n{links}",
+                    "description": f"{text}\n\n{address}{links}",
                     "color": embed_color,
                     "thumbnail": {
                         "url": image
@@ -180,7 +191,7 @@ class waypoint():
                     print(f"Result {result.status_code} for Photo")
                 if not text == "":
                     text = f"\n\n{text}"
-                payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){links}"}
+                payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){address}{links}"}
                 result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendMessage", params = payload)
                 print(f"Result {result.status_code} for Text")
                 time.sleep(2)

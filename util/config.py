@@ -21,6 +21,7 @@ class create_config:
 
         self.use_geocoding = config_file.getboolean("Maps", "geocoding")
         self.geocoding_provider = config_file.get("Maps", "geocoding_provider").lower()
+        self.geocoding_key = config_file.get("Maps", "geocoding_key").lower()
 
 
         self.scan_type = config_file.get("DB", "scanner").lower()

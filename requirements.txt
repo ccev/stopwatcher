@@ -1,3 +1,4 @@
 requests
 pymysql
 pyshorteners
+geocoder
