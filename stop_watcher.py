@@ -83,7 +83,7 @@ if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
 
 if (len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"])) == 0:
     print("Found empty Edit Cache. Trying to fill it now.")
-    edit_list = queries.create_edit_list(empty_edit_list)
+    edit_list = queries.create_edit_list(empty_edit_list, edit_list)
 
 new_portal_cache = portal_cache.copy()
 new_full_stop_cache = full_stop_cache.copy()
@@ -293,7 +293,7 @@ for fil in config.filters:
 
 if any("edits" in i for i in config.filters):
     print("Writing Edit Cache")
-    edit_list = queries.create_edit_list(empty_edit_list)
+    edit_list = queries.create_edit_list(empty_edit_list, edit_list)
 
 cursor.close()
 mydb.close()

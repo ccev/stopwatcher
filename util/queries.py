@@ -128,7 +128,7 @@ class create_queries():
         gyms = self.cursor.fetchone()
         return gyms
 
-    def create_edit_list(self, edit_list):
+    def create_edit_list(self, edit_list, old_edit_list):
         area_list = []
         for fil in self.filters:
             if not fil["area"] in area_list:
@@ -143,7 +143,7 @@ class create_queries():
                 for p_id, p_lat, p_lon, p_name, p_img in portals:
                     edit_list["portals"][area].append([p_id, p_lat, p_lon, p_name, p_img])
             except:
-                edit_list["portals"] = []
+                edit_list["portals"][area] = old_edit_list["portals"][area]
             
             try:
                 stops = self.get_stops(area)
@@ -151,7 +151,7 @@ class create_queries():
                     if s_name is not None:
                         edit_list["stops"][area].append([s_id, s_lat, s_lon, s_name, s_img])
             except:
-                edit_list["stops"] = []
+                edit_list["stops"][area] = old_edit_list["portals"][area]
             
             try:
                 gyms = self.get_gyms(area)
@@ -159,7 +159,7 @@ class create_queries():
                     if (g_name is not None) and (g_name != "unknown"):
                         edit_list["gyms"][area].append([g_id, g_lat, g_lon, g_name, g_img])
             except:
-                edit_list["gyms"] = []
+                edit_list["gyms"][area] = old_edit_list["portals"][area]
         
         return edit_list
 
