@@ -93,7 +93,7 @@ class waypoint():
                 geocode = geocoder.mapquest([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
             elif self.config.geocoding_provider == "mapbox":
                 geocode = geocoder.mapbox([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
-            address = f"{geocode}\n"
+            address = f"{geocode.address}\n"
 
         # WP specific stuff
         if self.type == "portal":
