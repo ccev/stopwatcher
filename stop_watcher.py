@@ -71,7 +71,7 @@ if args.delete:
         print("Deleted Portals:")
         for p_id in deleted_cache["portals"]:
             portal = queries.get_full_portal_by_id(p_id)
-            print(f"- {portal[2]} ({portal[0]},{portal[1]})")
+            print(f"- {portal[2]}   |   {portal[0]},{portal[1]}   |   {p_id}")
     except:
         print("Error checking for deleted Portals")
     print("")
@@ -83,7 +83,7 @@ if args.delete:
         print("Deleted Stops:")
         for s_id in deleted_cache["stops"]:
             stop = queries.get_full_stop_by_id(s_id)
-            print(f"- {stop[2]} ({stop[0]},{stop[1]})")
+            print(f"- {stop[2]}   |   {stop[0]},{stop[1]}   |   {s_id}")
         print("")
         if config.scan_type == "mad":
             print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE pokestop_id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
@@ -96,9 +96,9 @@ if args.delete:
     print("")
     try:
         print("Deleted Gyms:")
-        for s_id in deleted_cache["gyms"]:
-            gym = queries.get_full_gym_by_id(s_id)
-            print(f"- {gym[2]} ({gym[0]},{gym[1]})")
+        for g_id in deleted_cache["gyms"]:
+            gym = queries.get_full_gym_by_id(g_id)
+            print(f"- {gym[2]}   |   {gym[0]},{gym[1]}   |   {g_id}")
         print("")
         if config.scan_type == "mad":
             print(f"DELETE FROM {config.db_name_scan}.gym WHERE gym_id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
@@ -108,6 +108,8 @@ if args.delete:
             print(f"DELETE FROM {config.db_name_scan}.gym WHERE id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
     except:
         print("Error checking for deleted Gyms")
+    print("")
+    print("==========================================================================================================")
 
     sys.exit()
 
