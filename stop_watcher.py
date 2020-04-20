@@ -73,7 +73,7 @@ if args.delete:
             portal = queries.get_full_portal_by_id(p_id)
             print(f"- {portal[2]}   |   {portal[0]},{portal[1]}   |   {p_id}")
     except:
-        print("Error checking for deleted Portals")
+        continue
     print("")
     print(f"DELETE FROM {config.db_name_portal}.ingress_portals WHERE external_id in {str(deleted_cache['portals']).replace('[', '(').replace(']',')').replace(' ', '')};")
     print("")
@@ -90,7 +90,7 @@ if args.delete:
         elif config.scan_type == "rdm":
             print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
     except:
-        print("Error checking for deleted Stops")
+        continue
     print("")
     print("==========================================================================================================")
     print("")
@@ -107,7 +107,7 @@ if args.delete:
         elif config.scan_type == "rdm":
             print(f"DELETE FROM {config.db_name_scan}.gym WHERE id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
     except:
-        print("Error checking for deleted Gyms")
+        continue
     print("")
     print("==========================================================================================================")
 
