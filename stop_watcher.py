@@ -51,12 +51,65 @@ init = init(queries)
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--init", action='store_true', help="Copy every missing Stop/Gym/Portal ID into Stop Watcher's cache files")
+parser.add_argument("-d", "--delete", action='store_true', help="Generates SQL Queries to delete possibly removed Waypoints from you Databases")
 args = parser.parse_args()
 
 if args.init:
     portal_cache = []
     full_stop_cache = []
     full_gym_cache = []
+
+if args.delete:
+    print("==========================================================================================================")
+    print("")
+    print("!!! Please note that these Waypoints are NOT guaranteed to be removed. Please confirm if they still exist!")
+    print("You can do that by checking your Map/DB if they've been updated recently (Or just spoofing there)")
+    print("")
+    print("==========================================================================================================")
+    print("")
+    try:
+        print("Deleted Portals:")
+        for p_id in deleted_cache["portals"]:
+            portal = queries.get_full_portal_by_id(p_id)
+            print(f"- {portal[2]} ({portal[0]},{portal[1]})")
+    except:
+        print("Error checking for deleted Portals")
+    print("")
+    print(f"DELETE FROM {config.db_name_portal}.ingress_portals WHERE external_id in {str(deleted_cache['portals']).replace('[', '(').replace(']',')').replace(' ', '')};")
+    print("")
+    print("==========================================================================================================")
+    print("")
+    try:
+        print("Deleted Stops:")
+        for s_id in deleted_cache["stops"]:
+            stop = queries.get_full_stop_by_id(s_id)
+            print(f"- {stop[2]} ({stop[0]},{stop[1]})")
+        print("")
+        if config.scan_type == "mad":
+            print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE pokestop_id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
+        elif config.scan_type == "rdm":
+            print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
+    except:
+        print("Error checking for deleted Stops")
+    print("")
+    print("==========================================================================================================")
+    print("")
+    try:
+        print("Deleted Gyms:")
+        for s_id in deleted_cache["gyms"]:
+            gym = queries.get_full_gym_by_id(s_id)
+            print(f"- {gym[2]} ({gym[0]},{gym[1]})")
+        print("")
+        if config.scan_type == "mad":
+            print(f"DELETE FROM {config.db_name_scan}.gym WHERE gym_id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
+            print("")
+            print(f"DELETE FROM {config.db_name_scan}.gymdetails WHERE gym_id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
+        elif config.scan_type == "rdm":
+            print(f"DELETE FROM {config.db_name_scan}.gym WHERE id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
+    except:
+        print("Error checking for deleted Gyms")
+
+    sys.exit()
 
 if len(portal_cache) == 0:
     print("Found empty Portal Cache. Trying to fill it now.")
@@ -107,7 +160,7 @@ for fil in config.filters:
     deleted_max_portals = 5
     deleted_timespan_portals = ((4*config.scraper_wait) / 60)
     deleted_max_stops = 5
-    deleted_timespan_stops = 240
+    deleted_timespan_stops = 300
     if "deleted" in fil:
         if "max" in fil["deleted"]:
             if "scraper" in fil["deleted"]["max"]:
