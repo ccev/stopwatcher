@@ -218,6 +218,6 @@ class create_queries():
         if self.schema == "mad":
             self.cursor.execute(f"SELECT (SELECT COUNT(pokestop_id) FROM pokestop WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(latitude, longitude))), (SELECT COUNT(gym_id) FROM gym WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(latitude, longitude)));")
         elif self.schema == "rdm":
-            self.cursor.execute(f"SELECT id, lat, lon, name, url FROM gym WHERE updated < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+            self.cursor.execute(f"SELECT (SELECT COUNT(id) FROM pokestop WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon))), (SELECT COUNT(id) FROM gym WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon)));")
         count = self.cursor.fetchone()
         return count
