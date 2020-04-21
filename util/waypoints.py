@@ -16,8 +16,8 @@ class waypoint():
         self.type = wf_type
         self.name = name
         self.img = img
-        self.lat = lat
-        self.lon = lon
+        self.lat = float(lat)
+        self.lon = float(lon)
         self.edit = False
 
         self.empty = False
