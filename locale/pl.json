@@ -10,8 +10,11 @@
     "img_edit_title": "{name} ma nowe zdjęcie",
     "deleted_title": "{name} prawdopodobnie został usunięty",
     "edit_text": "Wcześniej {old}\nTeraz {new}",
-    "will_convert": "Nowy Pokestop lub Gym powstanie {day} o {time}.",
-    "wont_convert": "Nie powstanie nowy Pokestop/Gym",
+    "will_convert": "✅ Zamieni się w Pokestopa {day} o {time}",
+    "wont_convert": "❌ Nie zamieni się w Pokestopa",
+    "brings_gym": "✅ Powstanie nowy gym w komórce",
+    "brings_no_gym": "❌ Nie powstanie nowy Gym",
+    "x_stop_in_cell": "(Pokestop nr. {x} w komórce)",
     "time_format": "%H:%M",
     "today": "dzisiaj",
     "tomorrow": "jutro"

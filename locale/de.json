@@ -10,9 +10,12 @@
     "img_edit_title": "{name} hat ein neues Foto",
     "deleted_title": "{name} wurde entfernt",
     "edit_text": "Von {old}\nZu {new}",
-    "will_convert": "Wird {day} zu {time} Uhr zum Pokéstop oder Arena.",
-    "wont_convert": "Wird kein Pokéstop oder Arena.",
+    "will_convert": "✅ Wird zum Pokéstop({today} zu {time} Uhr)",
+    "wont_convert": "❌ Wird kein Pokéstop",
+    "brings_gym": "✅ Bringt eine neue Arena",
+    "brings_no_gym": "❌ Bringt keine neue Arena",
+    "x_stop_in_cell": "({x}. Stop in der Zelle)",
     "time_format": "%H:%M",
-    "today": "heute",
-    "tomorrow": "morgen"
+    "today": "Heute",
+    "tomorrow": "Morgen"
 }

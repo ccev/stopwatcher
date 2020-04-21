@@ -3,9 +3,10 @@ import time
 import json
 import pyshorteners
 import geocoder
-import s2sphere
 
 from datetime import datetime, timedelta
+
+from util.s2cells import s2cell
 
 class waypoint():
     def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = 0, lon = 0):
@@ -67,27 +68,12 @@ class waypoint():
         # Text
         pathjson = ""
         if self.type == "portal" and (not self.edit):
-            regionCover = s2sphere.RegionCoverer()
-            regionCover.min_level = 17
-            regionCover.max_level = 17
-            regionCover.max_cells = 1
-            p1 = s2sphere.LatLng.from_degrees(self.lat, self.lon)
-            p2 = s2sphere.LatLng.from_degrees(self.lat, self.lon)
-            covering = regionCover.get_covering(s2sphere.LatLngRect.from_point_pair(p1, p2))
-            cellId = covering[0].id()
-            cell = s2sphere.Cell(s2sphere.CellId(cellId))
-            path = []
-            for v in range(0, 4):
-                vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
-                path.append([vertex.lat().degrees, vertex.lng().degrees])
-            
-            stringfence = ""
-            for coordinates in path:
-                stringfence = f"{stringfence}{coordinates[0]} {coordinates[1]},"
-            stringfence = f"{stringfence}{path[0][0]} {path[0][1]}"
-            count = self.queries.count_in_cell(stringfence)
+            stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
+            gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
 
-            if (count[0] + count[1]) == 0:
+            will_convert = False
+            if (stop_cell.stops + stop_cell.gyms) == 0:
+                will_convert = True
                 utcnow = int(datetime.utcnow().strftime("%H"))
                 now = int(datetime.now().strftime("%H"))
                 offset = now - utcnow
@@ -101,8 +87,15 @@ class waypoint():
                 text = (self.locale["will_convert"]).format(day = day, time = conv_time)
             else:
                 text = self.locale["wont_convert"]
+
+            if will_convert and (gym_cell.stops == 1) or (gym_cell.stops == 5) or (gym_cell.stops == 19):
+                text = f"{text}\n{self.locale['brings_gym']}"
+            else:
+                text = f"{text}\n{self.locale['brings_no_gym']}"
+            if will_convert:
+                text = (f"{text}{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1)
             
-            pathjson = f"&pathjson={path}"
+            pathjson = f"&pathjson={stop_cell.path}"
 
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":

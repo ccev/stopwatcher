@@ -10,8 +10,11 @@
     "img_edit_title": "{name} obtuvo otra imagen",
     "deleted_title": "{name} (probablemente) fue borrado",
     "edit_text": "De {old}\nA {new}",
-    "will_convert": "Se convertirá {day} a las {time} en un Pokéstop o Gym.",
-    "wont_convert": "No se va a convertir en Pokéstop o Gym.",
+    "will_convert": "✅ Será en un Pokéstop ({day} a las ~{time})",
+    "wont_convert": "❌ No será un Pokéstop",
+    "brings_gym": "✅ Creará un nuevo Gym",
+    "brings_no_gym": "❌ No creará un nuevo Gym",
+    "x_stop_in_cell": "(Stop #{x} en esa celda)",
     "time_format": "%-I:%M %p",
     "today": "hoy",
     "tomorrow": "mañana"
