@@ -8,7 +8,7 @@ import s2sphere
 from datetime import datetime, timedelta
 
 class waypoint():
-    def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = None, lon = None):
+    def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = 0, lon = 0):
         self.queries = queries
         self.config = config
         self.locale = config.locale
