@@ -9,5 +9,10 @@
     "name_edit_title": "{name} hat einen neuen Titel",
     "img_edit_title": "{name} hat ein neues Foto",
     "deleted_title": "{name} wurde entfernt",
-    "edit_text": "Von {old}\nZu {new}"
+    "edit_text": "Von {old}\nZu {new}",
+    "will_convert": "Wird {day} zu {time} Uhr zum Pokéstop oder Arena.",
+    "wont_convert": "Wird kein Pokéstop oder Arena.",
+    "time_format": "%H:%M",
+    "today": "heute",
+    "tomorrow": "morgen"
 }

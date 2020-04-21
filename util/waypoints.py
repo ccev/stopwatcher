@@ -3,6 +3,9 @@ import time
 import json
 import pyshorteners
 import geocoder
+import s2sphere
+
+from datetime import datetime, timedelta
 
 class waypoint():
     def __init__(self, queries, config, wf_type, wf_id, name = None, img = None, lat = None, lon = None):
@@ -62,6 +65,45 @@ class waypoint():
             title = title.replace(char, f"\\{char}")
 
         # Text
+        pathjson = ""
+        if self.type == "portal" and (not self.edit):
+            regionCover = s2sphere.RegionCoverer()
+            regionCover.min_level = 17
+            regionCover.max_level = 17
+            regionCover.max_cells = 1
+            p1 = s2sphere.LatLng.from_degrees(self.lat, self.lon)
+            p2 = s2sphere.LatLng.from_degrees(self.lat, self.lon)
+            covering = regionCover.get_covering(s2sphere.LatLngRect.from_point_pair(p1, p2))
+            cellId = covering[0].id()
+            cell = s2sphere.Cell(s2sphere.CellId(cellId))
+            path = []
+            for v in range(0, 4):
+                vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
+                path.append([vertex.lat().degrees, vertex.lng().degrees])
+            
+            stringfence = ""
+            for coordinates in path:
+                stringfence = f"{stringfence}{coordinates[0]} {coordinates[1]},"
+            stringfence = f"{stringfence}{path[0][0]} {path[0][1]}"
+            count = self.queries.count_in_cell(stringfence)
+
+            if (count[0] + count[1]) == 0:
+                utcnow = int(datetime.utcnow().strftime("%H"))
+                now = int(datetime.now().strftime("%H"))
+                offset = now - utcnow
+
+                day = self.locale["today"]
+                if utcnow >= 9:
+                    day = self.locale["tomorrow"]
+
+                conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
+
+                text = (self.locale["will_convert"]).format(day = day, time = conv_time)
+            else:
+                text = self.locale["wont_convert"]
+            
+            pathjson = f"&pathjson={path}"
+
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
             links = f"{links} \\| [Intel](https://intel.ingress.com/intel?ll={self.lat},{self.lon}&z=18&pll={self.lat},{self.lon})"
@@ -139,7 +181,7 @@ class waypoint():
                     for lat, lon, w_type, dis in waypoints:
                         static_list.append([lat,lon,w_type])
                 if len(static_list) > 0:
-                    static_map = f"{static_map}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+                    static_map = f"{static_map}{pathjson}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
                 requests.get(static_map)
             elif self.config.static_provider == "mapbox":
                 limit = 32

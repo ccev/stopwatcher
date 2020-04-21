@@ -6,6 +6,7 @@
     "width": 800,
     "height": 500,
     "scale": 1,
+    "format": "png",
     "markers": [
         {% if pointjson %}
         {% for wp in pointjson %}
@@ -15,7 +16,11 @@
             "longitude": {{wp[1]}},
             "width": 48,
             "height": 48,
+            {% if type == "portal" %}
+            "y_offset": 0
+            {% else %}
             "y_offset": -24
+            {% endif %}
         },
         {% endfor %}
         {% endif %}
@@ -25,7 +30,22 @@
             "longitude": {{lon}},
             "width": 64,
             "height": 64,
+            {% if type == "portal" %}
+            "y_offset": 0
+            {% else %}
             "y_offset": -32
+            {% endif %}
         }
     ]
+    {% if pathjson %}
+    ,
+    "polygons": [
+        {
+            "fill_color": "#ffffff60",
+            "stroke_color": "#c7c7c7",
+            "stroke_width": 2,
+            "path": {{pathjson}}
+        }
+    ]
+    {% endif %}
 }

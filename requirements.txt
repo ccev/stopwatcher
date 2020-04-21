@@ -2,3 +2,4 @@ requests
 pymysql
 pyshorteners
 geocoder
+s2sphere
