@@ -93,7 +93,7 @@ class waypoint():
             else:
                 text = f"{text}\n{self.locale['brings_no_gym']}"
             if will_convert:
-                text = (f"{text}{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1)
+                text = (f"{text} {self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1)
             
             pathjson = f"&pathjson={stop_cell.path}"
 
