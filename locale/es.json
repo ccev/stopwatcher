@@ -9,5 +9,10 @@
     "name_edit_title": "{name} obtuvo otro nombre",
     "img_edit_title": "{name} obtuvo otra imagen",
     "deleted_title": "{name} (probablemente) fue borrado",
-    "edit_text": "De {old}\nA {new}"
+    "edit_text": "De {old}\nA {new}",
+    "will_convert": "Se convertirá {day} a las {time} en un Pokéstop o Gym.",
+    "wont_convert": "No se va a convertir en Pokéstop o Gym.",
+    "time_format": "%-I:%M %p",
+    "today": "hoy",
+    "tomorrow": "mañana"
 }
