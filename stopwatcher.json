@@ -1,0 +1,51 @@
+{
+    "style": "osm-bright",
+    "latitude": {{lat}},
+    "longitude": {{lon}},
+    "zoom": 17.5,
+    "width": 800,
+    "height": 500,
+    "scale": 1,
+    "format": "png",
+    "markers": [
+        {% if pointjson %}
+        {% for wp in pointjson %}
+        {
+            "url": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/{{wp[2]}}_gray.png",
+            "latitude": {{wp[0]}},
+            "longitude": {{wp[1]}},
+            "width": 48,
+            "height": 48,
+            {% if type == "portal" %}
+            "y_offset": 0
+            {% else %}
+            "y_offset": -24
+            {% endif %}
+        },
+        {% endfor %}
+        {% endif %}
+        {
+            "url": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/{{type}}_normal.png",
+            "latitude": {{lat}},
+            "longitude": {{lon}},
+            "width": 64,
+            "height": 64,
+            {% if type == "portal" %}
+            "y_offset": 0
+            {% else %}
+            "y_offset": -32
+            {% endif %}
+        }
+    ]
+    {% if pathjson %}
+    ,
+    "polygons": [
+        {
+            "fill_color": "#ffffff60",
+            "stroke_color": "#c7c7c7",
+            "stroke_width": 2,
+            "path": {{pathjson}}
+        }
+    ]
+    {% endif %}
+}
