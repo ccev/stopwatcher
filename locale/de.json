@@ -10,7 +10,7 @@
     "img_edit_title": "{name} hat ein neues Foto",
     "deleted_title": "{name} wurde entfernt",
     "edit_text": "Von {old}\nZu {new}",
-    "will_convert": "✅ Wird zum Pokéstop({today} zu {time} Uhr)",
+    "will_convert": "✅ Wird zum Pokéstop({day} zu {time} Uhr)",
     "wont_convert": "❌ Wird kein Pokéstop",
     "brings_gym": "✅ Bringt eine neue Arena",
     "brings_no_gym": "❌ Bringt keine neue Arena",
