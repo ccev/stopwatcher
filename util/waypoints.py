@@ -88,7 +88,7 @@ class waypoint():
             else:
                 text = self.locale["wont_convert"]
 
-            if will_convert and (gym_cell.stops == 1) or (gym_cell.stops == 5) or (gym_cell.stops == 19):
+            if will_convert and (gym_cell.stops + gym_cell.gyms == 1) or (gym_cell.stops + gym_cell.gyms == 5) or (gym_cell.stops + gym_cell.gyms == 19):
                 text = f"{text}\n{self.locale['brings_gym']}"
             else:
                 text = f"{text}\n{self.locale['brings_no_gym']}"

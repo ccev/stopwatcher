@@ -2,7 +2,7 @@ import s2sphere
 
 class s2cell():
     def __init__(self, queries, lat, lon, level):
-        regionCover = s2sphere.RegionCoverer()
+        """regionCover = s2sphere.RegionCoverer()
         regionCover.min_level = level
         regionCover.max_level = level
         regionCover.max_cells = 1
@@ -10,6 +10,10 @@ class s2cell():
         p2 = s2sphere.LatLng.from_degrees(lat, lon)
         covering = regionCover.get_covering(s2sphere.LatLngRect.from_point_pair(p1, p2))
         cellId = covering[0].id()
+        """
+        ll = s2sphere.LatLng.from_degrees(lat, lon)
+        cell = s2sphere.CellId().from_lat_lng(ll)
+        cellId = cell.parent(level).id()
         cell = s2sphere.Cell(s2sphere.CellId(cellId))
 
         path = []
