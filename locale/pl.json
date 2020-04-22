@@ -14,7 +14,8 @@
     "wont_convert": "❌ Nie zamieni się w Pokestopa",
     "brings_gym": "✅ Powstanie nowy gym w komórce",
     "brings_no_gym": "❌ Nie powstanie nowy Gym",
-    "x_stop_in_cell": "(Pokestop nr. {x} w komórce)",
+    "x_stop_in_cell": "📍 Stop {x}/{total} w komórce",
+    "x_stop_in_cell_20": "📍 Stop {x}. w komórce",
     "time_format": "%H:%M",
     "today": "dzisiaj",
     "tomorrow": "jutro"

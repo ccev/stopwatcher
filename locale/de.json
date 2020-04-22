@@ -14,7 +14,8 @@
     "wont_convert": "❌ Wird kein Pokéstop",
     "brings_gym": "✅ Bringt eine neue Arena",
     "brings_no_gym": "❌ Bringt keine neue Arena",
-    "x_stop_in_cell": "({x}. Stop in der Zelle)",
+    "x_stop_in_cell": "📍 Stop {x}/{total} in der Zelle",
+    "x_stop_in_cell_20": "📍 {x}. Stop in der Zelle",
     "time_format": "%H:%M",
     "today": "Heute",
     "tomorrow": "Morgen"

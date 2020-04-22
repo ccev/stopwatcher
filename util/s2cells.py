@@ -1,5 +1,7 @@
 import s2sphere
 
+# I copied most of this code from Map-A-Droid.
+
 class s2cell():
     def __init__(self, queries, lat, lon, level):
         """regionCover = s2sphere.RegionCoverer()

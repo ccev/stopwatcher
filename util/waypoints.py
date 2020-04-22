@@ -88,12 +88,21 @@ class waypoint():
             else:
                 text = self.locale["wont_convert"]
 
-            if will_convert and (gym_cell.stops + gym_cell.gyms == 1) or (gym_cell.stops + gym_cell.gyms == 5) or (gym_cell.stops + gym_cell.gyms == 19):
+            total_points = gym_cell.stops + gym_cell.gyms
+            if will_convert and (total_points == 1) or (total_points == 5) or (total_points == 19):
                 text = f"{text}\n{self.locale['brings_gym']}"
             else:
                 text = f"{text}\n{self.locale['brings_no_gym']}"
+
             if will_convert:
-                text = (f"{text} {self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1)
+                if total_points > 20:
+                    text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = total_points + 1)
+                else:
+                    total = 0
+                    for i in [2, 6, 20]:
+                        if total_points <= i:
+                            total = i
+                    text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = total_points + 1, total = total)
             
             pathjson = f"&pathjson={stop_cell.path}"
 
