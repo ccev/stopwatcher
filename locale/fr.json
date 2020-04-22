@@ -1,14 +1,13 @@
 {
-    "full_stop_title": "Informations du Pokéstop",
-    "unfull_stop_title": "Nouveau PokéStop",
-    "full_gym_title": "Nouvelle Arène",
-    "unfull_gym_title": "Nouvelle Arène",
-    "portal_title": "Nouveau Portail",
-    "edit_title": "Modifier le Portail",
-    "location_edit_title": "a été déplacé",
-    "title_edit_title": "a changé de nom",
-    "image_edit_title": "a changé d'image",
-    "deleted_title": "a (probablement) été supprimé",
-    "from": "De",
-    "to": "À"
+    "stop_name": "Nouveau PokéStop",
+    "gym_name": "Nouvelle Arène",
+    "portal_name": "Nouveau Portail",
+    "portal_edit_name": "Modifier du Portail",
+    "stop_edit_name": "Modifier du PokéStop",
+    "gym_edit_name": "Modification de l'Arène",
+    "location_edit_title": "{name} a été déplacé",
+    "name_edit_title": "{name} a changé de nom",
+    "img_edit_title": "{name} a une nouvelle photo",
+    "deleted_title": "{name} a (probablement) été supprimé",
+    "edit_text": "De {old}\nÀ {new}"
 }

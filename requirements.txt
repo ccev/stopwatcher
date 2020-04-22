@@ -1,4 +1,5 @@
 requests
 pymysql
-pyimgur
+pyshorteners
 geocoder
+s2sphere

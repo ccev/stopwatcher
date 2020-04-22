@@ -1,0 +1,21 @@
+{
+    "stop_name": "Nueva Poképarada",
+    "gym_name": "Nuevo Gimnasio",
+    "portal_name": "Nuevo Portal",
+    "portal_edit_name": "Edición de Portal",
+    "stop_edit_name": "Edición de Poképarada",
+    "gym_edit_name": "Edición de Gimnasio",
+    "location_edit_title": "{name} fue movido",
+    "name_edit_title": "{name} obtuvo otro nombre",
+    "img_edit_title": "{name} obtuvo otra imagen",
+    "deleted_title": "{name} (probablemente) fue borrado",
+    "edit_text": "De {old}\nA {new}",
+    "will_convert": "✅ Será en un Pokéstop ({day} a las ~{time})",
+    "wont_convert": "❌ No será un Pokéstop",
+    "brings_gym": "✅ Creará un nuevo Gym",
+    "brings_no_gym": "❌ No creará un nuevo Gym",
+    "x_stop_in_cell": "(Stop #{x} en esa celda)",
+    "time_format": "%-I:%M %p",
+    "today": "hoy",
+    "tomorrow": "mañana"
+}
