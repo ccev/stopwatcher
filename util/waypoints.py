@@ -103,6 +103,7 @@ class waypoint():
                     for i in [2, 6, 20]:
                         if total_points <= i:
                             total = i
+                            break
                     text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = total_points + 1, total = total)
             
             pathjson = f"&pathjson={stop_cell.path}"
