@@ -67,6 +67,7 @@ class waypoint():
 
         # Text
         pathjson = ""
+        geojson = ""
         if self.type == "portal" and (not self.edit):
             stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
             gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
@@ -105,6 +106,8 @@ class waypoint():
                     text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = total_points + 1, total = total)
             
             pathjson = f"&pathjson={stop_cell.path}"
+            geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+            geojson = f"{geojson},"
 
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
@@ -187,7 +190,7 @@ class waypoint():
                 requests.get(static_map)
             elif self.config.static_provider == "mapbox":
                 limit = 32
-                static_map = "https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/"
+                static_map = f"https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/{geojson}"
                 if self.type == "portal":
                     portals = self.queries.static_portals(limit, self.lat, self.lon)
                     for lat, lon, dis in portals:
@@ -197,7 +200,6 @@ class waypoint():
                     for lat, lon, w_type, dis in waypoints:
                         static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
                 static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({self.lon},{self.lat})/{self.lon},{self.lat},16/800x500?access_token={self.config.static_key}"
-            
             try:
                 static_map = short(static_map)
             except:

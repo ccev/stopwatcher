@@ -23,6 +23,12 @@ class s2cell():
             vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
             path.append([vertex.lat().degrees, vertex.lng().degrees])
 
+        mb_path = []
+        for v in range(0, 4):
+            vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
+            mb_path.append([vertex.lng().degrees, vertex.lat().degrees])
+        mb_path.append(mb_path[0])
+
         stringfence = ""
         for coordinates in path:
             stringfence = f"{stringfence}{coordinates[0]} {coordinates[1]},"
@@ -30,6 +36,7 @@ class s2cell():
         count = queries.count_in_cell(stringfence)
 
         self.path = path
+        self.mapbox_path = mb_path
         self.stops = count[0]
         self.gyms = count[1]
 
