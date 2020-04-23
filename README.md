@@ -24,13 +24,8 @@ To get working tileserver Static Maps, make sure you're on the latest version (>
 ### Ingress Scraper
 Use [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) for everything related to Portals. Have it loop and put the restart delay in Stop Watcher's config
 
-## Notification Examples
-#### Mapbox
-![](https://i.imgur.com/AvBkt8O.png)
-#### Google
-![](https://i.imgur.com/ETd8Jig.png)
-#### OSM (Mapquest)
-![](https://i.imgur.com/X0M1Esh.png)
+## Features
+[TODO (it's super cool i promise)]
 
 ## filters.json
 Filters tell Stop Watcher what to look for and where to send it. Every filter option is optional, except `"area"`. So if you don't want something, just delete the option to avoid confusion (e.g. remove `"webhook"` completely instead of putting `"webhook": []` if you don't want Discord notifications)
@@ -48,3 +43,10 @@ Filters tell Stop Watcher what to look for and where to send it. Every filter op
 | **`webhook`** | The Discord Webhook edited/new waypoints should get sent to. Can also be multiple | Webhook links, `["url.com"]` or `["url.com","url2.com"]` |
 | **`bot_id`** | You Telegram's Bot ID | String, `"8762682"` |
 | **`chat_id`** | You Telegram's Chat ID. Can also be multiple. (Needs a set `"bot_id"` to work) | Chat IDs, `["24254535"]` or `["4636363","970785"]` |
+
+## Extras
+### --init / -i
+Fills your cache files with up-to-date data. Useful if you want to add a new area to Stop Watcher or haven't ran it in a while.
+
+### --delete / -d
+Gives a report of all (possibly) removed Portals/Stops/Gyms together with their names, IDs, coordinates and a SQL Query to delete them from your database. The way Stop Watcher checks for removed Waypoints is not 100% accurate, so please check before you delete!
