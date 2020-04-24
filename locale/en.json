@@ -10,7 +10,7 @@
     "img_edit_title": "{name} got a new photo",
     "deleted_title": "{name} (probably) got removed",
     "edit_text": "From {old}\nTo {new}",
-    "will_convert": "✅ Will convert into a Pokéstop ({day} at ~{time})",
+    "will_convert": "✅ Will convert into a Pokéstop",
     "wont_convert": "❌ Won't convert into a Pokéstop",
     "brings_gym": "✅ Will bring a new Gym",
     "brings_no_gym": "❌ Won't bring a new Gym",
@@ -18,5 +18,14 @@
     "x_stop_in_cell_20": "📍 Stop #{x} in that cell",
     "time_format": "%-I:%M %p",
     "today": "today",
-    "tomorrow": "tomorrow"
+    "tomorrow": "tomorrow",
+    "when_convert": "Converts {day} around {time}",
+    "same_cell": "Same cell",
+    "new_cell": "New cell",
+    "old_cell": "Old cell",
+    "stays_stop": "✅ Keeps being a Stop",
+    "stays_no_stop": "❌ Keeps being no Stop",
+    "cell_becomes_empty": "✅ Becomes empty",
+    "cell_stays_occupied": "❌ Stays occupied",
+    "gets_new_stop": "✅ Gets a new Stop"
 }

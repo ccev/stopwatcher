@@ -1,17 +1,9 @@
 import s2sphere
 
-# I copied most of this code from Map-A-Droid.
-
 class s2cell():
     def __init__(self, queries, lat, lon, level):
-        """regionCover = s2sphere.RegionCoverer()
-        regionCover.min_level = level
-        regionCover.max_level = level
-        regionCover.max_cells = 1
-        p1 = s2sphere.LatLng.from_degrees(lat, lon)
-        p2 = s2sphere.LatLng.from_degrees(lat, lon)
-        covering = regionCover.get_covering(s2sphere.LatLngRect.from_point_pair(p1, p2))
-        cellId = covering[0].id()
+        """
+        I copied most of this code from Map-A-Droid.
         """
         ll = s2sphere.LatLng.from_degrees(lat, lon)
         cell = s2sphere.CellId().from_lat_lng(ll)
@@ -37,8 +29,23 @@ class s2cell():
 
         self.path = path
         self.mapbox_path = mb_path
-        self.stops = count[0]
-        self.gyms = count[1]
+        self.stops = count[0] + count[1]
 
+    def converts(self):
+        if self.stops == 0:
+            return True
+        else:
+            return False
 
-        
+    def brings_gym(self):
+        if (self.stops == 1) or (self.stops == 5) or (self.stops == 19):
+            return True
+        else:
+            return False
+
+    def next_threshold(self):
+        total = 20
+        for i in [1, 5, 19]:
+            if self.stops <= i:
+                total = i + 1
+                return total

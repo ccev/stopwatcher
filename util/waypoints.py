@@ -20,6 +20,8 @@ class waypoint():
         self.lat = float(lat)
         self.lon = float(lon)
         self.edit = False
+        self.edit_type = ""
+        self.before_edit = None
 
         self.empty = False
         if self.name is None or self.name == "unknown":
@@ -53,6 +55,19 @@ class waypoint():
         print(f"Deleting converted {self.type} {self.name} from your DB")
         self.queries.delete_stop(self.id)
 
+    def get_convert_time(self):
+        utcnow = int(datetime.utcnow().strftime("%H"))
+        now = int(datetime.now().strftime("%H"))
+        offset = now - utcnow
+
+        day = self.locale["today"]
+        if utcnow >= 9:
+            day = self.locale["tomorrow"]
+
+        conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
+
+        return [day, conv_time]
+
     def send(self, fil, text = "", title = ""):     
         # Title + image
         image = self.img
@@ -68,47 +83,87 @@ class waypoint():
         # Text
         pathjson = ""
         geojson = ""
-        if self.type == "portal" and (not self.edit):
-            stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
-            gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
-
-            will_convert = False
-            if (stop_cell.stops + stop_cell.gyms) == 0:
-                will_convert = True
-                utcnow = int(datetime.utcnow().strftime("%H"))
-                now = int(datetime.now().strftime("%H"))
-                offset = now - utcnow
-
-                day = self.locale["today"]
-                if utcnow >= 9:
-                    day = self.locale["tomorrow"]
-
-                conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
-
-                text = (self.locale["will_convert"]).format(day = day, time = conv_time)
+        convert_time = ""
+        if self.type == "portal":
+            if (self.queries.get_stop_by_id(self.id) is None) and (self.queries.get_full_gym_by_id(self.id) is None):
+                didnt_exist = True
             else:
-                text = self.locale["wont_convert"]
-
-            total_points = gym_cell.stops + gym_cell.gyms
-            if will_convert and (total_points == 1) or (total_points == 5) or (total_points == 19):
-                text = f"{text}\n{self.locale['brings_gym']}"
-            else:
-                text = f"{text}\n{self.locale['brings_no_gym']}"
-
-            if will_convert:
-                if total_points > 20:
-                    text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = total_points + 1)
-                else:
-                    total = 0
-                    for i in [2, 6, 20]:
-                        if total_points <= i:
-                            total = i
-                            break
-                    text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = total_points + 1, total = total)
+                didnt_exist = False
             
-            pathjson = f"&pathjson={stop_cell.path}"
-            geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-            geojson = f"{geojson},"
+            if self.edit:
+                text = f"{text}\n\n"
+
+            utcnow = int(datetime.utcnow().strftime("%H"))
+            now = int(datetime.now().strftime("%H"))
+            offset = now - utcnow
+
+            day = self.locale["today"]
+            if utcnow >= 9:
+                day = self.locale["tomorrow"]
+
+            conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
+            convert_time = (self.locale['when_convert']).format(day = day, time = conv_time)
+
+            if not self.edit:
+                stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
+                gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
+
+                if stop_cell.converts():
+                    conv_time = self.get_convert_time()
+                    text = self.locale["will_convert"]
+                else:
+                    text = self.locale["wont_convert"]
+
+                if stop_cell.converts() and gym_cell.brings_gym():
+                    text = f"{text}\n{self.locale['brings_gym']}"
+                else:
+                    text = f"{text}\n{self.locale['brings_no_gym']}"
+
+                if stop_cell.converts():
+                    if gym_cell.stops > 20:
+                        text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
+                    else:
+                        text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
+                
+                pathjson = f"&pathjson={stop_cell.path}"
+                geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+                geojson = f"{geojson},"
+
+            elif self.edit_type == "location":
+
+                old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
+                new_stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
+
+                if old_stop_cell.path == new_stop_cell.path:
+                    text = f"**{text}{self.locale['same_cell']}**:\n"
+                    if not didnt_exist:
+                        text = f"{text}{self.locale['stays_stop']}"
+                    else:
+                        text = f"{text}{self.locale['stays_no_stop']}"
+                
+                else:
+                    text = f"{text}**{self.locale['new_cell']}**:\n"
+                    if didnt_exist:
+                        if new_stop_cell.converts():
+                            text = f"{text}{self.locale['will_convert']}"
+                        else:
+                            text = f"{text}{self.locale['stays_no_stop']}"
+                    else:
+                        text = f"{text}{self.locale['stays_stop']}"
+
+                    text = f"{text}\n**{self.locale['old_cell']}**:\n"
+                    if old_stop_cell.converts():
+                        text = f"{text}{self.locale['cell_becomes_empty']}"
+                    else:
+                        if didnt_exist:
+                            text = f"{text}{self.locale['cell_stays_occupied']}"
+                        else:
+                            text = f"{text}{self.locale['gets_new_stop']}"
+
+                pathjson = f"&pathjson={new_stop_cell.path}"
+                geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{new_stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+                geojson = f"{geojson},"
+
 
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
@@ -215,6 +270,9 @@ class waypoint():
                     "title": title,
                     "description": f"{text}\n\n{address}{links}",
                     "color": embed_color,
+                    "footer": {
+                        "text": convert_time
+                    },
                     "thumbnail": {
                         "url": image
                     },
@@ -231,6 +289,7 @@ class waypoint():
         if "bot_id" in fil:
             for char in ["_", "*", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
                 text = text.replace(char, f"\\{char}")
+            text = text.replace("**", "*")
             for chat_id in fil["chat_id"]:
                 if not self.empty:
                     payload = {"chat_id": str(chat_id), "photo": image}
@@ -246,6 +305,8 @@ class waypoint():
     def send_location_edit(self, fil, old_lat, old_lon):
         print(f"Found edited location of {self.type} {self.name} - Sending now.")
         self.edit = True
+        self.edit_type = "location"
+        self.before_edit = [old_lat, old_lon]
         title = self.locale["location_edit_title"].format(name = self.name)
         text = self.locale["edit_text"].format(old = f"`{old_lat},{old_lon}`", new = f"`{self.lat},{self.lon}`")
         self.send(fil, text, title)
@@ -253,14 +314,18 @@ class waypoint():
     def send_name_edit(self, fil, old_name):
         print(f"Found edited name of {self.type} {old_name} - Sending now.")
         self.edit = True
+        self.edit_type = "name"
+        self.before_edit = old_name
         title = self.locale["name_edit_title"].format(name = old_name)
-
         text = self.locale["edit_text"].format(old = f"`{old_name}`", new = f"`{self.name}`")
+        text = f"{text}\n\n"
         self.send(fil, text, title)
 
     def send_img_edit(self, fil, old_img):
         print(f"Found new image for {self.type} {self.name} - Sending now.")
         self.edit = True
+        self.edit_type = "img"
+        self.before_edit = old_img
         title = self.locale["img_edit_title"].format(name = self.name)
         text = self.locale["edit_text"].format(old = f"[Link]({old_img})", new = f"[Link]({self.img})")
         self.send(fil, text, title)
@@ -268,6 +333,7 @@ class waypoint():
     def send_deleted(self, fil):
         print(f"Found possibly removed {self.type} {self.name} :o")
         self.edit = True
+        self.edit_type = "deleted"
         title = self.locale["deleted_title"].format(name = self.name)
         self.send(fil, "", title)
 
