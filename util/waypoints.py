@@ -84,24 +84,24 @@ class waypoint():
         pathjson = ""
         geojson = ""
         convert_time = ""
-        if self.type == "portal":
-            if (self.queries.get_stop_by_id(self.id) is None) and (self.queries.get_full_gym_by_id(self.id) is None):
-                didnt_exist = True
-            else:
-                didnt_exist = False
-            
-            utcnow = int(datetime.utcnow().strftime("%H"))
-            now = int(datetime.now().strftime("%H"))
-            offset = now - utcnow
+        try:
+            if self.type == "portal":
+                if (self.queries.get_stop_by_id(self.id) is None) and (self.queries.get_full_gym_by_id(self.id) is None):
+                    didnt_exist = True
+                else:
+                    didnt_exist = False
+                
+                utcnow = int(datetime.utcnow().strftime("%H"))
+                now = int(datetime.now().strftime("%H"))
+                offset = now - utcnow
 
-            day = self.locale["today"]
-            if utcnow >= 9:
-                day = self.locale["tomorrow"]
+                day = self.locale["today"]
+                if utcnow >= 9:
+                    day = self.locale["tomorrow"]
 
-            conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
-            convert_time = (self.locale['when_convert']).format(day = day, time = conv_time)
+                conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
+                convert_time = (self.locale['when_convert']).format(day = day, time = conv_time)
 
-            try:
                 if not self.edit:
                     stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
                     gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
@@ -126,10 +126,7 @@ class waypoint():
                     pathjson = f"&pathjson={stop_cell.path}"
                     geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
                     geojson = f"{geojson},"
-            except:
-                pass
 
-            try:
                 elif self.edit_type == "location":
                     text = f"{text}\n\n"
                     old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
@@ -164,8 +161,9 @@ class waypoint():
                     pathjson = f"&pathjson={new_stop_cell.path}"
                     geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{new_stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
                     geojson = f"{geojson},"
-            except:
-                pass
+        except:
+            pass
+
 
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
