@@ -1,4 +1,5 @@
 {
+    "thanks": "Thank you @Monolio#6572 on Discord for translating Stop Watcher to French!",
     "stop_name": "Nouveau PokéStop",
     "gym_name": "Nouvelle Arène",
     "portal_name": "Nouveau Portail",
@@ -10,7 +11,7 @@
     "img_edit_title": "{name} a une nouvelle photo",
     "deleted_title": "{name} a (probablement) été supprimé",
     "edit_text": "De {old}\nÀ {new}",
-    "will_convert": "✅ Se transformera en Pokéstop({day} at ~{time})",
+    "will_convert": "✅ Sera converti en un Pokéstop",
     "wont_convert": "❌ Ne se transformera pas en Pokéstop",
     "brings_gym": "✅ Apportera une nouvelle Arène",
     "brings_no_gym": "❌ N'apportera pas de nouvelle Arène",
@@ -18,5 +19,14 @@
     "x_stop_in_cell_20": "📍 PokéStop #{x} dans cette cellule",
     "time_format": "%H:%M",
     "today": "aujourd'hui",
-    "tomorrow": "demain"
+    "tomorrow": "demain",
+    "when_convert": "La convertion se fera le {day} vers {time}",
+    "same_cell": "Même cellule",
+    "new_cell": "Nouvelle cellule",
+    "old_cell": "Ancienne cellule",
+    "stays_stop": "✅ Continu d'être un PokéStop",
+    "stays_no_stop": "❌ Ne sera pas un PokéStop",
+    "cell_becomes_empty": "✅ Devient vide",
+    "cell_stays_occupied": "❌ Reste occupée",
+    "gets_new_stop": "✅ Deviendra un PokéStop"
 }
