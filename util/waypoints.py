@@ -90,9 +90,6 @@ class waypoint():
             else:
                 didnt_exist = False
             
-            if self.edit:
-                text = f"{text}\n\n"
-
             utcnow = int(datetime.utcnow().strftime("%H"))
             now = int(datetime.now().strftime("%H"))
             offset = now - utcnow
@@ -130,7 +127,7 @@ class waypoint():
                 geojson = f"{geojson},"
 
             elif self.edit_type == "location":
-
+                text = f"{text}\n\n"
                 old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
                 new_stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
 
