@@ -58,6 +58,7 @@ if args.init:
     portal_cache = []
     full_stop_cache = []
     full_gym_cache = []
+    edit_list = {"portals": {},"stops": {},"gyms": {}}
 
 if args.delete:
     print("==========================================================================================================")
