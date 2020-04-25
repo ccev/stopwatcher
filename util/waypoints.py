@@ -101,66 +101,71 @@ class waypoint():
             conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
             convert_time = (self.locale['when_convert']).format(day = day, time = conv_time)
 
-            if not self.edit:
-                stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
-                gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
+            try:
+                if not self.edit:
+                    stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
+                    gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
 
-                if stop_cell.converts():
-                    conv_time = self.get_convert_time()
-                    text = self.locale["will_convert"]
-                else:
-                    text = self.locale["wont_convert"]
-
-                if stop_cell.converts() and gym_cell.brings_gym():
-                    text = f"{text}\n{self.locale['brings_gym']}"
-                else:
-                    text = f"{text}\n{self.locale['brings_no_gym']}"
-
-                if stop_cell.converts():
-                    if gym_cell.stops > 20:
-                        text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
+                    if stop_cell.converts():
+                        conv_time = self.get_convert_time()
+                        text = self.locale["will_convert"]
                     else:
-                        text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
-                
-                pathjson = f"&pathjson={stop_cell.path}"
-                geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-                geojson = f"{geojson},"
+                        text = self.locale["wont_convert"]
 
-            elif self.edit_type == "location":
-                text = f"{text}\n\n"
-                old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
-                new_stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
-
-                if old_stop_cell.path == new_stop_cell.path:
-                    text = f"**{text}{self.locale['same_cell']}**:\n"
-                    if not didnt_exist:
-                        text = f"{text}{self.locale['stays_stop']}"
+                    if stop_cell.converts() and gym_cell.brings_gym():
+                        text = f"{text}\n{self.locale['brings_gym']}"
                     else:
-                        text = f"{text}{self.locale['stays_no_stop']}"
-                
-                else:
-                    text = f"{text}**{self.locale['new_cell']}**:\n"
-                    if didnt_exist:
-                        if new_stop_cell.converts():
-                            text = f"{text}{self.locale['will_convert']}"
+                        text = f"{text}\n{self.locale['brings_no_gym']}"
+
+                    if stop_cell.converts():
+                        if gym_cell.stops > 20:
+                            text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
+                        else:
+                            text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
+                    
+                    pathjson = f"&pathjson={stop_cell.path}"
+                    geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+                    geojson = f"{geojson},"
+            except:
+                pass
+
+            try:
+                elif self.edit_type == "location":
+                    text = f"{text}\n\n"
+                    old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
+                    new_stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
+
+                    if old_stop_cell.path == new_stop_cell.path:
+                        text = f"**{text}{self.locale['same_cell']}**:\n"
+                        if not didnt_exist:
+                            text = f"{text}{self.locale['stays_stop']}"
                         else:
                             text = f"{text}{self.locale['stays_no_stop']}"
+                    
                     else:
-                        text = f"{text}{self.locale['stays_stop']}"
-
-                    text = f"{text}\n**{self.locale['old_cell']}**:\n"
-                    if old_stop_cell.converts():
-                        text = f"{text}{self.locale['cell_becomes_empty']}"
-                    else:
+                        text = f"{text}**{self.locale['new_cell']}**:\n"
                         if didnt_exist:
-                            text = f"{text}{self.locale['cell_stays_occupied']}"
+                            if new_stop_cell.converts():
+                                text = f"{text}{self.locale['will_convert']}"
+                            else:
+                                text = f"{text}{self.locale['stays_no_stop']}"
                         else:
-                            text = f"{text}{self.locale['gets_new_stop']}"
+                            text = f"{text}{self.locale['stays_stop']}"
 
-                pathjson = f"&pathjson={new_stop_cell.path}"
-                geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{new_stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-                geojson = f"{geojson},"
+                        text = f"{text}\n**{self.locale['old_cell']}**:\n"
+                        if old_stop_cell.converts():
+                            text = f"{text}{self.locale['cell_becomes_empty']}"
+                        else:
+                            if didnt_exist:
+                                text = f"{text}{self.locale['cell_stays_occupied']}"
+                            else:
+                                text = f"{text}{self.locale['gets_new_stop']}"
 
+                    pathjson = f"&pathjson={new_stop_cell.path}"
+                    geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{new_stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
+                    geojson = f"{geojson},"
+            except:
+                pass
 
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
