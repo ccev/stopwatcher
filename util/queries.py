@@ -102,6 +102,14 @@ class create_queries():
         stops = self.cursor.fetchall()
         return stops
 
+    def get_gym_by_id(self, w_id):
+        if self.schema == "mad":
+            self.cursor.execute(f"SELECT name, url FROM gymdetails WHERE gym_id = '{w_id}';")
+        elif self.schema == "rdm":
+            self.cursor.execute(f"SELECT name, url FROM gym WHERE id = '{w_id}';")
+        stops = self.cursor.fetchall()
+        return stops
+
     def get_portal_by_id(self, w_id):
         self.cursor.execute(f"SELECT name, url FROM {self.portal}.ingress_portals WHERE external_id = '{w_id}';")
         portals = self.cursor.fetchall()
