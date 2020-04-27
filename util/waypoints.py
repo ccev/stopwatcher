@@ -103,6 +103,7 @@ class waypoint():
                     didnt_exist = True
                 else:
                     didnt_exist = False
+                    convert_time = self.get_convert_time()
 
                 stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
 
@@ -110,9 +111,7 @@ class waypoint():
                     gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
 
                     if stop_cell.converts():
-                        conv_time = self.get_convert_time()
                         text = self.locale["will_convert"]
-                        convert_time = self.get_convert_time()
                     else:
                         text = self.locale["wont_convert"]
 
@@ -133,7 +132,6 @@ class waypoint():
 
                 elif self.edit_type == "location":
                     text = f"{text}\n\n"
-                    convert_time = self.get_convert_time()
                     old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
 
                     if old_stop_cell.path == stop_cell.path:
@@ -142,16 +140,15 @@ class waypoint():
                             text = f"{text}{self.locale['stays_stop']}"
                         else:
                             text = f"{text}{self.locale['stays_no_stop']}"
-                            convert_time = ""
                     
                     else:
                         text = f"{text}**{self.locale['new_cell']}**:\n"
                         if didnt_exist:
                             if stop_cell.converts():
                                 text = f"{text}{self.locale['will_convert']}"
+                                convert_time = self.get_convert_time()
                             else:
                                 text = f"{text}{self.locale['stays_no_stop']}"
-                                convert_time = ""
                         else:
                             text = f"{text}{self.locale['stays_stop']}"
 
@@ -167,10 +164,6 @@ class waypoint():
                     pathjson = f"&pathjson={stop_cell.path}"
                     geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
                     geojson = f"{geojson},"
-
-                else:
-                    if not didnt_exist:
-                        convert_time = ""
         except:
             pass
 
@@ -328,7 +321,6 @@ class waypoint():
         self.before_edit = old_name
         title = self.locale["name_edit_title"].format(name = old_name)
         text = self.locale["edit_text"].format(old = f"`{old_name}`", new = f"`{self.name}`")
-        text = f"{text}\n\n"
         self.send(fil, text, title)
 
     def send_img_edit(self, fil, old_img):
