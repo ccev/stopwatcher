@@ -20,7 +20,7 @@
     "time_format": "%-I:%M %p",
     "today": "hoy",
     "tomorrow": "mañana",
-    "when_convert": "Se convierte el {day} alrededor de las {time}",
+    "when_convert": "Se convierte {day} alrededor de las {time}",
     "same_cell": "Misma celda",
     "new_cell": "Nueva celda",
     "old_cell": "Antigua celda",
