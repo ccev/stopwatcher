@@ -43,7 +43,7 @@ with open("config/cache/edits.json", encoding="utf-8") as f:
 with open("config/cache/deleted.json", encoding="utf-8") as f:
     deleted_cache = json.load(f)
 
-with open("config_example/cache/edits.json", encoding="utf-8") as f:
+with open("config/cache/edits.json", encoding="utf-8") as f:
     empty_edit_list = json.load(f)
 
 queries = create_queries(config, cursor)
