@@ -11,7 +11,7 @@ Note that a working Ingress Scraper is needed for everything related to Portals 
 
 ## Setup
 1. `git clone https://github.com/ccev/stopwatcher.git && cd stopwatcher` and `pip[3[.6]] install -r requirements.txt`
-2. `cp -r config_example config`, fill out config/config.ini, config/filters.json and config/geofence.json. The geofence file uses the same format as Poracle, so you can copy from there or just follow the example. Config and filters are explained below.
+2. `cp -r config_example config`, fill out config/config.ini, config/filters.json and config/geofence.json ([Explainations](https://github.com/ccev/stopwatcher#config-files)). Config and filters are explained below.
 3. That's it. Now run `python3 stop_watcher.py`. I recommend using cron or pm2 to loop it
 
 ## Additional Steps
@@ -27,32 +27,33 @@ Use [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper
 ## Features
 [TODO (it's super cool i promise)]
 
-## config.ini
+## Config files
+### config.ini
 This file provides the settings, api keys, and generic configuration needed to function. Since this file is parsed by python make sure to **not** include quotation marks.
 
  Heading | Option | Description | What to put in
 |-|-|-|-|
-| Config | **`language`** | Needs to match one of the files under the locale/ directory. | `fr`
-| Config | **`portal_scraper_interval`** | Time interval in seconds that your portal scraper script runs on. Used to help determine when portals have been removed. | `3600`
-| Maps | **`static_map`** | Include map in the notification or not. | `True`/`False`
-| Maps | **`static_map_provider`** | Select your static map provider. | `tileserver`, `osm`, `mapbox`, `google`
-| Maps | **`key`** | Google or mapbox api key here. | `REALLY_LONG_KEY_HERE`
-| Maps | **`frontend_map`** | Include a link to your frontend map. | `True`/`False`
+| Config | **`language`** | The language you want your notifications to be in. | `en`/`de`/`fr`/`es`/`pl`
+| Config | **`portal_scraper_interval`** | The restart delay of your Ingress Scraper. Used to help determine when portals have been removed. | A number in seconds
+| Maps | **`static_map`** | Wheter to include a static map in the notification or not. | `True`/`False`
+| Maps | **`static_map_provider`** | Your static map provider. | `tileserver`/`mapbox`/`osm`/`google`
+| Maps | **`key`** | The additional information needed to generate Static Maps. Either your API key or Tileserver URL. | String, mapbox/mapquest/google api key or tileserver url
+| Maps | **`frontend_map`** | Whether to include a link to your frontend map or not. | `True`/`False`
 | Maps | **`map_url`** | URL to your frontend map. | `https://www.map.com/`
-| Maps | **`frontend`** | Frontend that you're using. | `pmsf/rdm/rmad`
-| Maps | **`map_name`** | This is the text that links to your frontend map. | `Pokemap`
-| Maps | **`geocoding`** | Include the address in the notification. | `True`/`False`
-| Maps | **`geocoding_provider`** | Include the address in the notification. | `google`, `osm`, `mapbox`
-| Maps | **`geocoding_key`** | API key for geocoding, required for google & mapbox. | `google/osm/mapbox`
-| DB | **`scanner`** | Select your scanner type. | `mad/rdm`
-| DB | **`scanner_db_name`** | Name of your scanner database. | `maddb`
-| DB | **`portal_db_name`** | Name of your portal database, with [pmsf](https://github.com/pmsf/PMSF/blob/master/sql/manualdb/manualdb.sql) data structure. | `manualdb`
-| DB | **`host`** | Hostname or ip address of your database server. | `0.0.0.0`
-| DB | **`port`** | Port of database server. | `0.0.0.0`
-| DB | **`user`** | Username that has access to scanner/pmsf database tables. | `username`
-| DB | **`password`** | User password that has access to scanner/pmsf database tables. | `username`
+| Maps | **`frontend`** | Frontend that you're using. | `pmsf`/`rdm`/`rmad`
+| Maps | **`map_name`** | This is the text that links to your frontend map. | Your Map Name
+| Maps | **`geocoding`** | Wheter to include the address in the notification or not. | `True`/`False`
+| Maps | **`geocoding_provider`** | Your geocoding provider. | `google`/`osm`/`mapbox`
+| Maps | **`geocoding_key`** | API key for geocoding, required for google & mapbox. | `google`/`osm`/`mapbox`
+| DB | **`scanner`** | Select your scanner type. | `mad`/`rdm`
+| DB | **`scanner_db_name`** | Name of your scanner database. | Database name
+| DB | **`portal_db_name`** | Name of your portal database (must follow [pmsf](https://github.com/pmsf/PMSF/blob/master/sql/manualdb/manualdb.sql) data structure). | Database name
+| DB | **`host`** | Hostname or ip address of your database server. | Address
+| DB | **`port`** | Port of database server. | Port
+| DB | **`user`** | Username that has access to scanner/pmsf database tables. | Username
+| DB | **`password`** | User password that has access to scanner/pmsf database tables. | Password
 
-## filters.json
+### filters.json
 Filters tell Stop Watcher what to look for and where to send it. Every filter option is optional, except `"area"`. So if you don't want something, just delete the option to avoid confusion (e.g. remove `"webhook"` completely instead of putting `"webhook": []` if you don't want Discord notifications)
 
 | Option | Description | What to put in
@@ -69,12 +70,11 @@ Filters tell Stop Watcher what to look for and where to send it. Every filter op
 | **`bot_id`** | You Telegram's Bot ID | String, `"8762682"` |
 | **`chat_id`** | You Telegram's Chat ID. Can also be multiple. (Needs a set `"bot_id"` to work) | Chat IDs, `["24254535"]` or `["4636363","970785"]` |
 
-
-## geofence.json
-This in includes your areas that can be filtered on. Use [geo.jasparke.net](http://geo.jasparke.net/) or [maps.poracle.world](https://maps.poracle.world/) to help create this file.
+### geofence.json
+The areas you want to use in your filters.json. It's the same format Poracle (or Discordopole) uses, so you can copy it from there. You can use [poracle.world](https://maps.poracle.world/) or [geo.jasparke.net](http://geo.jasparke.net/) to help create this file.
 
 ## Extras
-These are command line arguments that can be passed to the `stop_watcher.py` script.
+Command line arguments that can be passed to the `stop_watcher.py` script.
 
 ### --init / -i
 Fills your cache files with up-to-date data. Useful if you want to add a new area to Stop Watcher or haven't ran it in a while.
