@@ -23,6 +23,10 @@ class create_config:
         self.geocoding_provider = config_file.get("Maps", "geocoding_provider").lower()
         self.geocoding_key = config_file.get("Maps", "geocoding_key")
 
+        self.zoom = config_file.get("Maps", "zoom", fallback="17")
+        self.width = config_file.get("Maps", "width", fallback="800")
+        self.height = config_file.get("Maps", "height", fallback="500")
+
 
         self.scan_type = config_file.get("DB", "scanner").lower()
         self.db_name_scan = config_file.get("DB", "scanner_db_name")
