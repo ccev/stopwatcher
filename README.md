@@ -32,12 +32,12 @@ Filters tell Stop Watcher what to look for and where to send it. Every filter op
 
 | Option | Description | What to put in
 |-|-|-|
-| **`"area"`** | Needs to match an area name from your geofence.json, else it will default to your whole DB. | String, `"berlin"`
-| **`"update"`** | What kind of Waypoints' photos/titles you want to get updates, if they're empty. Works with Stops and Gyms. Stops take their info from Portal, Gyms from Stops or Portals. | List with "stop" and/or "gym" in, `["stop", "gym"]` |
-| **`"delete_converted_stops"`** | Whether to delete Stops that turned into Gyms or not. You can just delete the option instead of putting in `false` | `true`/`false` |
-| **`"send"`** | The kinds of new Waypoints you want to get sent. | List with "portal", "stop" and/or "gym", `["portal", "stop", "gym"]` |
-| **`"send_empty"`** | Whether or not to send Stops/Gyms with no photo/title. If true, the Waypoint will be sent again if its info is known. If you have an Ingress Scraper running and updates set to true, you can leave this option on, in case the systems fail. You can just delete the option instead of putting in `false` | `true`/`false`
-| **`"edits"`** | The kinds of Waypoints you want edits to be sent of. | List with "portal", "stop" and/or "gym", `["portal", "stop", "gym"]` |
+| **`area`** | Needs to match an area name from your geofence.json, else it will default to your whole DB. | String, `"berlin"`
+| **`update`** | What kind of Waypoints' photos/titles you want to get updates, if they're empty. Works with Stops and Gyms. Stops take their info from Portal, Gyms from Stops or Portals. | List with "stop" and/or "gym" in, `["stop", "gym"]` |
+| **`delete_converted_stops`** | Whether to delete Stops that turned into Gyms or not. You can just delete the option instead of putting in `false` | `true`/`false` |
+| **`send`** | The kinds of new Waypoints you want to get sent. | List with "portal", "stop" and/or "gym", `["portal", "stop", "gym"]` |
+| **`send_empty`** | Whether or not to send Stops/Gyms with no photo/title. If true, the Waypoint will be sent again if its info is known. If you have an Ingress Scraper running and updates set to true, you can leave this option on, in case the systems fail. You can just delete the option instead of putting in `false` | `true`/`false`
+| **`edits`** | The kinds of Waypoints you want edits to be sent of. | List with "portal", "stop" and/or "gym", `["portal", "stop", "gym"]` |
 | **`edit_types`** | The kinds of edits you want to get sent. (Should have at least one if `"edits"` has something in) | List with "location", "title", "photo" and/or "removal", `["location", "title", "photo", "removal"]` |
 | **`deleted`** | Stop Watcher looks for removals by searching for Waypoints that haven't been updated in a certain time interval. If it finds more than {max}, it will send a notification for it. That time interval is (4x(Scraper Interval))/60 for Portals and 5 hours for Stops/Gyms. {max} is 5 for each. Since those values can very per area, you can use this option to set your own ones | JSON that looks like this: (Every option is optional!) `{"max": {"scraper": 10, "scanner": 3}, "timespan": {"scraper": 3600, "scanner": 1440}}` |
 | **`webhook`** | The Discord Webhook edited/new waypoints should get sent to. Can also be multiple | Webhook links, `["url.com"]` or `["url.com","url2.com"]` |
