@@ -27,6 +27,31 @@ Use [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper
 ## Features
 [TODO (it's super cool i promise)]
 
+## config.ini
+This file provides the settings, api keys, and generic configuration needed to function. Since this file is parsed by python make sure to **not** include quotation marks.
+
+ Heading | Option | Description | What to put in
+|-|-|-|-|
+| Config | **`language`** | Needs to match one of the files under the locale/ directory. | `fr`
+| Config | **`portal_scraper_interval`** | Time interval in seconds that your portal scraper script runs on. Used to help determine when portals have been removed. | `3600`
+| Maps | **`static_map`** | Include map in the notification or not. | `True`/`False`
+| Maps | **`static_map_provider`** | Select your static map provider. | `tileserver`, `osm`, `mapbox`, `google`
+| Maps | **`key`** | Google or mapbox api key here. | `REALLY_LONG_KEY_HERE`
+| Maps | **`frontend_map`** | Include a link to your frontend map. | `True`/`False`
+| Maps | **`map_url`** | URL to your frontend map. | `https://www.map.com/`
+| Maps | **`frontend`** | Frontend that you're using. | `pmsf/rdm/rmad`
+| Maps | **`map_name`** | This is the text that links to your frontend map. | `Pokemap`
+| Maps | **`geocoding`** | Include the address in the notification. | `True`/`False`
+| Maps | **`geocoding_provider`** | Include the address in the notification. | `google`, `osm`, `mapbox`
+| Maps | **`geocoding_key`** | API key for geocoding, required for google & mapbox. | `google/osm/mapbox`
+| DB | **`scanner`** | Select your scanner type. | `mad/rdm`
+| DB | **`scanner_db_name`** | Name of your scanner database. | `maddb`
+| DB | **`portal_db_name`** | Name of your portal database, with [pmsf](https://github.com/pmsf/PMSF/blob/master/sql/manualdb/manualdb.sql) data structure. | `manualdb`
+| DB | **`host`** | Hostname or ip address of your database server. | `0.0.0.0`
+| DB | **`port`** | Port of database server. | `0.0.0.0`
+| DB | **`user`** | Username that has access to scanner/pmsf database tables. | `username`
+| DB | **`password`** | User password that has access to scanner/pmsf database tables. | `username`
+
 ## filters.json
 Filters tell Stop Watcher what to look for and where to send it. Every filter option is optional, except `"area"`. So if you don't want something, just delete the option to avoid confusion (e.g. remove `"webhook"` completely instead of putting `"webhook": []` if you don't want Discord notifications)
 
@@ -44,7 +69,13 @@ Filters tell Stop Watcher what to look for and where to send it. Every filter op
 | **`bot_id`** | You Telegram's Bot ID | String, `"8762682"` |
 | **`chat_id`** | You Telegram's Chat ID. Can also be multiple. (Needs a set `"bot_id"` to work) | Chat IDs, `["24254535"]` or `["4636363","970785"]` |
 
+
+## geofence.json
+This in includes your areas that can be filtered on. Use [geo.jasparke.net](http://geo.jasparke.net/) or [maps.poracle.world](https://maps.poracle.world/) to help create this file.
+
 ## Extras
+These are command line arguments that can be passed to the `stop_watcher.py` script.
+
 ### --init / -i
 Fills your cache files with up-to-date data. Useful if you want to add a new area to Stop Watcher or haven't ran it in a while.
 
