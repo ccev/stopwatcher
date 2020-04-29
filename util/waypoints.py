@@ -184,9 +184,9 @@ class waypoint():
                 if self.type == "portal":
                     map_url = f"{self.config.map_url}@/{self.lat}/{self.lon}/18"
                 elif self.type == "stop":
-                    map_url = f"{self.config.map_url}@pokestop/:{self.id}"
+                    map_url = f"{self.config.map_url}@pokestop/{self.id}"
                 elif self.type == "gym":
-                    map_url = f"{self.config.map_url}@gym/:{self.id}"
+                    map_url = f"{self.config.map_url}@gym/{self.id}"
             elif self.config.map_provider == "rmad":
                 map_url = f"{self.config.map_url}?lat={self.lat}&lon={self.lon}&zoom=18"
             links = f"{links} \\| [{self.config.map_name}]({map_url})"
