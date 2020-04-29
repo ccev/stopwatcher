@@ -105,7 +105,7 @@ class waypoint():
                     didnt_exist = False
                     convert_time = self.get_convert_time()
 
-                stop_cell = s2cell(self.queries, self.lat, self.lon, self.config.zoom)
+                stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
 
                 if not self.edit:
                     gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
@@ -132,7 +132,7 @@ class waypoint():
 
                 elif self.edit_type == "location":
                     text = f"{text}\n\n"
-                    old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], self.config.zoom)
+                    old_stop_cell = s2cell(self.queries, self.before_edit[0], self.before_edit[1], 17)
 
                     if old_stop_cell.path == stop_cell.path:
                         text = f"**{text}{self.locale['same_cell']}**:\n"
