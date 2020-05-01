@@ -30,6 +30,7 @@ class s2cell():
         self.path = path
         self.mapbox_path = mb_path
         self.stops = count[0] + count[1]
+        self.portals = count[2]
 
     def converts(self):
         if self.stops == 0:

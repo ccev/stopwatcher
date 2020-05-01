@@ -146,14 +146,14 @@ class waypoint():
                         if didnt_exist:
                             if stop_cell.converts():
                                 text = f"{text}{self.locale['will_convert']}"
-                                convert_time = self.get_convert_time()
                             else:
                                 text = f"{text}{self.locale['stays_no_stop']}"
+                                convert_time = ""
                         else:
                             text = f"{text}{self.locale['stays_stop']}"
 
                         text = f"{text}\n**{self.locale['old_cell']}**:\n"
-                        if old_stop_cell.converts():
+                        if old_stop_cell.portals == 0:
                             text = f"{text}{self.locale['cell_becomes_empty']}"
                         else:
                             if didnt_exist:
@@ -164,6 +164,10 @@ class waypoint():
                     pathjson = f"&pathjson={stop_cell.path}"
                     geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
                     geojson = f"{geojson},"
+
+                elif self.edit_type == "img":
+                    convert_time = ""
+                    
         except:
             pass
 

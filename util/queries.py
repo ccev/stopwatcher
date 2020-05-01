@@ -227,5 +227,8 @@ class create_queries():
             self.cursor.execute(f"SELECT (SELECT COUNT(pokestop_id) FROM pokestop WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(latitude, longitude))), (SELECT COUNT(gym_id) FROM gym WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(latitude, longitude)));")
         elif self.schema == "rdm":
             self.cursor.execute(f"SELECT (SELECT COUNT(id) FROM pokestop WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon))), (SELECT COUNT(id) FROM gym WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon)));")
-        count = self.cursor.fetchone()
-        return count
+        count1 = self.cursor.fetchone()
+        self.cursor.execute(f"SELECT COUNT(id) FROM {self.portal}.ingress_portals WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon));")
+        count2 = self.cursor.fetchone()
+
+        return count1 + count2

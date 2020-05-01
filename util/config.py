@@ -14,6 +14,9 @@ class create_config:
         self.static_provider = config_file.get("Maps", "static_map_provider").lower()
         self.static_key = config_file.get("Maps", "key")
 
+        #self.host_provider = config_file.get("Maps", "hosting").lower()
+        #self.host_key = config_file.get("Maps", "hosting_key")
+
         self.use_map = config_file.getboolean("Maps", "frontend_map")
         self.map_url = config_file.get("Maps", "map_url")
         self.map_provider = config_file.get("Maps", "frontend").lower()
