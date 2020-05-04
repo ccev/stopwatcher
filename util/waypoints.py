@@ -3,6 +3,7 @@ import time
 import json
 import pyshorteners
 import geocoder
+import pyimgur
 
 from datetime import datetime, timedelta
 
@@ -246,7 +247,6 @@ class waypoint():
         # Static Map
         static_map = ""
         if self.config.use_static_map:           
-            short = pyshorteners.Shortener().tinyurl.short
             if self.config.static_provider == "google":
                 static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
             elif self.config.static_provider == "osm":
@@ -278,10 +278,30 @@ class waypoint():
                     for lat, lon, w_type, dis in waypoints:
                         static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
                 static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({self.lon},{self.lat})/{self.lon},{self.lat},16/800x500?access_token={self.config.static_key}"
-            try:
-                static_map = short(static_map)
-            except:
-                static_map = ""
+            
+            if self.config.host_provider == "tinyurl":
+                short = pyshorteners.Shortener().tinyurl.short
+                try:
+                    static_map = short(static_map)
+                except:
+                    static_map = ""
+
+            elif self.config.host_provider == "imgur":
+                imgur_success = False
+                while not imgur_success:
+                    try:
+                        imgur = pyimgur.Imgur(self.config.host_key)
+                        uploaded_image = imgur.upload_image(url=static_map)
+                        static_map = (uploaded_image.link)
+                        imgur_success = True
+                    except Exception as err:
+                        print("Imgur Error - Sleeping 1 hour and trying again :S")
+                        print(err)
+                        time.sleep(3600)
+
+            elif self.config.host_provider == "polr":
+                result = requests.get(f"http://demo.polr.me/api/v2/action/shorten?key={self.config.host_key}&url={static_map}&is_secret=false")
+                static_map = result.text
 
         # Send
         if "webhook" in fil:
