@@ -77,6 +77,7 @@ class create_queries():
             self.cursor.execute(f"DELETE FROM pokestop WHERE id = '{s_id}';")
 
     def update_waypoint(self, w_type, w_id, w_name, w_img):
+        w_name = w_name.replace("'", "\\'")
         if self.schema == "mad":
             if w_type == "stop":
                 table = "pokestop"
