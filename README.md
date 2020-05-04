@@ -38,6 +38,8 @@ This file provides the settings, api keys, and generic configuration needed to f
 | Maps | **`static_map`** | Wheter to include a static map in the notification or not. | `True`/`False`
 | Maps | **`static_map_provider`** | Your static map provider. | `tileserver`/`mapbox`/`osm`/`google`
 | Maps | **`key`** | The additional information needed to generate Static Maps. Either your API key or Tileserver URL. | String, mapbox/mapquest/google api key or tileserver url
+| Maps | **`hosting`** | Decide what service you want to use to shorten Static Map URLs. TinyURL is default and works without a key, Imgur is recommended and needs an Imgur Account (they want your phone number). You can also use polr if you have it set up and know how it works. | `tinyurl`/`imgur`/`polr`
+| Maps | **`hosting_key`** | Needed for Imgur and polr. If you're using tinyurl, just ignore. To get your Imgur Client ID, go to https://api.imgur.com/oauth2/addclient, sign in, tick OAuth 2 authorization without a callback URL and then fill out Application name:, Email: and Description:. It does not matter what you put in. Solve the captcha and click submit. Now copy the Client ID. | Imgur API Key/polr key 
 | Maps | **`frontend_map`** | Whether to include a link to your frontend map or not. | `True`/`False`
 | Maps | **`map_url`** | URL to your frontend map. | `https://www.map.com/`
 | Maps | **`frontend`** | Frontend that you're using. | `pmsf`/`rdm`/`rmad`
