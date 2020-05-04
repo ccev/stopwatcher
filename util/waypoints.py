@@ -27,9 +27,9 @@ class waypoint():
         if self.name is None or self.name == "unknown":
             self.empty = True
 
-    def update(self):
+    def update(self, stop_update = True):
         needs_update = True
-        if self.type == "gym":
+        if self.type == "gym" and stop_update:
             try:
                 stop = self.queries.get_stop_by_id(self.id)
                 for s_name, s_img in stop:
@@ -54,6 +54,21 @@ class waypoint():
     def delete(self):
         print(f"Deleting converted {self.type} {self.name} from your DB")
         self.queries.delete_stop(self.id)
+
+    def is_gym(self):
+        if len(self.queries.get_gym_by_id(self.id)) == 0:
+            return False
+        else:
+            return True
+
+    def is_stop(self):
+        if len(self.queries.get_stop_by_id(self.id)) == 0:
+            return False
+        else:
+            return True
+
+    def set_type(self, new_type):
+        self.type = new_type
 
     def get_convert_time(self):
         utcnow = int(datetime.utcnow().strftime("%H"))
@@ -99,12 +114,12 @@ class waypoint():
         convert_time = ""
         try:
             if self.type == "portal":
-                if len(self.queries.get_stop_by_id(self.id)) + len(self.queries.get_gym_by_id(self.id)) == 0:
-                    didnt_exist = True
-                else:
+                if self.is_stop() or self.is_gym():
                     didnt_exist = False
                     convert_time = self.get_convert_time()
-
+                else:
+                    didnt_exist = True
+                    
                 stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
 
                 if not self.edit:

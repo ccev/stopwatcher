@@ -269,6 +269,11 @@ for fil in config.filters:
                     if "title" in fil["edit_types"]:
                         portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
                         portal.send_name_edit(fil, p_name)
+                        if "update_gym_title" in fil:
+                            if fil["update_gym_title"]:
+                                if portal.is_gym():
+                                    portal.set_type("gym")
+                                    portal.update(False)
                 if p_img != p[3]:
                     if "photo" in fil["edit_types"]:
                         portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
