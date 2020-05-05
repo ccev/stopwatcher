@@ -39,7 +39,7 @@ This file provides the settings, api keys, and generic configuration needed to f
 | Maps | **`static_map_provider`** | Your static map provider. | `tileserver`/`mapbox`/`osm`/`google`
 | Maps | **`key`** | The additional information needed to generate Static Maps. Either your API key or Tileserver URL. | String, mapbox/mapquest/google api key or tileserver url
 | Maps | **`hosting`** | Decide what service you want to use to shorten Static Map URLs. TinyURL is default and works without a key, Imgur is recommended and needs an Imgur Account (they want your phone number). You can also use polr if you have it set up and know how it works. | `tinyurl`/`imgur`/`polr`
-| Maps | **`hosting_key`** | Needed for Imgur and polr. If you're using tinyurl, just ignore. To get your Imgur Client ID, go to https://api.imgur.com/oauth2/addclient, sign in, tick OAuth 2 authorization without a callback URL and then fill out Application name:, Email: and Description:. It does not matter what you put in. Solve the captcha and click submit. Now copy the Client ID. | Imgur API Key/polr key 
+| Maps | **`hosting_key`** | Needed for Imgur and polr. If you're using tinyurl, just ignore. **Imgur Client ID:** go to https://api.imgur.com/oauth2/addclient, sign in, tick OAuth 2 authorization without a callback URL and then fill out Application name:, Email: and Description:. It does not matter what you put in. Solve the captcha and click submit. Now copy the Client ID. **Polr:** If you have polr set up, you can use that instead. Just make sure to put `http://www.your.url,api_key` as the key. | Imgur Client ID/polr key 
 | Maps | **`frontend_map`** | Whether to include a link to your frontend map or not. | `True`/`False`
 | Maps | **`map_url`** | URL to your frontend map. | `https://www.map.com/`
 | Maps | **`frontend`** | Frontend that you're using. | `pmsf`/`rdm`/`rmad`
@@ -84,3 +84,6 @@ Fills your cache files with up-to-date data. Useful if you want to add a new are
 
 ### --delete / -d
 Gives a report of all (possibly) removed Portals/Stops/Gyms together with their names, IDs, coordinates and a SQL Query to delete them from your database. The way Stop Watcher checks for removed Waypoints is not 100% accurate, so please check before you delete!
+
+### --compare / -c
+Keep your area updated! --compare gives a report of all Stops and Gyms that don't match the details of their corresponding Portals. It will also update the location and title of them.
