@@ -4,6 +4,7 @@ import sys
 
 from pymysql import connect
 
+import util.tools as tools
 from util.config import create_config
 from util.queries import create_queries
 from util.waypoints import waypoint, init
@@ -52,6 +53,7 @@ init = init(queries)
 parser = argparse.ArgumentParser()
 parser.add_argument("-i", "--init", action='store_true', help="Copy every missing Stop/Gym/Portal ID into Stop Watcher's cache files")
 parser.add_argument("-d", "--delete", action='store_true', help="Generates SQL Queries to delete possibly removed Waypoints from you Databases")
+parser.add_argument("-c", "--compare", action='store_true', help="Compare all your Stops/Gyms to Portals and update them if details don't match")
 args = parser.parse_args()
 
 if args.init:
@@ -61,57 +63,11 @@ if args.init:
     edit_list = {"portals": {},"stops": {},"gyms": {}}
 
 if args.delete:
-    print("==========================================================================================================")
-    print("")
-    print("!!! Please note that these Waypoints are NOT guaranteed to be removed. Please confirm if they still exist!")
-    print("You can do that by checking your Map/DB if they've been updated recently (Or just spoofing there)")
-    print("")
-    print("==========================================================================================================")
-    print("")
-    try:
-        print("Deleted Portals:")
-        for p_id in deleted_cache["portals"]:
-            portal = queries.get_full_portal_by_id(p_id)
-            print(f"- {portal[2]}   |   {portal[0]},{portal[1]}   |   {p_id}")
-    except:
-        pass
-    print("")
-    print(f"DELETE FROM {config.db_name_portal}.ingress_portals WHERE external_id in {str(deleted_cache['portals']).replace('[', '(').replace(']',')').replace(' ', '')};")
-    print("")
-    print("==========================================================================================================")
-    print("")
-    try:
-        print("Deleted Stops:")
-        for s_id in deleted_cache["stops"]:
-            stop = queries.get_full_stop_by_id(s_id)
-            print(f"- {stop[2]}   |   {stop[0]},{stop[1]}   |   {s_id}")
-        print("")
-        if config.scan_type == "mad":
-            print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE pokestop_id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
-        elif config.scan_type == "rdm":
-            print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
-    except:
-        pass
-    print("")
-    print("==========================================================================================================")
-    print("")
-    try:
-        print("Deleted Gyms:")
-        for g_id in deleted_cache["gyms"]:
-            gym = queries.get_full_gym_by_id(g_id)
-            print(f"- {gym[2]}   |   {gym[0]},{gym[1]}   |   {g_id}")
-        print("")
-        if config.scan_type == "mad":
-            print(f"DELETE FROM {config.db_name_scan}.gym WHERE gym_id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
-            print("")
-            print(f"DELETE FROM {config.db_name_scan}.gymdetails WHERE gym_id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
-        elif config.scan_type == "rdm":
-            print(f"DELETE FROM {config.db_name_scan}.gym WHERE id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
-    except:
-        pass
-    print("")
-    print("==========================================================================================================")
+    tools.delete(queries, config, deleted_cache)
+    sys.exit()
 
+if args.compare:
+    tools.compare(queries, config)
     sys.exit()
 
 if len(portal_cache) == 0:
