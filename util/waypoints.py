@@ -300,7 +300,9 @@ class waypoint():
                         time.sleep(3600)
 
             elif self.config.host_provider == "polr":
-                result = requests.get(f"http://demo.polr.me/api/v2/action/shorten?key={self.config.host_key}&url={static_map}&is_secret=false")
+                key = list(self.config.host_key.split(","))
+                polr_payload = {"key": key[1], "url": static_map, "is_secret": "false"}
+                result = requests.get(f"{key[0]}/api/v2/action/shorten?key={key[1]}", params = polr_payload)
                 static_map = result.text
 
         # Send
