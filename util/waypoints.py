@@ -128,6 +128,7 @@ class waypoint():
 
                     if stop_cell.converts():
                         text = self.locale["will_convert"]
+                        convert_time = self.get_convert_time()
                     else:
                         text = self.locale["wont_convert"]
 

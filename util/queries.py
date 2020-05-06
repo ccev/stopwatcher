@@ -8,6 +8,7 @@ class create_queries():
         self.schema = config.scan_type
         self.geofences = config.geofences
         self.filters = config.filters
+        self.area = ""
 
     def convert_area(self, area_name):
         stringfence = "-200 -200, -200 200, 200 200, 200 -200, -200 -200"
