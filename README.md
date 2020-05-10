@@ -21,8 +21,8 @@ Mapbox and tileserver static maps are the coolest ones. If you don't already hav
 #### [Flo's Tileserver](https://github.com/123FLO321/SwiftTileserverCache)
 To get working tileserver Static Maps, make sure you're on the latest version (>1.0.3 / March 4 2020), then copy stopwatcher.json to the `Templates` folder in your TileServer directory
 
-### Ingress Scraper
-Use [ClarkyKent's ingress scraper](https://github.com/ClarkyKent/ingress_scraper) for everything related to Portals. Have it loop and put the restart delay in Stop Watcher's config
+### Ingress Portals
+Use [Intel Watcher](https://github.com/ccev/intelwatcher) for everything related to Portals. It'll scrape the Ingress Intel Map and put all Portals in your area in a database. Have it loop and put the restart delay in Stop Watcher's config.
 
 ## Features
 [TODO (it's super cool i promise)]
