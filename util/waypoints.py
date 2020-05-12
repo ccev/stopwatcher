@@ -332,7 +332,7 @@ class waypoint():
                 time.sleep(2)
 
         if "bot_id" in fil:
-            for char in ["_", "*", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
+            for char in ["_", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
                 text = text.replace(char, f"\\{char}")
             text = text.replace("**", "*")
             for chat_id in fil["chat_id"]:
