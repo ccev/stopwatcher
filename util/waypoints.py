@@ -303,15 +303,17 @@ class waypoint():
                             print("Hit Imgur's rate limit. Sleeping 1 hour.")
                             time.sleep(3600)
                         else:
-                            print("Imgur error :S please report")
+                            print("Imgur error :S please report - tyring again in 1 minute")
                             print(data)
+                            time.sleep(60)
                     elif "id" in data:
-                        image_id = result.json()["data"]["id"]
+                        image_id = data["id"]
                         static_map = f"https://i.imgur.com/{image_id}.png"
                         imgur_success = True
                     else:
-                        print("Some weird Imgur stuff. Please report this log entry!!")
+                        print("Some weird Imgur stuff. Please report this log entry!! - trying again in 1 minute")
                         print(data)
+                        time.sleep(60)
 
             elif self.config.host_provider == "polr":
                 key = list(self.config.host_key.split(","))
