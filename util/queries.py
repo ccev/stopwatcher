@@ -209,7 +209,7 @@ class create_queries():
             self.cursor.execute(f"SELECT pokestop_id, latitude, longitude, name, image FROM pokestop WHERE last_updated < '{time}' AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(latitude, longitude));")
         elif self.schema == "rdm":
             time = (datetime.utcnow() - timedelta(minutes = minutes)).timestamp()
-            self.cursor.execute(f"SELECT id, lat, lon, name, url FROM pokestop WHERE updates < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+            self.cursor.execute(f"SELECT id, lat, lon, name, url FROM pokestop WHERE updated < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
         stops = self.cursor.fetchall()
         return stops
 
