@@ -123,24 +123,31 @@ class waypoint():
                 stop_cell = s2cell(self.queries, self.lat, self.lon, 17)
 
                 if not self.edit:
-                    gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
-
-                    if stop_cell.converts():
-                        text = self.locale["will_convert"]
-                        convert_time = self.get_convert_time()
+                    if self.queries.get_stop_by_id(self.id):
+                        text = self.locale["already_stop"]
+                        convert_time = ""
+                    elif self.queries.get_gym_by_id(self.id):
+                        text = self.locale["already_gym"]
+                        convert_time = ""
                     else:
-                        text = self.locale["wont_convert"]
+                        gym_cell = s2cell(self.queries, self.lat, self.lon, 14)
 
-                    if stop_cell.converts() and gym_cell.brings_gym():
-                        text = f"{text}\n{self.locale['brings_gym']}"
-                    else:
-                        text = f"{text}\n{self.locale['brings_no_gym']}"
-
-                    if stop_cell.converts():
-                        if gym_cell.stops > 20:
-                            text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
+                        if stop_cell.converts():
+                            text = self.locale["will_convert"]
+                            convert_time = self.get_convert_time()
                         else:
-                            text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
+                            text = self.locale["wont_convert"]
+
+                        if stop_cell.converts() and gym_cell.brings_gym():
+                            text = f"{text}\n{self.locale['brings_gym']}"
+                        else:
+                            text = f"{text}\n{self.locale['brings_no_gym']}"
+
+                        if stop_cell.converts():
+                            if gym_cell.stops > 20:
+                                text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
+                            else:
+                                text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
                     
                     pathjson = f"&pathjson={stop_cell.path}"
                     geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")

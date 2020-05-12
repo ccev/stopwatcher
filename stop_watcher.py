@@ -159,7 +159,18 @@ for fil in config.filters:
             for p_id, p_lat, p_lon, p_name, p_img in portals:
                 if not p_id in portal_cache:
                     portal = waypoint(queries, config, "portal", p_id, p_name, p_img, p_lat, p_lon)
-                    portal.send(fil)
+                    if "dont_send_if_already_exists_as_stop_or_gym" in fil:
+                        if fil["dont_send_if_already_exists_as_stop_or_gym"]:
+                            if queries.get_stop_by_id(p_id):
+                                print(f"Found portal {p_name} - not sending because portal is already a stop")
+                            elif queries.get_gym_by_id(p_id):
+                                print(f"Found portal {p_name} - not sending because portal is already a gym")
+                            else:
+                                portal.send(fil)
+                        else:
+                            portal.send(fil)
+                    else:
+                        portal.send(fil)
                     if not portal.id in new_portal_cache:
                         new_portal_cache.append(p_id)
             with open("config/cache/portals.json", "w", encoding="utf-8") as f:

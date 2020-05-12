@@ -27,5 +27,7 @@
     "stays_no_stop": "❌ Keeps being no Stop",
     "cell_becomes_empty": "✅ Becomes empty",
     "cell_stays_occupied": "❌ Stays occupied",
-    "gets_new_stop": "✅ Gets a new Stop"
+    "gets_new_stop": "✅ Gets a new Stop",
+	"already_stop": "✅ Portal is already a Stop",
+	"already_gym": "✅ Portal is already a Gym"
 }
