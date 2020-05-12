@@ -1,0 +1,22 @@
+
+{
+    "static_map": [
+        {
+            "for": ["portal"],
+            "provider": "tileserver",
+            "key": "",
+            "style": "osm-light",
+            "zoom": 17.5,
+            "width": 800,
+            "height": 500,
+            "17-s2cell": true,
+            "s2cell-fill": "#ffffff60",
+            "s2cell-stroke": "#c7c7c7",
+            "s2cell-stroke-width": 2,
+            "markers": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/"
+        },
+        {
+            "for": ["stop", "gym"]
+        }
+    ]
+}
