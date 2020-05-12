@@ -3,7 +3,6 @@ import time
 import json
 import pyshorteners
 import geocoder
-import pyimgur
 
 from datetime import datetime, timedelta
 
@@ -290,15 +289,29 @@ class waypoint():
             elif self.config.host_provider == "imgur":
                 imgur_success = False
                 while not imgur_success:
-                    try:
-                        imgur = pyimgur.Imgur(self.config.host_key)
-                        uploaded_image = imgur.upload_image(url=static_map)
-                        static_map = (uploaded_image.link)
+                    #try:
+                    """imgur = pyimgur.Imgur(self.config.host_key)
+                    uploaded_image = imgur.upload_image(url=static_map)
+                    static_map = (uploaded_image.link)
+                    imgur_success = True"""
+                    payload = {'image': static_map}
+                    headers = {'Authorization': f'Client-ID {self.config.host_key}'}
+                    result = requests.post(url="https://api.imgur.com/3/image/", data=payload, headers=headers)
+                    data = result.json()["data"]
+                    if "error" in data:
+                        if data["error"]["code"] == 429:
+                            print("Hit Imgur's rate limit. Sleeping 1 hour.")
+                            time.sleep(3600)
+                        else:
+                            print("Imgur error :S please report")
+                            print(data)
+                    elif "id" in data:
+                        image_id = result.json()["data"]["id"]
+                        static_map = f"https://i.imgur.com/{image_id}.png"
                         imgur_success = True
-                    except Exception as err:
-                        print("Imgur Error - Sleeping 1 hour and trying again :S")
-                        print(err)
-                        time.sleep(3600)
+                    else:
+                        print("Some weird Imgur stuff. Please report this log entry!!")
+                        print(data)
 
             elif self.config.host_provider == "polr":
                 key = list(self.config.host_key.split(","))

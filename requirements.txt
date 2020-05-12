@@ -3,4 +3,3 @@ pymysql
 pyshorteners
 geocoder
 s2sphere
-pyimgur
