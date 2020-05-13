@@ -1,11 +1,11 @@
 import requests
 import time
 import json
-import pyshorteners
 import geocoder
 
 from datetime import datetime, timedelta
 
+import util.static_map as StaticMap
 from util.s2cells import s2cell
 
 class waypoint():
@@ -80,19 +80,6 @@ class waypoint():
             day = self.locale["tomorrow"]
 
         conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
-
-        return [day, conv_time]
-
-    def get_convert_time(self):
-        utcnow = int(datetime.utcnow().strftime("%H"))
-        now = int(datetime.now().strftime("%H"))
-        offset = now - utcnow
-
-        day = self.locale["today"]
-        if utcnow >= 9:
-            day = self.locale["tomorrow"]
-
-        conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
         convert_time = (self.locale['when_convert']).format(day = day, time = conv_time)
         return convert_time
 
@@ -109,8 +96,6 @@ class waypoint():
             title = title.replace(char, f"\\{char}")
 
         # Text
-        pathjson = ""
-        geojson = ""
         convert_time = ""
         try:
             if self.type == "portal":
@@ -141,10 +126,6 @@ class waypoint():
                             text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
                         else:
                             text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
-                    
-                    pathjson = f"&pathjson={stop_cell.path}"
-                    geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-                    geojson = f"{geojson},"
 
                 elif self.edit_type == "location":
                     text = f"{text}\n\n"
@@ -176,10 +157,6 @@ class waypoint():
                                 text = f"{text}{self.locale['cell_stays_occupied']}"
                             else:
                                 text = f"{text}{self.locale['gets_new_stop']}"
-
-                    pathjson = f"&pathjson={stop_cell.path}"
-                    geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{stop_cell.mapbox_path}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D)".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-                    geojson = f"{geojson},"
 
                 elif self.edit_type == "img":
                     convert_time = ""
@@ -245,81 +222,10 @@ class waypoint():
                 embed_username = self.locale["gym_edit_name"]
 
         # Static Map
-        static_map = ""
-        if self.config.use_static_map:           
-            if self.config.static_provider == "google":
-                static_map = f"https://maps.googleapis.com/maps/api/staticmap?center={self.lat},{self.lon}&zoom=17&scale=1&size=800x500&maptype=roadmap&key={self.config.static_key}&format=png&visual_refresh=true&markers=size:normal%7Ccolor:0x{static_color}%7Clabel:%7C{self.lat},{self.lon}"
-            elif self.config.static_provider == "osm":
-                static_map = f"https://www.mapquestapi.com/staticmap/v5/map?locations={self.lat},{self.lon}&size=800,500&defaultMarker=marker-md-{static_color}&zoom=17&key={self.config.static_key}"
-            elif self.config.static_provider == "tileserver":
-                limit = 30
-                static_map = f"{self.config.static_key}staticmap/stopwatcher?lat={self.lat}&lon={self.lon}&type={self.type}"
-                static_list = json.loads("[]")
-                if self.type == "portal":
-                    portals = self.queries.static_portals(limit, self.lat, self.lon)
-                    for lat, lon, dis in portals:
-                        static_list.append([lat,lon,"portal"])
-                else:
-                    waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
-                    for lat, lon, w_type, dis in waypoints:
-                        static_list.append([lat,lon,w_type])
-                if len(static_list) > 0:
-                    static_map = f"{static_map}{pathjson}&pointjson={static_list}".replace(" ", "").replace("'", "%22").replace("[", "%5B").replace("]", "%5D").replace(",", "%2C")
-                requests.get(static_map)
-            elif self.config.static_provider == "mapbox":
-                limit = 32
-                static_map = f"https://api.mapbox.com/styles/v1/mapbox/dark-v10/static/{geojson}"
-                if self.type == "portal":
-                    portals = self.queries.static_portals(limit, self.lat, self.lon)
-                    for lat, lon, dis in portals:
-                        static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2Fportal_gray.png({lon},{lat}),"
-                else:
-                    waypoints = self.queries.static_waypoints(limit, self.lat, self.lon)
-                    for lat, lon, w_type, dis in waypoints:
-                        static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{w_type}_gray.png({lon},{lat}),"
-                static_map = f"{static_map}url-https%3A%2F%2Fraw.githubusercontent.com%2Fccev%2Fstopwatcher-icons%2Fmaster%2Fmapbox%2F{self.type}_normal.png({self.lon},{self.lat})/{self.lon},{self.lat},16/800x500?access_token={self.config.static_key}"
-            
-            if self.config.host_provider == "tinyurl":
-                short = pyshorteners.Shortener().tinyurl.short
-                try:
-                    static_map = short(static_map)
-                except:
-                    static_map = ""
-
-            elif self.config.host_provider == "imgur":
-                imgur_success = False
-                while not imgur_success:
-                    #try:
-                    """imgur = pyimgur.Imgur(self.config.host_key)
-                    uploaded_image = imgur.upload_image(url=static_map)
-                    static_map = (uploaded_image.link)
-                    imgur_success = True"""
-                    payload = {'image': static_map}
-                    headers = {'Authorization': f'Client-ID {self.config.host_key}'}
-                    result = requests.post(url="https://api.imgur.com/3/image/", data=payload, headers=headers)
-                    data = result.json()["data"]
-                    if "error" in data:
-                        if data["error"]["code"] == 429:
-                            print("Hit Imgur's rate limit. Sleeping 1 hour.")
-                            time.sleep(3600)
-                        else:
-                            print("Imgur error :S please report - tyring again in 1 minute")
-                            print(data)
-                            time.sleep(60)
-                    elif "id" in data:
-                        image_id = data["id"]
-                        static_map = f"https://i.imgur.com/{image_id}.png"
-                        imgur_success = True
-                    else:
-                        print("Some weird Imgur stuff. Please report this log entry!! - trying again in 1 minute")
-                        print(data)
-                        time.sleep(60)
-
-            elif self.config.host_provider == "polr":
-                key = list(self.config.host_key.split(","))
-                polr_payload = {"key": key[1], "url": static_map, "is_secret": "false"}
-                result = requests.get(f"{key[0]}/api/v2/action/shorten?key={key[1]}", params = polr_payload)
-                static_map = result.text
+        if self.config.use_static_map:
+            static_map = StaticMap.create_static_map(self.config, self.queries, self.type, self.lat, self.lon, static_color)
+        else:
+            static_map = ""
 
         # Send
         if "webhook" in fil:

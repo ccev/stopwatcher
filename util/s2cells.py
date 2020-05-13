@@ -8,18 +8,12 @@ class s2cell():
         ll = s2sphere.LatLng.from_degrees(lat, lon)
         cell = s2sphere.CellId().from_lat_lng(ll)
         cellId = cell.parent(level).id()
-        cell = s2sphere.Cell(s2sphere.CellId(cellId))
+        self.cell = s2sphere.Cell(s2sphere.CellId(cellId))
 
         path = []
         for v in range(0, 4):
-            vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
+            vertex = s2sphere.LatLng.from_point(self.cell.get_vertex(v))
             path.append([vertex.lat().degrees, vertex.lng().degrees])
-
-        mb_path = []
-        for v in range(0, 4):
-            vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
-            mb_path.append([vertex.lng().degrees, vertex.lat().degrees])
-        mb_path.append(mb_path[0])
 
         stringfence = ""
         for coordinates in path:
@@ -28,7 +22,6 @@ class s2cell():
         count = queries.count_in_cell(stringfence)
 
         self.path = path
-        self.mapbox_path = mb_path
         self.stops = count[0] + count[1]
         self.portals = count[2]
 
@@ -50,3 +43,14 @@ class s2cell():
             if self.stops <= i:
                 total = i + 1
                 return total
+
+    def mapbox(self):
+        mb_path = []
+        for v in range(0, 4):
+            vertex = s2sphere.LatLng.from_point(self.cell.get_vertex(v))
+            mb_path.append([vertex.lng().degrees, vertex.lat().degrees])
+        mb_path.append(mb_path[0])
+        return mb_path
+
+    def tileserver(self):
+        return self.path
