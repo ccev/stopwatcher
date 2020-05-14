@@ -2,21 +2,31 @@
 {
     "static_map": [
         {
-            "for": ["portal"],
+            "for": ["example"],
             "provider": "tileserver",
-            "key": "",
-            "style": "osm-light",
-            "zoom": 17.5,
-            "width": 800,
-            "height": 500,
+            "style": "klokantech-basic",
+            "zoom": 18,
+            "width": 1000,
+            "height": 800,
+            "scale": 3,
             "17-s2cell": true,
             "s2cell-fill": "#ffffff60",
             "s2cell-stroke": "#c7c7c7",
-            "s2cell-stroke-width": 2,
+            "s2cell-stroke-width": 3,
             "markers": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/"
         },
         {
-            "for": ["stop", "gym"]
+            "for": ["example"],
+            "provider": "mapbox",
+            "style": "light-v10",
+            "zoom": 17,
+            "width": 1200,
+            "height": 900,
+            "17-s2cell": true,
+            "s2cell-fill": "#ffffff60",
+            "s2cell-stroke": "#c7c7c7",
+            "s2cell-stroke-width": 3,
+            "markers": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/mapbox/"
         }
     ]
 }

@@ -80,7 +80,7 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
                         "stroke-width": template['s2cell-stroke-width'],
                         "stroke-opacity": 1,
                         "fill": template['s2cell-fill'],
-                        "fill-opacity": 0.5
+                        "fill-opacity": 0.4
                     },
                     "geometry": {
                         "type": "Polygon",
@@ -127,7 +127,6 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
         static_map = static_map + f"url-{quote_plus(template['markers'])}{type_}_normal.png({lon},{lat})/{lon},{lat},{template['zoom']}/{template['width']}x{template['height']}?access_token={template['key']}"
     
     # HOSTING
-    print(static_map)
 
     if config.host_provider == "tinyurl":
         short = pyshorteners.Shortener().tinyurl.short
