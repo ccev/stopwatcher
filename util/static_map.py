@@ -70,7 +70,29 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
     if template["17-s2cell"]:
         cell = s2cell(queries, lat, lon, 17)
         pathjson = f"&pathjson={quote(str(cell.tileserver()))}"
-        geojson = f"geojson(%7B%0D%0A%22type%22%3A%22FeatureCollection%22%2C%0D%0A%22features%22%3A%5B%0D%0A%7B%0D%0A%22type%22%3A%22Feature%22%2C%0D%0A%22properties%22%3A%7B%7D%2C%0D%0A%22geometry%22%3A%7B%0D%0A%22type%22%3A%22Polygon%22%2C%0D%0A%22coordinates%22%3A%5B%0D%0A{cell.mapbox()}%0D%0A%5D%0D%0A%7D%0D%0A%7D%0D%0A%5D%0D%0A%7D),"
+        geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "stroke": template['s2cell-stroke'],
+                        "stroke-width": template['s2cell-stroke-width'],
+                        "stroke-opacity": 1,
+                        "fill": template['s2cell-fill'],
+                        "fill-opacity": 0.5
+                    },
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [
+                            cell.mapbox()
+                        ]
+                    }
+                }
+            ]
+        }
+        geojson = f"geojson({quote(json.dumps(geojson))}),"
+
 
     static_map = ""         
     if config.static_provider == "google":
@@ -93,16 +115,16 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
         requests.get(static_map)
     elif config.static_provider == "mapbox":
         limit = 32
-        static_map = f"https://api.mapbox.com/styles/v1/mapbox/{template['style']}/static/" + quote(geojson)
+        static_map = f"https://api.mapbox.com/styles/v1/mapbox/{template['style']}/static/{geojson}"
         if type_ == "portal":
             portals = queries.static_portals(limit, lat, lon)
-            for lat, lon, dis in portals:
-                static_map = static_map + quote(f"url-{template['markers']}portal_gray.png({lon},{lat}),")
+            for lat_, lon_, dis in portals:
+                static_map = static_map + f"url-{quote_plus(template['markers'])}portal_gray.png({lon_},{lat_}),"
         else:
             waypoints = queries.static_waypoints(limit, lat, lon)
-            for lat, lon, w_type, dis in waypoints:
-                static_map = static_map + quote(f"url-{template['markers']}{w_type}_gray.png({lon},{lat}),")
-        static_map = static_map + quote(f"url-{template['markers']}{type_}_normal.png({lon},{lat})/{lon},{lat},{template['zoom']}/{template['width']}x{template['height']}?access_token={template['key']}")
+            for lat_, lon_, w_type, dis in waypoints:
+                static_map = static_map + f"url-{quote_plus(template['markers'])}{w_type}_gray.png({lon_},{lat_}),"
+        static_map = static_map + f"url-{quote_plus(template['markers'])}{type_}_normal.png({lon},{lat})/{lon},{lat},{template['zoom']}/{template['width']}x{template['height']}?access_token={template['key']}"
     
     # HOSTING
     print(static_map)
