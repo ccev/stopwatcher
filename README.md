@@ -36,7 +36,7 @@ This file provides the settings, api keys, and generic configuration needed to f
 | Config | **`language`** | The language you want your notifications to be in. | `en`/`de`/`fr`/`es`/`pl`
 | Config | **`portal_scraper_interval`** | The restart delay of your Ingress Scraper. Used to help determine when portals have been removed. | A number in seconds
 | Maps | **`static_map`** | Wheter to include a static map in the notification or not. | `True`/`False`
-| Maps | **`static_map_provider`** | Your static map provider. | `tileserver`/`mapbox`/`osm`/`google`
+| Maps | **`static_map_provider`** | Your static map provider. | `tileserver`/`mapbox`/`mapquest`/`google`
 | Maps | **`key`** | The additional information needed to generate Static Maps. Either your API key or Tileserver URL. | String, mapbox/mapquest/google api key or tileserver url
 | Maps | **`hosting`** | Decide what service you want to use to shorten Static Map URLs. TinyURL is default and works without a key, Imgur is recommended and needs an Imgur Account (they want your phone number). You can also use polr if you have it set up and know how it works. | `tinyurl`/`imgur`/`polr`
 | Maps | **`hosting_key`** | Needed for Imgur and polr. If you're using tinyurl, just ignore. **Imgur Client ID:** go to https://api.imgur.com/oauth2/addclient, sign in, tick OAuth 2 authorization without a callback URL and then fill out Application name:, Email: and Description:. It does not matter what you put in. Solve the captcha and click submit. Now copy the Client ID. **Polr:** If you have polr set up, you can use that instead. Just make sure to put `http://www.your.url,api_key` as the key. | Imgur Client ID/polr key 
@@ -75,6 +75,27 @@ Filters tell Stop Watcher what to look for and where to send it. Every filter op
 
 ### geofence.json
 The areas you want to use in your filters.json. It's the same format Poracle (or Discordopole) uses, so you can copy it from there. You can use [poracle.world](https://maps.poracle.world/) or [geo.jasparke.net](http://geo.jasparke.net/) to help create this file.
+
+### templates.json
+Templates allow you to customize Stop Watcher. All template options are optional, except `"for"`. If a certain option is not given, it will fall back to the default value.
+
+#### Static Maps
+| Option | Supported providers | What to put in
+|-|-|-|
+| **`for`** | all | A list. `["portal", "stop", "gym"]` (could also be just `["gym"]`)
+| **`provider`** | all | `tileserver`/`mapbox`/`mapquest`/`google`
+| **`key`** | all | If you wish to use another key/tileserver url from your config
+| **`style`** | tileserver, mapbox, google | Tileserver Styles: {tileserver_url}/styles / [mapbox styles](https://docs.mapbox.com/api/maps/#styles) / [google styles](https://developers.google.com/maps/documentation/maps-static/dev-guide#MapTypes)
+| **`scale`** | tileserver, google | a number (int)
+| **`zoom`** | all | a number (some allow double, others int)
+| **`width`** | all | a number (int) in px
+| **`height`** | all | a number (int) in px
+| **`17-s2cell`** | tileserver, mapbox | `true`/`false`
+| **`s2cell-fill`** | tileserver, mapbox | [imagemagick colors](https://imagemagick.org/script/color.php) for tileserver / normal hex value for mapbox
+| **`s2cell-stroke`** | tileserver, mapbox | [imagemagick colors](https://imagemagick.org/script/color.php) for tileserver / normal hex value for mapbox
+| **`s2cell-stroke-width`** | tileserver, mapbox | a number (int)
+| **`markers`** | tileserver, mapbox | marker images ([have to be this format](https://github.com/ccev/stopwatcher-icons)) 
+| **`marker-color`** | google, mapquest | hex value
 
 ## Extras
 Command line arguments that can be passed to the `stop_watcher.py` script.
