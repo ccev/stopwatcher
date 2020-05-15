@@ -1,7 +1,6 @@
 import json
 import time
 import requests
-import pyshorteners
 
 from urllib.parse import quote, quote_plus
 
@@ -129,13 +128,15 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
     # HOSTING
 
     if config.host_provider == "tinyurl":
-        short = pyshorteners.Shortener().tinyurl.short
-        try:
-            static_map = short(static_map)
-        except:
+        result = requests.get(f"http://tinyurl.com/api-create.php?url={quote_plus(static_map)}")
+        if result.status_code >= 400:
             print("Error with tinyurl. Sending no Static Map.")
+            print(result.content)
             print(static_map)
             static_map = ""
+        else:
+            static_map = result.text
+
 
     elif config.host_provider == "imgur":
         imgur_success = False

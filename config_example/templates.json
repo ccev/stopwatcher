@@ -8,7 +8,7 @@
             "zoom": 18,
             "width": 1000,
             "height": 800,
-            "scale": 3,
+            "scale": 1,
             "17-s2cell": true,
             "s2cell-fill": "#ffffff60",
             "s2cell-stroke": "#c7c7c7",
