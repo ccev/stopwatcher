@@ -34,11 +34,14 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
     if type_ == "portal":
         template["17-s2cell"] = True
 
+    if not new_template:
+        new_template = template
+
     if "provider" in new_template:
         template["provider"] = new_template["provider"]
 
     if template["provider"] == "tileserver":
-        template["style"] = "osm-light"
+        template["style"] = "osm-bright"
         template["zoom"] = 17.5
         template["markers"] = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/"
         template["cell_fill"] = "#ffffff60"
