@@ -44,17 +44,17 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
         template["style"] = "osm-bright"
         template["zoom"] = 17.5
         template["markers"] = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/"
-        template["cell_fill"] = "#ffffff60"
-        template["cell_stroke"] = "#c7c7c7"
-        template["cell_width"] = 2
+        template["s2cell-fill"] = "#ffffff60"
+        template["s2cell-stroke"] = "#c7c7c7"
+        template["s2cell-stroke-width"] = 2
 
     elif template["provider"] == "mapbox":
         template["style"] = "dark-v10"
         template["zoom"] = 16
         template["markers"] = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/mapbox/"
-        template["cell_fill"] = "#ffffff60"
-        template["cell_stroke"] = "#c7c7c7"
-        template["cell_width"] = 2
+        template["s2cell-fill"] = "#575757"
+        template["s2cell-stroke"] = "#7d7d7d"
+        template["s2cell-stroke-width"] = 2
 
     elif template["provider"] == "google":
         template["style"] = "roadmap"
