@@ -133,6 +133,8 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
         try:
             static_map = short(static_map)
         except:
+            print("Error with tinyurl. Sending no Static Map.")
+            print(static_map)
             static_map = ""
 
     elif config.host_provider == "imgur":
