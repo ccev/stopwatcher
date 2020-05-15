@@ -111,7 +111,7 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
             for lat_, lon_, w_type, dis in waypoints:
                 static_list.append([lat_,lon_,w_type])
 
-        static_map = f"{template['key']}staticmap/stopwatcher_beta?style={template['style']}&lat={lat}&lon={lon}&zoom={template['zoom']}&width={template['width']}&height={template['height']}&scale={template['scale']}&fill={quote(template['s2cell-fill'])}&stroke={quote(template['s2cell-stroke'])}&stroke-width={template['s2cell-stroke-width']}&type={type_}{pathjson}&pointjson={quote(json.dumps(static_list))}&markers={quote_plus(template['markers'])}"
+        static_map = f"{template['key']}staticmap/stopwatcher?style={template['style']}&lat={lat}&lon={lon}&zoom={template['zoom']}&width={template['width']}&height={template['height']}&scale={template['scale']}&fill={quote(template['s2cell-fill'])}&stroke={quote(template['s2cell-stroke'])}&stroke-width={template['s2cell-stroke-width']}&type={type_}{pathjson}&pointjson={quote(json.dumps(static_list))}&markers={quote_plus(template['markers'])}"
         requests.get(static_map)
     elif config.static_provider == "mapbox":
         limit = 32
