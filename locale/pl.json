@@ -28,5 +28,7 @@
     "stays_no_stop": "❌ Nadal nie będzie Pokestopem",
     "cell_becomes_empty": "✅ Będzie pusta",
     "cell_stays_occupied": "❌ Pozostaje zajęta",
-    "gets_new_stop": "✅ Powstanie nowy Pokestop"
+    "gets_new_stop": "✅ Powstanie nowy Pokestop",
+    "already_stop": "✅ Już jest Pokestopem",
+    "already_gym": "✅ Już jest Gymem"
 }

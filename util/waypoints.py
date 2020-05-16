@@ -116,16 +116,29 @@ class waypoint():
                     else:
                         text = self.locale["wont_convert"]
 
+                    if self.is_stop():
+                        text = self.locale["already_stop"]
+                    elif self.is_gym():
+                        text = self.locale["already_gym"]
+
                     if stop_cell.converts() and gym_cell.brings_gym():
                         text = f"{text}\n{self.locale['brings_gym']}"
                     else:
                         text = f"{text}\n{self.locale['brings_no_gym']}"
 
+                    show_gym_stops = False
                     if stop_cell.converts():
+                        gym_stops = gym_cell.stops + 1
+                        show_gym_stops = True
+                    elif self.is_gym() or self.is_stop():
+                        gym_stops = gym_cell.stops
+                        show_gym_stops = True
+
+                    if show_gym_stops:
                         if gym_cell.stops > 20:
-                            text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_cell.stops + 1)
+                            text = (f"{text}\n{self.locale['x_stop_in_cell_20']}").format(x = gym_stops)
                         else:
-                            text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_cell.stops + 1, total = gym_cell.next_threshold())
+                            text = (f"{text}\n{self.locale['x_stop_in_cell']}").format(x = gym_stops, total = gym_cell.next_threshold())
 
                 elif self.edit_type == "location":
                     text = f"{text}\n\n"

@@ -27,5 +27,7 @@
     "stays_no_stop": "❌ Bleibt kein Stop",
     "cell_becomes_empty": "✅ Wird leer",
     "cell_stays_occupied": "❌ Bleibt belegt",
-    "gets_new_stop": "✅ Bekommt einen neuen Stop"
+    "gets_new_stop": "✅ Bekommt einen neuen Stop",
+    "already_stop": "✅ Ist breits ein Stop",
+    "already_gym": "✅ Ist breits eine Arena"
 }

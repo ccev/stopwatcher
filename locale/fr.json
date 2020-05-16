@@ -28,5 +28,7 @@
     "stays_no_stop": "❌ Ne sera pas un PokéStop",
     "cell_becomes_empty": "✅ Devient vide",
     "cell_stays_occupied": "❌ Reste occupée",
-    "gets_new_stop": "✅ Deviendra un PokéStop"
+    "gets_new_stop": "✅ Deviendra un PokéStop",
+    "already_stop": "✅ Already a Stop",
+    "already_gym": "✅ Already a Gym"
 }

@@ -28,5 +28,7 @@
     "stays_no_stop": "❌ Sigue sin ser una Poképarada",
     "cell_becomes_empty": "✅ Queda vacía",
     "cell_stays_occupied": "❌ Queda ocupada",
-    "gets_new_stop": "✅ Obtiene una nueva Poképarada"
+    "gets_new_stop": "✅ Obtiene una nueva Poképarada",
+    "already_stop": "✅ Ya es una Poképarada",
+    "already_gym": "✅ Ya es un gimnasio"
 }
