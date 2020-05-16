@@ -114,7 +114,6 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
                 static_list.append([lat_,lon_,w_type])
 
         static_map = f"{template['key']}staticmap/stopwatcher?style={template['style']}&lat={lat}&lon={lon}&zoom={template['zoom']}&width={template['width']}&height={template['height']}&scale={template['scale']}&fill={quote(template['s2cell-fill'])}&stroke={quote(template['s2cell-stroke'])}&stroke-width={template['s2cell-stroke-width']}&type={type_}{pathjson}&pointjson={quote(json.dumps(static_list))}&markers={quote_plus(template['markers'])}"
-        requests.get(static_map)
     elif config.static_provider == "mapbox":
         limit = 32
         static_map = f"https://api.mapbox.com/styles/v1/mapbox/{template['style']}/static/{geojson}"
@@ -130,6 +129,13 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
     
     # HOSTING
 
+    if config.host_provider == "pregenerate":
+        static_map = static_map + "&pregenerate=keep"
+        result = requests.get(static_map)
+        static_map = f"{template['key']}staticmap/pregenerated/{result.text}"
+    else:
+        requests.get(static_map)
+
     if config.host_provider == "tinyurl":
         result = requests.get(f"http://tinyurl.com/api-create.php?url={quote_plus(static_map)}")
         if result.status_code >= 400:
@@ -139,7 +145,6 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
             static_map = ""
         else:
             static_map = result.text
-
 
     elif config.host_provider == "imgur":
         imgur_success = False

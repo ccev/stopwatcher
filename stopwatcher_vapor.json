@@ -1,0 +1,51 @@
+{
+    "style": "#(style)",
+    "latitude": #(lat),
+    "longitude": #(lon),
+    "zoom": #(zoom),
+    "width": #(width),
+    "height": #(height),
+    "scale": #(scale),
+    "format": "png",
+    "markers": [
+        #if(pointjson != nil)
+        #for(wp in pointjson)
+        {
+            "url": "#(markers)#(wp[2])_gray.png",
+            "latitude": #(wp[0]),
+            "longitude": #(wp[1]),
+            "width": 48,
+            "height": 48,
+            #if(type == "portal")
+            "y_offset": 0
+            #else
+            "y_offset": -24
+            #endif
+        },
+        #endfor
+        #endif
+        {
+            "url": "#(markers)#(type)_normal.png",
+            "latitude": #(lat),
+            "longitude": #(lon),
+            "width": 64,
+            "height": 64,
+            #if(type == "portal")
+            "y_offset": 0
+            #else
+            "y_offset": -32
+            #endif
+        }
+    ]
+    #if(pathjson != nil)
+    ,
+    "polygons": [
+        {
+            "fill_color": "#(fill)",
+            "stroke_color": "#(stroke)",
+            "stroke_width": #(stroke-width),
+            "path": #(pathjson)
+        }
+    ]
+    #endif
+}
