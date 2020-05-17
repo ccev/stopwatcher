@@ -43,7 +43,7 @@
         {
             "fill_color": "{{fill}}",
             "stroke_color": "{{stroke}}",
-            "stroke_width": {{stroke-width}},
+            "stroke_width": {{strokewidth}},
             "path": {{pathjson}}
         }
     ]

@@ -113,7 +113,7 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
             for lat_, lon_, w_type, dis in waypoints:
                 static_list.append([lat_,lon_,w_type])
 
-        static_map = f"{template['key']}staticmap/stopwatcher?style={template['style']}&lat={lat}&lon={lon}&zoom={template['zoom']}&width={template['width']}&height={template['height']}&scale={template['scale']}&fill={quote(template['s2cell-fill'])}&stroke={quote(template['s2cell-stroke'])}&stroke-width={template['s2cell-stroke-width']}&type={type_}{pathjson}&pointjson={quote(json.dumps(static_list))}&markers={quote_plus(template['markers'])}"
+        static_map = f"{template['key']}staticmap/stopwatcher?style={template['style']}&lat={lat}&lon={lon}&zoom={template['zoom']}&width={template['width']}&height={template['height']}&scale={template['scale']}&fill={quote(template['s2cell-fill'])}&stroke={quote(template['s2cell-stroke'])}&strokewidth={template['s2cell-stroke-width']}&type={type_}{pathjson}&pointjson={quote(json.dumps(static_list))}&markers={quote_plus(template['markers'])}"
     elif config.static_provider == "mapbox":
         limit = 32
         static_map = f"https://api.mapbox.com/styles/v1/mapbox/{template['style']}/static/{geojson}"
