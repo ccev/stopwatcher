@@ -130,7 +130,7 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
     # HOSTING
 
     if config.host_provider == "pregenerate":
-        static_map = static_map + "&pregenerate=keep"
+        static_map = static_map + "&pregenerate=true&regeneratable=true"
         result = requests.get(static_map)
         static_map = f"{template['key']}staticmap/pregenerated/{result.text}"
     else:
