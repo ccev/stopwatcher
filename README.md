@@ -45,8 +45,8 @@ This file provides the settings, api keys, and generic configuration needed to f
 | Maps | **`frontend`** | Frontend that you're using. | `pmsf`/`rdm`/`rmad`
 | Maps | **`map_name`** | This is the text that links to your frontend map. | Your Map Name
 | Maps | **`geocoding`** | Wheter to include the address in the notification or not. | `True`/`False`
-| Maps | **`geocoding_provider`** | Your geocoding provider. | `google`/`osm`/`mapbox`
-| Maps | **`geocoding_key`** | API key for geocoding, required for google & mapbox. | `google`/`osm`/`mapbox`
+| Maps | **`geocoding_provider`** | Your geocoding provider. They're basically the same except osm being free | `osm`/`mapbox`
+| Maps | **`geocoding_key`** | Your mapbox API key if you're using that as your geocoding provider. | mapbox key
 | DB | **`scanner`** | Select your scanner type. | `mad`/`rdm`
 | DB | **`scanner_db_name`** | Name of your scanner database. | Database name
 | DB | **`portal_db_name`** | Name of your portal database (must follow [pmsf](https://github.com/pmsf/PMSF/blob/master/sql/manualdb/manualdb.sql) data structure). | Database name
@@ -82,7 +82,7 @@ Templates allow you to customize Stop Watcher. All template options are optional
 #### Static Maps
 | Option | Supported providers | What to put in
 |-|-|-|
-| **`for`** | all | A list. `["portal", "stop", "gym"]` (could also be just `["gym"]`)
+| **`for`** | all | A list. `["portal", "stop", "gym"]` (could also just be `["gym"]`)
 | **`provider`** | all | `tileserver`/`mapbox`/`mapquest`/`google`
 | **`key`** | all | If you wish to use another key/tileserver url from your config
 | **`style`** | tileserver, mapbox, google | Tileserver Styles: {tileserver_url}/styles / [mapbox styles](https://docs.mapbox.com/api/maps/#styles) / [google styles](https://developers.google.com/maps/documentation/maps-static/dev-guide#MapTypes)
@@ -96,6 +96,14 @@ Templates allow you to customize Stop Watcher. All template options are optional
 | **`s2cell-stroke-width`** | tileserver, mapbox | a number (int)
 | **`markers`** | tileserver, mapbox | marker images ([have to be this format](https://github.com/ccev/stopwatcher-icons)) 
 | **`marker-color`** | google, mapquest | hex value
+
+### Geocoding
+| Option | What to put in
+|-|-|
+| **`for`** | A list. `["portal", "stop", "gym"]` (could also just be `["gym"]`)
+| **`provider`** | `osm`/`mapbox`
+| **`key`** | If you wish to use another mapbox key from your config
+| **`text`** | Your address format. Can include any text with keys being `{street}`, `{street_number}`, `{suburb}`, `{city}`, `{postcode}`, `{region}`, `{country}`, `{address}`
 
 ## Extras
 Command line arguments that can be passed to the `stop_watcher.py` script.
