@@ -20,6 +20,9 @@ with open("config/filters.json", encoding="utf-8") as f:
 with open("config/geofence.json", encoding="utf-8") as f:
     config.geofences = json.load(f)
 
+with open("config/templates.json", encoding="utf-8") as f:
+    config.templates = json.load(f)
+
 with open(f"locale/{config.language}.json", encoding="utf-8") as f:
     config.locale = json.load(f)
 

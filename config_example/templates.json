@@ -28,5 +28,12 @@
             "s2cell-stroke-width": 3,
             "markers": "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/mapbox/"
         }
+    ],
+    "geocoding": [
+        {
+            "for": ["example"],
+            "provider": "osm",
+            "text": "{street} {street_number}, {suburb}, {city}"
+        }
     ]
 }

@@ -1,4 +1,3 @@
 requests
 pymysql
-geocoder
 s2sphere

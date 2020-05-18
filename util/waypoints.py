@@ -1,7 +1,6 @@
 import requests
 import time
 import json
-import geocoder
 
 from datetime import datetime, timedelta
 
@@ -203,13 +202,67 @@ class waypoint():
         
         address = ""
         if self.config.use_geocoding:
-            if self.config.geocoding_provider == "google":
-                geocode = geocoder.google([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
-            elif self.config.geocoding_provider == "osm":
-                geocode = geocoder.mapquest([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
-            elif self.config.geocoding_provider == "mapbox":
-                geocode = geocoder.mapbox([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
-            address = f"{geocode.address}\n"
+            geocode_template = {
+                "provider": self.config.geocoding_provider,
+                "key": self.config.geocoding_key,
+                "text": "{address}"
+            }
+            for t in self.config.templates["geocoding"]:
+                if self.type in t["for"]:
+                    geocode_template = t
+                    break
+
+            street = ""
+            street_number = ""
+            suburb = ""
+            city = ""
+            postcode = ""
+            region = ""
+            country = ""
+            addressg = ""
+
+            if geocode_template["provider"] == "osm":
+                geocode_response = requests.get(f"https://nominatim.openstreetmap.org/reverse?lat={self.lat}&lon={self.lon}&format=json&accept_language={self.config.language}")
+
+                addressg = geocode_response.json().get("display_name", "")
+                street = geocode_response.json()["address"].get("road", "")
+                street_number = geocode_response.json()["address"].get("house_number", "")
+                suburb = geocode_response.json()["address"].get("suburb", "")
+                postcode = geocode_response.json()["address"].get("postcode", "")
+                region = postcode = geocode_response.json()["address"].get("state", "")
+                country = postcode = geocode_response.json()["address"].get("country", "")
+
+                city = postcode = geocode_response.json()["address"].get("city", "")
+                if city == "":
+                    city = geocode_response.json()["address"].get("town", "")
+                    if city == "":
+                        city = geocode_response.json()["address"].get("village", "")
+            #if self.config.geocoding_provider == "google":
+            #    geocode = geocoder.google([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+            #elif self.config.geocoding_provider == "osm":
+            #    geocode = geocoder.mapquest([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+            elif geocode_template["provider"] == "mapbox":
+                #geocode = geocoder.mapbox([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+                geocode_response = requests.get(f"https://api.mapbox.com/geocoding/v5/mapbox.places/{self.lon},{self.lat}.json?language={self.config.language}&access_token={geocode_template['key']}")
+                
+                addressg = geocode_response.json()["features"].get("place_name", "")
+                street = geocode_response.json()["features"].get("text", "")
+                street_number = geocode_response.json()["features"].get("address", "")
+                
+                for feature in geocode_response.json()["features"]["context"]:
+                    if "locality" in feature["id"]:
+                        suburb = feature["text"]
+                    if "place" in feature["id"]:
+                        city = feature["text"]
+                    elif "postcode" in feature["id"]:
+                        postcode = feature["text"]
+                    elif "region" in feature["id"]:
+                        region = feature["text"]
+                    elif "country" in feature["id"]:
+                        country = feature["text"]
+  
+            final_address = geocode_template["text"].format(address=addressg, street=street, street_number=street_number, city=city, suburb=suburb, postcode=postcode, region=region, country=country)
+            address = f"{final_address}\n"
 
         # WP specific stuff
         if self.type == "portal":
@@ -268,6 +321,7 @@ class waypoint():
         if "bot_id" in fil:
             for char in ["_", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
                 text = text.replace(char, f"\\{char}")
+                address = address.replace(char, f"\\{char}")
             text = text.replace("**", "*")
             for chat_id in fil["chat_id"]:
                 if not self.empty:

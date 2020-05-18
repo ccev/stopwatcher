@@ -7,11 +7,8 @@ from urllib.parse import quote, quote_plus
 from util.s2cells import s2cell
 
 def create_static_map(config, queries, type_, lat, lon, marker_color):
-    with open("config/templates.json", encoding="utf-8") as f:
-        templates = json.load(f)
-
     new_template = None
-    for t in templates["static_map"]:
+    for t in config.templates["static_map"]:
         if type_ in t["for"]:
             new_template = t
             break
