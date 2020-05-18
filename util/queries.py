@@ -77,24 +77,20 @@ class create_queries():
         elif self.schema == "rdm":
             self.cursor.execute(f"DELETE FROM pokestop WHERE id = '{s_id}';")
 
-    def update_waypoint(self, w_type, w_id, w_name, w_img):
+    def update_waypoint(self, w_type, w_id, w_name, w_img, w_lat, w_lon):
         w_name = w_name.replace("'", "\\'")
         if self.schema == "mad":
             if w_type == "stop":
-                table = "pokestop"
-                c_id = "pokestop_id"
-                img = "image"
+                self.cursor.execute(f"UPDATE pokestop SET image = '{w_img}', name = '{w_name}', latitude = {w_lat}, longitude = {w_lon} WHERE (pokestop_id = '{w_id}');")
             elif w_type == "gym":
-                table = "gymdetails"
-                c_id = "gym_id"
-                img = "url"
-            self.cursor.execute(f"UPDATE {table} SET {img} = '{w_img}', name = '{w_name}' WHERE ({c_id} = '{w_id}');")
+                self.cursor.execute(f"UPDATE gym SET latitude = {w_lat}, longitude = {w_lon} WHERE (gym_id = '{w_id}');")
+                self.cursor.execute(f"UPDATE gymdetails SET url = '{w_img}', name = '{w_name}' WHERE (gym_id = '{w_id}');")
         elif self.schema == "rdm":
             if w_type == "stop":
                 table = "pokestop"
             elif w_type == "gym":
                 table = "gym"
-            self.cursor.execute(f"UPDATE {table} SET url = '{w_img}', name = '{w_name}' WHERE (id = '{w_id}');")
+            self.cursor.execute(f"UPDATE {table} SET url = '{w_img}', name = '{w_name}', lat = {w_lat}, lon = {w_lon} WHERE (id = '{w_id}');")
 
     def get_stop_by_id(self, w_id):
         if self.schema == "mad":

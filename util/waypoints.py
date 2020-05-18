@@ -30,23 +30,17 @@ class waypoint():
         needs_update = True
         if self.type == "gym" and stop_update:
             try:
-                stop = self.queries.get_stop_by_id(self.id)
-                for s_name, s_img in stop:
-                    if s_name is not None:
-                        self.queries.update_waypoint(self.type, self.id, s_name, s_img)
-                        print(f"Updated {self.type} {s_name} using Stop info")
-                        needs_update = False
+                stop = self.queries.get_full_stop_by_id(self.id)
+                if stop[2] is not None:
+                    self.queries.update_waypoint(self.type, self.id, stop[2], stop[3], stop[0], stop[1])
+                    print(f"Updated {self.type} {p_name} using Stop info")
+                    needs_update = False  
             except:
                 needs_update = True
 
         if needs_update:
             try:
-                portal = self.queries.get_portal_by_id(self.id)
-                for p_name, p_img in portal:
-                    if p_name is not None:
-                        self.queries.update_waypoint(self.type, self.id, p_name, p_img)
-                        print(f"Updated {self.type} {p_name} using Portal info")
-                        needs_update = False
+                portal = self.queries.get_full_portal_by_id(self.id)
             except:
                 needs_update = True
 
