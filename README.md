@@ -1,9 +1,9 @@
 # Stop Watcher
 Stop Watcher is an all-in-one package to stay updated on your local Waypoints. it can:
-- Update names/photos of new Gyms and Stops using Portal (or Stop) information
-- Delete Stops that converted to Gyms
 - Send notifications about new Portals, Stops and Gyms to Discord and Telegram
 - Track location, title and photo edits, as well as removals of Portals, Stops and Gyms and send noticiations for them
+- Update names/photos of new Gyms and Stops using Portal (or Stop) information and delete Stops that converted into Gyms
+- **[You can find a detailed summary of all features here](https://github.com/ccev/stopwatcher/blob/master/features.md)**
 
 ### Join the [Pogo Tools Discord Server](https://discord.gg/CWFyy6s) for help and updates
 
@@ -23,9 +23,6 @@ To get working tileserver Static Maps, make sure you're on the latest version (>
 
 ### Ingress Portals
 Use [Intel Watcher](https://github.com/ccev/intelwatcher) for everything related to Portals. It'll scrape the Ingress Intel Map and put all Portals in your area in a database. Have it loop and put the restart delay in Stop Watcher's config.
-
-## Features
-[TODO (it's super cool i promise)]
 
 ## Config files
 ### config.ini
