@@ -1,30 +1,32 @@
 from util.waypoints import waypoint
 
 def delete(queries, config, deleted_cache):
-    print("==========================================================================================================")
+    print("="*106)
     print("")
     print("!!! Please note that these Waypoints are NOT guaranteed to be removed. Please confirm if they still exist!")
     print("You can do that by checking your Map/DB if they've been updated recently (Or just spoofing there)")
     print("")
-    print("==========================================================================================================")
+    print("="*106)
     print("")
     try:
         print("Deleted Portals:")
         for p_id in deleted_cache["portals"]:
             portal = queries.get_full_portal_by_id(p_id)
-            print(f"  - {portal[2]}   |   {portal[0]},{portal[1]}   |   {p_id}")
-    except:
+            coords = f"{portal[0]},{portal[1]}"
+            print(f"  - {portal[2]:<41} | {coords:<20} | {p_id}")
+    except Exception as e:
         pass
     print("")
     print(f"DELETE FROM {config.db_name_portal}.ingress_portals WHERE external_id in {str(deleted_cache['portals']).replace('[', '(').replace(']',')').replace(' ', '')};")
     print("")
-    print("==========================================================================================================")
+    print("="*106)
     print("")
     try:
         print("Deleted Stops:")
         for s_id in deleted_cache["stops"]:
             stop = queries.get_full_stop_by_id(s_id)
-            print(f"  - {stop[2]}   |   {stop[0]},{stop[1]}   |   {s_id}")
+            coords = f"{stop[0]},{stop[1]}"
+            print(f"  - {stop[2]:<41} | {coords:<20} | {s_id}")
         print("")
         if config.scan_type == "mad":
             print(f"DELETE FROM {config.db_name_scan}.pokestop WHERE pokestop_id in {str(deleted_cache['stops']).replace('[', '(').replace(']',')').replace(' ', '')};")
@@ -33,13 +35,14 @@ def delete(queries, config, deleted_cache):
     except:
         pass
     print("")
-    print("==========================================================================================================")
+    print("="*106)
     print("")
     try:
         print("Deleted Gyms:")
         for g_id in deleted_cache["gyms"]:
             gym = queries.get_full_gym_by_id(g_id)
-            print(f"  - {gym[2]}   |   {gym[0]},{gym[1]}   |   {g_id}")
+            coords = f"{gym[0]},{gym[1]}"
+            print(f"  - {gym[2]:<41} | {coords:<20} | {g_id}")
         print("")
         if config.scan_type == "mad":
             print(f"DELETE FROM {config.db_name_scan}.gym WHERE gym_id in {str(deleted_cache['gyms']).replace('[', '(').replace(']',')').replace(' ', '')};")
@@ -50,7 +53,7 @@ def delete(queries, config, deleted_cache):
     except:
         pass
     print("")
-    print("==========================================================================================================")
+    print("="*106)
 
 def compare_loop(queries, config, stops, wp_type, compare_list):
     for s_id, s_lat, s_lon, s_name, s_img in stops:
