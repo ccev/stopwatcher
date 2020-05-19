@@ -207,7 +207,7 @@ class waypoint():
                     new_geocode_template = t
                     break
 
-            for key in template.keys():
+            for key in geocode_template.keys():
                 if key in new_geocode_template:
                     geocode_template[key] = new_template[key]
 
@@ -239,12 +239,8 @@ class waypoint():
                 suburb = geocode_response.json()["address"].get("suburb", "")
                 if suburb == "":
                     suburb = geocode_response.json()["address"].get("neighbourhood", "")
-            #if self.config.geocoding_provider == "google":
-            #    geocode = geocoder.google([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
-            #elif self.config.geocoding_provider == "osm":
-            #    geocode = geocoder.mapquest([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
+
             elif geocode_template["provider"] == "mapbox":
-                #geocode = geocoder.mapbox([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
                 geocode_response = requests.get(f"https://api.mapbox.com/geocoding/v5/mapbox.places/{self.lon},{self.lat}.json?language={self.config.language}&access_token={geocode_template['key']}")
                 
                 addressg = geocode_response.json()["features"].get("place_name", "")
