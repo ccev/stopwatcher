@@ -124,6 +124,7 @@ class waypoint():
                         gym_stops = gym_cell.stops + 1
                         show_gym_stops = True
                     elif self.is_gym() or self.is_stop():
+                        convert_time = ""
                         gym_stops = gym_cell.stops
                         show_gym_stops = True
 
@@ -203,8 +204,12 @@ class waypoint():
             }
             for t in self.config.templates["geocoding"]:
                 if self.type in t["for"]:
-                    geocode_template = t
+                    new_geocode_template = t
                     break
+
+            for key in template.keys():
+                if key in new_geocode_template:
+                    geocode_template[key] = new_template[key]
 
             street = ""
             street_number = ""
@@ -221,16 +226,19 @@ class waypoint():
                 addressg = geocode_response.json().get("display_name", "")
                 street = geocode_response.json()["address"].get("road", "")
                 street_number = geocode_response.json()["address"].get("house_number", "")
-                suburb = geocode_response.json()["address"].get("suburb", "")
                 postcode = geocode_response.json()["address"].get("postcode", "")
-                region = postcode = geocode_response.json()["address"].get("state", "")
-                country = postcode = geocode_response.json()["address"].get("country", "")
+                region = geocode_response.json()["address"].get("state", "")
+                country = geocode_response.json()["address"].get("country", "")
 
-                city = postcode = geocode_response.json()["address"].get("city", "")
+                city = geocode_response.json()["address"].get("city", "")
                 if city == "":
                     city = geocode_response.json()["address"].get("town", "")
                     if city == "":
                         city = geocode_response.json()["address"].get("village", "")
+
+                suburb = geocode_response.json()["address"].get("suburb", "")
+                if suburb == "":
+                    suburb = geocode_response.json()["address"].get("neighbourhood", "")
             #if self.config.geocoding_provider == "google":
             #    geocode = geocoder.google([self.lat, self.lon], method='reverse', key=self.config.geocoding_key, language=self.config.language)
             #elif self.config.geocoding_provider == "osm":
