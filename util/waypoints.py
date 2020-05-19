@@ -247,16 +247,20 @@ class waypoint():
                 street = geocode_response.json()["features"].get("text", "")
                 street_number = geocode_response.json()["features"].get("address", "")
                 
-                for feature in geocode_response.json()["features"]["context"]:
-                    if "locality" in feature["id"]:
+                for feature in geocode_response.json()["features"]:
+                    if feature["place_type"] == "address":
+                        addressg = feature["place_name"]
+                        street = feature["text"]
+                        street_number = feature["address"]
+                    elif feature["place_type"] == "locality":
                         suburb = feature["text"]
-                    if "place" in feature["id"]:
+                    elif feature["place_type"] == "place":
                         city = feature["text"]
-                    elif "postcode" in feature["id"]:
+                    elif feature["place_type"] == "postcode":
                         postcode = feature["text"]
-                    elif "region" in feature["id"]:
+                    elif feature["place_type"] == "region":
                         region = feature["text"]
-                    elif "country" in feature["id"]:
+                    elif feature["place_type"] == "country":
                         country = feature["text"]
   
             final_address = geocode_template["text"].format(address=addressg, street=street, street_number=street_number, city=city, suburb=suburb, postcode=postcode, region=region, country=country)
