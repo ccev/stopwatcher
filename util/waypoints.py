@@ -209,7 +209,7 @@ class waypoint():
 
             for key in geocode_template.keys():
                 if key in new_geocode_template:
-                    geocode_template[key] = new_template[key]
+                    geocode_template[key] = new_geocode_template[key]
 
             street = ""
             street_number = ""
