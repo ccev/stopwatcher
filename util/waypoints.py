@@ -202,6 +202,7 @@ class waypoint():
                 "key": self.config.geocoding_key,
                 "text": "{address}"
             }
+            new_geocode_template = {}
             for t in self.config.templates["geocoding"]:
                 if self.type in t["for"]:
                     new_geocode_template = t
