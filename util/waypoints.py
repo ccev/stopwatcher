@@ -244,10 +244,6 @@ class waypoint():
             elif geocode_template["provider"] == "mapbox":
                 geocode_response = requests.get(f"https://api.mapbox.com/geocoding/v5/mapbox.places/{self.lon},{self.lat}.json?language={self.config.language}&access_token={geocode_template['key']}")
                 
-                addressg = geocode_response.json()["features"].get("place_name", "")
-                street = geocode_response.json()["features"].get("text", "")
-                street_number = geocode_response.json()["features"].get("address", "")
-                
                 for feature in geocode_response.json()["features"]:
                     if feature["place_type"] == "address":
                         addressg = feature["place_name"]
