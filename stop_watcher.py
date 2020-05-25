@@ -107,6 +107,28 @@ new_full_gym_cache = full_gym_cache.copy()
 new_empty_gym_cache = empty_gym_cache.copy()
 new_deleted_cache = deleted_cache.copy()
 
+def check_edits(fil, wp, w_type, w_id, w_lat, w_lon, w_name, w_img):
+    if wp is None:
+        return
+    if (w_lat != wp[0]) or (w_lon != wp[1]):
+        if "location" in fil["edit_types"]:
+            _waypoint = waypoint(queries, config, w_type, w_id, wp[2], wp[3], wp[0], wp[1])
+            _waypoint.send_location_edit(fil, w_lat, w_lon)
+    if w_name != wp[2]:
+        if "title" in fil["edit_types"]:
+            _waypoint = waypoint(queries, config, w_type, w_id, wp[2], wp[3], wp[0], wp[1])
+            _waypoint.send_name_edit(fil, w_name)
+            if not w_type == "gym":
+                if "update_gym_title" in fil:
+                    if fil["update_gym_title"]:
+                        if _waypoint.is_gym():
+                            _waypoint.set_type("gym")
+                            _waypoint.update(False)
+    if w_img != wp[3]:
+        if "photo" in fil["edit_types"]:
+            _waypoint = waypoint(queries, config, w_type, w_id, wp[2], wp[3], wp[0], wp[1])
+            _waypoint.send_img_edit(fil, w_img)
+    
 print("Ready to watch Stops")
 
 for fil in config.filters:
@@ -220,23 +242,8 @@ for fil in config.filters:
             for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"][fil["area"]]:
                 p = queries.get_full_portal_by_id(p_id)
                 #0=lat, 1=lon, 2=name, 3=img
-                if (p_lat != p[0]) or (p_lon != p[1]):
-                    if "location" in fil["edit_types"]:
-                        portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
-                        portal.send_location_edit(fil, p_lat, p_lon)
-                if p_name != p[2]:
-                    if "title" in fil["edit_types"]:
-                        portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
-                        portal.send_name_edit(fil, p_name)
-                        if "update_gym_title" in fil:
-                            if fil["update_gym_title"]:
-                                if portal.is_gym():
-                                    portal.set_type("gym")
-                                    portal.update(False)
-                if p_img != p[3]:
-                    if "photo" in fil["edit_types"]:
-                        portal = waypoint(queries, config, "portal", p_id, p[2], p[3], p[0], p[1])
-                        portal.send_img_edit(fil, p_img)
+                check_edits(fil, p, "portal", p_id, p_lat, p_lon, p_name, p_img)
+
             if "removal" in fil["edit_types"]:
                 print("Looking for Portal Removals")
                 portals = queries.get_deleted_portals(deleted_timespan_portals, fil["area"])
@@ -255,19 +262,8 @@ for fil in config.filters:
             for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"][fil["area"]]:
                 s = queries.get_full_stop_by_id(s_id)
                 #0=lat, 1=lon, 2=name, 3=img
-                if s is not None:
-                    if (s_lat != s[0]) or (s_lon != s[1]):
-                        if "location" in fil["edit_types"]:
-                            stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                            stop.send_location_edit(fil, s_lat, s_lon)
-                    if s_name != s[2]:
-                        if "title" in fil["edit_types"]:
-                            stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                            stop.send_name_edit(fil, s_name)
-                    if s_img != s[3]:
-                        if "photo" in fil["edit_types"]:
-                            stop = waypoint(queries, config, "stop", s_id, s[2], s[3], s[0], s[1])
-                            stop.send_img_edit(fil, s_img)
+                check_edits(fil, s, "stop", s_id, s_lat, s_lon, s_name, s_img)
+
             if "removal" in fil["edit_types"]:
                 print("Looking for Stop Removals")
                 stops = queries.get_deleted_stops(deleted_timespan_stops, fil["area"])
@@ -280,23 +276,14 @@ for fil in config.filters:
                                 new_deleted_cache["stops"].append(s_id)
                 else:
                     print(f"Stop amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
+        
         if "gym" in fil["edits"]:
             print("Looking for Gym Edits")
             for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"][fil["area"]]:
                 g = queries.get_full_gym_by_id(g_id)
                 #0=lat, 1=lon, 2=name, 3=img
-                if (g_lat != g[0]) or (g_lon != g[1]):
-                    if "location" in fil["edit_types"]:
-                        gym = waypoint(queries, config, "gym", g_id, g[2], g[3], g[0], g[1])
-                        gym.send_location_edit(fil, g_lat, g_lon)
-                if g_name != g[2]:
-                    if "title" in fil["edit_types"]:
-                        gym = waypoint(queries, config, "gym", g_id, g[2], g[3], g[0], g[1])
-                        gym.send_name_edit(fil, g_name)
-                if g_img != g[3]:
-                    if "photo" in fil["edit_types"]:
-                        gym = waypoint(queries, config, "gym", g_id, g[2], g[3], g[0], g[1])
-                        gym.send_img_edit(fil, g_img)
+                check_edits(fil, g, "gym", g_id, g_lat, g_lon, g_name, g_img)
+
             if "removal" in fil["edit_types"]:
                 print("Looking for Gym Removals")
                 gyms = queries.get_deleted_gyms(deleted_timespan_stops, fil["area"])

@@ -33,7 +33,7 @@ class waypoint():
                 stop = self.queries.get_full_stop_by_id(self.id)
                 if stop[2] is not None:
                     self.queries.update_waypoint(self.type, self.id, stop[2], stop[3], stop[0], stop[1])
-                    print(f"Updated {self.type} {p_name} using Stop info")
+                    print(f"Updated {self.type} {stop[2]} using Stop info")
                     needs_update = False  
             except:
                 needs_update = True
@@ -41,6 +41,10 @@ class waypoint():
         if needs_update:
             try:
                 portal = self.queries.get_full_portal_by_id(self.id)
+                if portal[2] is not None:
+                    self.queries.update_waypoint(self.type, self.id, portal[2], portal[3], portal[0], portal[1])
+                    print(f"Updated {self.type} {portal[2]} using Portal info")
+                    needs_update = False  
             except:
                 needs_update = True
 
@@ -170,7 +174,6 @@ class waypoint():
                     
         except:
             pass
-
 
         links = f"[Google Maps](https://www.google.com/maps/search/?api=1&query={self.lat},{self.lon})"
         if self.type == "portal":
@@ -318,7 +321,7 @@ class waypoint():
                 time.sleep(2)
 
         if "bot_id" in fil:
-            for char in ["_", "[", "]", "(", ")", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
+            for char in ["_", "~", ">", "#", "+", "-", "=", "|", "{", "}", ".", "!"]:
                 text = text.replace(char, f"\\{char}")
                 address = address.replace(char, f"\\{char}")
             text = text.replace("**", "*")
