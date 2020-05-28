@@ -154,7 +154,7 @@ for fil in config.filters:
         if "timespan" in fil["deleted"]:
             if "scraper" in fil["deleted"]["timespan"]:
                 deleted_timespan_portals = fil["deleted"]["timespan"]["scraper"]
-            if "scanner" in fil["deleted"]["max"]:
+            if "scanner" in fil["deleted"]["timespan"]:
                 deleted_timespan_stops = fil["deleted"]["timespan"]["scanner"]
 
     if "update" in fil:
