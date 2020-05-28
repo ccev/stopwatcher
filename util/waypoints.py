@@ -248,19 +248,21 @@ class waypoint():
                 geocode_response = requests.get(f"https://api.mapbox.com/geocoding/v5/mapbox.places/{self.lon},{self.lat}.json?language={self.config.language}&access_token={geocode_template['key']}")
                 
                 for feature in geocode_response.json()["features"]:
-                    if feature["place_type"] == "address":
+                    place_type = "".join(feature["place_type"])
+
+                    if place_type == "address":
                         addressg = feature["place_name"]
                         street = feature["text"]
                         street_number = feature["address"]
-                    elif feature["place_type"] == "locality":
+                    elif place_type == "locality":
                         suburb = feature["text"]
-                    elif feature["place_type"] == "place":
+                    elif place_type == "place":
                         city = feature["text"]
-                    elif feature["place_type"] == "postcode":
+                    elif place_type == "postcode":
                         postcode = feature["text"]
-                    elif feature["place_type"] == "region":
+                    elif place_type == "region":
                         region = feature["text"]
-                    elif feature["place_type"] == "country":
+                    elif place_type == "country":
                         country = feature["text"]
   
             final_address = geocode_template["text"].format(address=addressg, street=street, street_number=street_number, city=city, suburb=suburb, postcode=postcode, region=region, country=country)
