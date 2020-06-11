@@ -253,7 +253,8 @@ class waypoint():
                     if place_type == "address":
                         addressg = feature["place_name"]
                         street = feature["text"]
-                        street_number = feature["address"]
+                        if "address" in feature:
+                            street_number = feature["address"]
                     elif place_type == "locality":
                         suburb = feature["text"]
                     elif place_type == "place":
