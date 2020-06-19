@@ -136,9 +136,9 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
     if config.host_provider == "tinyurl":
         result = requests.get(f"http://tinyurl.com/api-create.php?url={quote_plus(static_map)}")
         if result.status_code >= 400:
-            print("Error with tinyurl. Sending no Static Map.")
-            print(result.content)
-            print(static_map)
+            config.console.log("Error with tinyurl. Sending no Static Map.")
+            config.console.log(result.content)
+            config.console.log(static_map)
             static_map = ""
         else:
             static_map = result.text
@@ -152,21 +152,21 @@ def create_static_map(config, queries, type_, lat, lon, marker_color):
             data = result.json()["data"]
             if "error" in data:
                 if data["error"]["code"] == 429:
-                    print("Hit Imgur's rate limit. Sleeping 1 hour.")
+                    config.console.log("Hit Imgur's rate limit. Sleeping 1 hour.")
                     time.sleep(3600)
                 else:
-                    print("Imgur error :S please report - trying again in 1 minute")
-                    print(static_map)
-                    print(data)
+                    config.console.log("Imgur error :S please report - trying again in 1 minute")
+                    config.console.log(static_map)
+                    config.console.log(data)
                     time.sleep(60)
             elif "id" in data:
                 image_id = data["id"]
                 static_map = f"https://i.imgur.com/{image_id}.png"
                 imgur_success = True
             else:
-                print("Some weird Imgur stuff. Please report this log entry!! - trying again in 1 minute")
-                print(static_map)
-                print(data)
+                config.console.log("Some weird Imgur stuff. Please report this log entry!! - trying again in 1 minute")
+                config.console.log(static_map)
+                config.console.log(data)
                 time.sleep(60)
 
     elif config.host_provider == "polr":

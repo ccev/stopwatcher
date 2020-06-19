@@ -33,7 +33,7 @@ class waypoint():
                 stop = self.queries.get_full_stop_by_id(self.id)
                 if stop[2] is not None:
                     self.queries.update_waypoint(self.type, self.id, stop[2], stop[3], stop[0], stop[1])
-                    print(f"Updated {self.type} {stop[2]} using Stop info")
+                    self.config.console.log(f"Updated {self.type} {stop[2]} using Stop info")
                     needs_update = False  
             except:
                 needs_update = True
@@ -43,13 +43,13 @@ class waypoint():
                 portal = self.queries.get_full_portal_by_id(self.id)
                 if portal[2] is not None:
                     self.queries.update_waypoint(self.type, self.id, portal[2], portal[3], portal[0], portal[1])
-                    print(f"Updated {self.type} {portal[2]} using Portal info")
+                    self.config.console.log(f"Updated {self.type} {portal[2]} using Portal info")
                     needs_update = False  
             except:
                 needs_update = True
 
     def delete(self):
-        print(f"Deleting converted {self.type} {self.name} from your DB")
+        self.config.console.log(f"Deleting converted {self.type} {self.name} from your DB")
         self.queries.delete_stop(self.id)
 
     def is_gym(self):
@@ -84,7 +84,7 @@ class waypoint():
         # Title + image
         image = self.img
         if not self.edit:
-            print(f"Found {self.type} {self.name} - Sending now")
+            self.config.console.log(f"Found {self.type} {self.name} - Sending now")
             title = self.name
         if self.empty:
             title = ""
@@ -320,7 +320,11 @@ class waypoint():
             }
             for webhook in fil["webhook"]:
                 result = requests.post(webhook, json=data)
-                print(result)
+                if result.status_code in range(1, 300):
+                    self.config.console.log("Success sending Webhook")
+                else:
+                    self.config.console.log(f"Error while sending Webhook: {result.status_code}")
+                    self.config.console.log(data)
                 time.sleep(2)
 
         if "bot_id" in fil:
@@ -332,16 +336,16 @@ class waypoint():
                 if not self.empty:
                     payload = {"chat_id": str(chat_id), "photo": image}
                     result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendPhoto", params = payload)
-                    print(f"Result {result.status_code} for Photo")
+                    self.config.console.log(f"Result {result.status_code} for Photo")
                 if not text == "":
                     text = f"\n\n{text}"
                 payload = {"chat_id": str(chat_id), "parse_mode": "markdownv2", "text": f"*{embed_username}*\n{title}{text}\n\n[‌‌]({static_map}){address}{links}"}
                 result = requests.get(f"https://api.telegram.org/bot{fil['bot_id']}/sendMessage", params = payload)
-                print(f"Result {result.status_code} for Text")
+                self.config.console.log(f"Result {result.status_code} for Text")
                 time.sleep(2)
 
     def send_location_edit(self, fil, old_lat, old_lon):
-        print(f"Found edited location of {self.type} {self.name} - Sending now.")
+        self.config.console.log(f"Found edited location of {self.type} {self.name} - Sending now.")
         self.edit = True
         self.edit_type = "location"
         self.before_edit = [old_lat, old_lon]
@@ -350,7 +354,7 @@ class waypoint():
         self.send(fil, text, title)
 
     def send_name_edit(self, fil, old_name):
-        print(f"Found edited name of {self.type} {old_name} - Sending now.")
+        self.config.console.log(f"Found edited name of {self.type} {old_name} - Sending now.")
         self.edit = True
         self.edit_type = "name"
         self.before_edit = old_name
@@ -359,7 +363,7 @@ class waypoint():
         self.send(fil, text, title)
 
     def send_img_edit(self, fil, old_img):
-        print(f"Found new image for {self.type} {self.name} - Sending now.")
+        self.config.console.log(f"Found new image for {self.type} {self.name} - Sending now.")
         self.edit = True
         self.edit_type = "img"
         self.before_edit = old_img
@@ -368,7 +372,7 @@ class waypoint():
         self.send(fil, text, title)
 
     def send_deleted(self, fil):
-        print(f"Found possibly removed {self.type} {self.name} :o")
+        self.config.console.log(f"Found possibly removed {self.type} {self.name} :o")
         self.edit = True
         self.edit_type = "deleted"
         title = self.locale["deleted_title"].format(name = self.name)

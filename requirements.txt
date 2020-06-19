@@ -1,3 +1,4 @@
 requests
 pymysql
 s2sphere
+rich

@@ -3,6 +3,9 @@ import argparse
 import sys
 
 from pymysql import connect
+from rich.console import Console
+from rich.table import Column, Table
+from rich.progress import Progress
 
 import util.tools as tools
 from util.config import create_config
@@ -13,6 +16,11 @@ config = create_config("config/config.ini")
 
 mydb = connect(host = config.db_host, user = config.db_user, password = config.db_password, database = config.db_name_scan, port = config.db_port, autocommit = True)
 cursor = mydb.cursor()
+
+config.console = Console()
+config.errorstyle = "red"
+
+config.console.log("Initializing...")
 
 with open("config/filters.json", encoding="utf-8") as f:
     config.filters = json.load(f)
@@ -74,30 +82,30 @@ if args.compare:
     sys.exit()
 
 if len(portal_cache) == 0:
-    print("Found empty Portal Cache. Trying to fill it now.")
+    config.console.log("Found empty Portal Cache. Trying to fill it now.")
     try:
         portal_cache = init.write_portals(portal_cache)
     except:
-        print("Error while doing that. Just skipping it.")
+        config.console.log("Error while doing that. Just skipping it.", style=errorstyle)
 
 if len(full_stop_cache) == 0 or len(empty_stop_cache) == 0:
-    print("Found empty Stop Cache. Trying to fill it now.")
+    config.console.log("Found empty Stop Cache. Trying to fill it now.")
     try:
         full_stop_cache = init.write_stops(full_stop_cache)
         empty_stop_cache = full_stop_cache
     except:
-        print("Error while doing that. Just skipping it.")   
+        config.console.log("Error while doing that. Just skipping it.", style=errorstyle)   
 
 if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
-    print("Found empty Gym Cache. Trying to fill it now.")
+    config.console.log("Found empty Gym Cache. Trying to fill it now.")
     try:
         full_gym_cache = init.write_gyms(full_gym_cache)
         empty_gym_cache = full_gym_cache
     except:
-        print("Error while doing that. Just skipping it.")
+        config.console.log("Error while doing that. Just skipping it.", style=errorstyle)
 
 if (len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"])) == 0:
-    print("Found empty Edit Cache. Trying to fill it now.")
+    config.console.log("Found empty Edit Cache. Trying to fill it now.")
     edit_list = queries.create_edit_list(empty_edit_list, edit_list)
 
 new_portal_cache = portal_cache.copy()
@@ -128,13 +136,33 @@ def check_edits(fil, wp, w_type, w_id, w_lat, w_lon, w_name, w_img):
         if "photo" in fil["edit_types"]:
             _waypoint = waypoint(queries, config, w_type, w_id, wp[2], wp[3], wp[0], wp[1])
             _waypoint.send_img_edit(fil, w_img)
-    
-print("Ready to watch Stops")
+
+log_filters = [
+    ["update", "What to update upon creation"],
+    ["delete_converted_stops", "Delete converted Stops"],
+    ["send", "What to send notifications for"],
+    ["send_empty", "Should they be sent with an unknown image/name?"],
+    ["edits", "What to track edits for"],
+    ["edit_types", "What kind of edits to track"],
+    ["update_gym_title", "If a Portal's title changes, should the corresponding Gym title get updated?"]
+]
+
+config.console.log("Done. Ready to watch Stops")
 
 for fil in config.filters:
-    print("----------------------------")
-    print(f"Going through {fil['area']}")
-    print("")
+    #print("----------------------------")
+    #print(f"Going through {fil['area']}")
+    #print("")
+    config.console.log(f"[green]> Now going through [bold]{fil['area'].capitalize()}")
+    table = Table(show_header=False)
+    table.add_column("key")
+    table.add_column("value")
+    for logfilter in log_filters:
+        value = fil.get(logfilter[0], None)
+        if isinstance(value, list):
+            value = ", ".join(value)
+        table.add_row(logfilter[1], str(value))
+    config.console.log(table)
 
     dont_send_empty = True
     if "send_empty" in fil:
@@ -159,27 +187,27 @@ for fil in config.filters:
 
     if "update" in fil:
         if "stop" in fil["update"]:
-            print("Looking for Stops to update")
+            config.console.log("Looking for Stops to update")
             stops = queries.get_empty_stops(fil["area"])
             for s_id in stops:
                 stop = waypoint(queries, config, "stop", s_id[0])
                 stop.update()
         if "gym" in fil["update"]:
-            print("Looking for Gyms to update")
+            config.console.log("Looking for Gyms to update")
             gyms = queries.get_empty_gyms(fil["area"])
             for g_id in gyms:
                 gym = waypoint(queries, config, "gym", g_id[0])
                 gym.update()
     if "delete_converted_stops" in fil:
         if fil["delete_converted_stops"]:
-            print("Looking for converted Stops to delete")
+            config.console.log("Looking for converted Stops to delete")
             stops = queries.get_converted_stops(fil["area"])
             for s_id, s_name in stops:
                 stop = waypoint(queries, config, "stop", s_id, s_name)
                 stop.delete()
     if "send" in fil:
         if "portal" in fil["send"]:
-            print("Looking for new Portals")
+            config.console.log("Looking for new Portals")
             portals = queries.get_portals(fil["area"])
             for p_id, p_lat, p_lon, p_name, p_img in portals:
                 if not p_id in portal_cache:
@@ -191,7 +219,7 @@ for fil in config.filters:
                 f.write(json.dumps(new_portal_cache, indent=4))
 
         if "stop" in fil["send"]:
-            print("Looking for new Stops")
+            config.console.log("Looking for new Stops")
             stops = queries.get_stops(fil["area"])
             for s_id, s_lat, s_lon, s_name, s_img in stops:
                 stop = waypoint(queries, config, "stop", s_id, s_name, s_img, s_lat, s_lon)
@@ -214,7 +242,7 @@ for fil in config.filters:
                 f.write(json.dumps(new_empty_stop_cache, indent=4))
 
         if "gym" in fil["send"]:
-            print("Looking for new Gyms")
+            config.console.log("Looking for new Gyms")
             gyms = queries.get_gyms(fil["area"])
             for g_id, g_lat, g_lon, g_name, g_img in gyms:
                 gym = waypoint(queries, config, "gym", g_id, g_name, g_img, g_lat, g_lon)
@@ -238,14 +266,16 @@ for fil in config.filters:
 
     if "edits" in fil:
         if "portal" in fil["edits"]:
-            print("Looking for Portal Edits")
-            for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"][fil["area"]]:
-                p = queries.get_full_portal_by_id(p_id)
-                #0=lat, 1=lon, 2=name, 3=img
-                check_edits(fil, p, "portal", p_id, p_lat, p_lon, p_name, p_img)
+            with Progress(console=config.console) as progress:
+                task = progress.add_task("Looking for Portal Edits", total=len(edit_list["portals"][fil["area"]]))
+                for p_id, p_lat, p_lon, p_name, p_img in edit_list["portals"][fil["area"]]:
+                    p = queries.get_full_portal_by_id(p_id)
+                    #0=lat, 1=lon, 2=name, 3=img
+                    check_edits(fil, p, "portal", p_id, p_lat, p_lon, p_name, p_img)
+                    progress.update(task, advance=1)
 
             if "removal" in fil["edit_types"]:
-                print("Looking for Portal Removals")
+                config.console.log("Looking for Portal Removals")
                 portals = queries.get_deleted_portals(deleted_timespan_portals, fil["area"])
                 if len(portals) <= deleted_max_portals:
                     for p_id, p_lat, p_lon, p_name, p_img in portals:
@@ -255,17 +285,19 @@ for fil in config.filters:
                             if not p_id in new_deleted_cache["portals"]:
                                 new_deleted_cache["portals"].append(p_id)
                 else:
-                    print(f"Deleted Portal amount exceeded the limit of {deleted_max_portals} - Check your Cookie")
+                    config.console.log(f"Deleted Portal amount exceeded the limit of {deleted_max_portals} - Check your Cookie", style=config.errorstyle)
               
         if "stop" in fil["edits"]:
-            print("Looking for Stop Edits")
-            for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"][fil["area"]]:
-                s = queries.get_full_stop_by_id(s_id)
-                #0=lat, 1=lon, 2=name, 3=img
-                check_edits(fil, s, "stop", s_id, s_lat, s_lon, s_name, s_img)
+            with Progress(console=config.console) as progress:
+                task = progress.add_task("Looking for Stop Edits", total=len(edit_list["stops"][fil["area"]]))
+                for s_id, s_lat, s_lon, s_name, s_img in edit_list["stops"][fil["area"]]:
+                    s = queries.get_full_stop_by_id(s_id)
+                    #0=lat, 1=lon, 2=name, 3=img
+                    check_edits(fil, s, "stop", s_id, s_lat, s_lon, s_name, s_img)
+                    progress.update(task, advance=1)
 
             if "removal" in fil["edit_types"]:
-                print("Looking for Stop Removals")
+                config.console.log("Looking for Stop Removals")
                 stops = queries.get_deleted_stops(deleted_timespan_stops, fil["area"])
                 if len(stops) <= deleted_max_stops:
                     for s_id, s_lat, s_lon, s_name, s_img in stops:
@@ -275,17 +307,19 @@ for fil in config.filters:
                             if not s_id in new_deleted_cache["stops"]:
                                 new_deleted_cache["stops"].append(s_id)
                 else:
-                    print(f"Stop amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
+                    config.console.log(f"Stop amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup", style=config.errorstyle)
         
         if "gym" in fil["edits"]:
-            print("Looking for Gym Edits")
-            for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"][fil["area"]]:
-                g = queries.get_full_gym_by_id(g_id)
-                #0=lat, 1=lon, 2=name, 3=img
-                check_edits(fil, g, "gym", g_id, g_lat, g_lon, g_name, g_img)
+            with Progress(console=config.console) as progress:
+                task = progress.add_task("Looking for Gym Edits", total=len(edit_list["gyms"][fil["area"]]))
+                for g_id, g_lat, g_lon, g_name, g_img in edit_list["gyms"][fil["area"]]:
+                    g = queries.get_full_gym_by_id(g_id)
+                    #0=lat, 1=lon, 2=name, 3=img
+                    check_edits(fil, g, "gym", g_id, g_lat, g_lon, g_name, g_img)
+                    progress.update(task, advance=1)
 
             if "removal" in fil["edit_types"]:
-                print("Looking for Gym Removals")
+                config.console.log("Looking for Gym Removals")
                 gyms = queries.get_deleted_gyms(deleted_timespan_stops, fil["area"])
                 if len(gyms) <= deleted_max_stops:
                     for g_id, g_lat, g_lon, g_name, g_img in gyms:
@@ -295,11 +329,10 @@ for fil in config.filters:
                             if not g_id in new_deleted_cache["gyms"]:
                                 new_deleted_cache["gyms"].append(g_id)
                 else:
-                    print(f"Gym amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
-    print("")
+                    config.console.log(f"Gym amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup", style=config.errorstyle)
 
 if any("edits" in i for i in config.filters):
-    print("Writing Edit Cache")
+    config.console.log("Writing Edit Cache")
     edit_list = queries.create_edit_list(empty_edit_list, edit_list)
 
 cursor.close()
@@ -310,3 +343,5 @@ with open("config/cache/edits.json", "w", encoding="utf-8") as f:
 
 with open("config/cache/deleted.json", "w", encoding="utf-8") as f:
     f.write(json.dumps(new_deleted_cache, indent=4))
+
+config.console.log("[green]Done.[/] Thanks for using Stop Watcher")
