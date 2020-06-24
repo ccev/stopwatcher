@@ -18,7 +18,6 @@ mydb = connect(host = config.db_host, user = config.db_user, password = config.d
 cursor = mydb.cursor()
 
 config.console = Console()
-config.errorstyle = "red"
 
 config.console.log("Initializing...")
 
@@ -86,7 +85,7 @@ if len(portal_cache) == 0:
     try:
         portal_cache = init.write_portals(portal_cache)
     except:
-        config.console.log("Error while doing that. Just skipping it.", style=errorstyle)
+        config.console.log("Error while doing that. Just skipping it.")
 
 if len(full_stop_cache) == 0 or len(empty_stop_cache) == 0:
     config.console.log("Found empty Stop Cache. Trying to fill it now.")
@@ -94,7 +93,7 @@ if len(full_stop_cache) == 0 or len(empty_stop_cache) == 0:
         full_stop_cache = init.write_stops(full_stop_cache)
         empty_stop_cache = full_stop_cache
     except:
-        config.console.log("Error while doing that. Just skipping it.", style=errorstyle)   
+        config.console.log("Error while doing that. Just skipping it.")   
 
 if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
     config.console.log("Found empty Gym Cache. Trying to fill it now.")
@@ -102,7 +101,7 @@ if len(full_gym_cache) == 0 or len(empty_gym_cache) == 0:
         full_gym_cache = init.write_gyms(full_gym_cache)
         empty_gym_cache = full_gym_cache
     except:
-        config.console.log("Error while doing that. Just skipping it.", style=errorstyle)
+        config.console.log("Error while doing that. Just skipping it.")
 
 if (len(edit_list["portals"]) + len(edit_list["stops"]) + len(edit_list["gyms"])) == 0:
     config.console.log("Found empty Edit Cache. Trying to fill it now.")
@@ -285,7 +284,7 @@ for fil in config.filters:
                             if not p_id in new_deleted_cache["portals"]:
                                 new_deleted_cache["portals"].append(p_id)
                 else:
-                    config.console.log(f"Deleted Portal amount exceeded the limit of {deleted_max_portals} - Check your Cookie", style=config.errorstyle)
+                    config.console.log(f"Deleted Portal amount exceeded the limit of {deleted_max_portals} - Check your Cookie")
               
         if "stop" in fil["edits"]:
             with Progress(console=config.console) as progress:
@@ -307,7 +306,7 @@ for fil in config.filters:
                             if not s_id in new_deleted_cache["stops"]:
                                 new_deleted_cache["stops"].append(s_id)
                 else:
-                    config.console.log(f"Stop amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup", style=config.errorstyle)
+                    config.console.log(f"Stop amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
         
         if "gym" in fil["edits"]:
             with Progress(console=config.console) as progress:
@@ -329,7 +328,7 @@ for fil in config.filters:
                             if not g_id in new_deleted_cache["gyms"]:
                                 new_deleted_cache["gyms"].append(g_id)
                 else:
-                    config.console.log(f"Gym amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup", style=config.errorstyle)
+                    config.console.log(f"Gym amount exceeded the limit of {deleted_max_portals} - Check your Scanner Setup")
 
 if any("edits" in i for i in config.filters):
     config.console.log("Writing Edit Cache")
