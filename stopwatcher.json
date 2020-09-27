@@ -1,51 +1,56 @@
 {
-    "style": "{{style}}",
-    "latitude": {{lat}},
-    "longitude": {{lon}},
-    "zoom": {{zoom}},
-    "width": {{width}},
-    "height": {{height}},
-    "scale": {{scale}},
+    "style": "#(style)",
+    "latitude": #(lat),
+    "longitude": #(lon),
+    "zoom": #(zoom),
+    "width": #(width),
+    "height": #(height),
+    "scale": #(scale),
     "format": "png",
     "markers": [
-        {% if pointjson %}
-        {% for wp in pointjson %}
+        #if(pointjson != nil):
+        #for(wp in pointjson):
         {
-            "url": "{{markers}}{{wp[2]}}_gray.png",
-            "latitude": {{wp[0]}},
-            "longitude": {{wp[1]}},
+            "url": "#(markers)#index(wp, 2)_gray.png",
+            "latitude": #index(wp, 0),
+            "longitude": #index(wp, 1),
             "width": 48,
             "height": 48,
-            {% if type == "portal" %}
+            #if(type == "portal"):
             "y_offset": 0
-            {% else %}
+            #else:
             "y_offset": -24
-            {% endif %}
+            #endif
         },
-        {% endfor %}
-        {% endif %}
+        #endfor
+        #endif
         {
-            "url": "{{markers}}{{type}}_normal.png",
-            "latitude": {{lat}},
-            "longitude": {{lon}},
+            "url": "#(markers)#(type)_normal.png",
+            "latitude": #(lat),
+            "longitude": #(lon),
             "width": 64,
             "height": 64,
-            {% if type == "portal" %}
+            #if(type == "portal"):
             "y_offset": 0
-            {% else %}
+            #else:
             "y_offset": -32
-            {% endif %}
+            #endif
         }
     ]
-    {% if pathjson %}
+    #if(pathjson != nil):
     ,
     "polygons": [
         {
-            "fill_color": "{{fill}}",
-            "stroke_color": "{{stroke}}",
-            "stroke_width": {{strokewidth}},
-            "path": {{pathjson}}
+            "fill_color": "#(fill)",
+            "stroke_color": "#(stroke)",
+            "stroke_width": #(strokewidth),
+            "path":
+                [
+                    #for(coord in pathjson):
+                    #if(index != 0):,#endif[#index(coord, 0), #index(coord, 1)]
+                    #endfor 
+                ]
         }
     ]
-    {% endif %}
+    #endif
 }
