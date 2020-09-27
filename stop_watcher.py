@@ -13,12 +13,7 @@ from util.queries import create_queries
 from util.waypoints import waypoint, init
 
 config = create_config("config/config.ini")
-
-mydb = connect(host = config.db_host, user = config.db_user, password = config.db_password, database = config.db_name_scan, port = config.db_port, autocommit = True)
-cursor = mydb.cursor()
-
 config.console = Console()
-
 config.console.log("Initializing...")
 
 with open("config/filters.json", encoding="utf-8") as f:
@@ -57,7 +52,26 @@ with open("config/cache/deleted.json", encoding="utf-8") as f:
 with open("config_example/cache/edits.json", encoding="utf-8") as f:
     empty_edit_list = json.load(f)
 
-queries = create_queries(config, cursor)
+mydb = connect(
+    host=config.db_host,
+    user=config.db_user,
+    password=config.db_password,
+    database=config.db_name_scan,
+    port=config.db_port,
+    autocommit=True
+)
+cursor = mydb.cursor()
+
+mydb_p = connect(
+    host=config.portal_db_host,
+    user=config.portal_db_user,
+    password=config.portal_db_password,
+    database=config.db_name_portal,
+    port=config.portal_db_port,
+    autocommit=True
+)
+portal_cursor = mydb_p.cursor()
+queries = create_queries(config, cursor, portal_cursor)
 init = init(queries)
 
 parser = argparse.ArgumentParser()

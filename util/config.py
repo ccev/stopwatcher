@@ -35,3 +35,8 @@ class create_config:
         self.db_port = config_file.getint("DB", "port")
         self.db_user = config_file.get("DB", "user")
         self.db_password = config_file.get("DB", "password")
+
+        self.portal_db_host = config_file.get("DB", "portal_host", fallback=self.db_host)
+        self.portal_db_port = config_file.getint("DB", "portal_port", fallback=self.db_port)
+        self.portal_db_user = config_file.get("DB", "portal_user", fallback=self.db_user)
+        self.portal_db_password = config_file.get("DB", "portal_password", fallback=self.db_password)

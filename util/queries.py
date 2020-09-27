@@ -2,9 +2,9 @@ from pymysql import connect
 from datetime import datetime, timedelta 
 
 class create_queries():
-    def __init__(self, config, cursor):
+    def __init__(self, config, cursor, p_cursor):
         self.cursor = cursor
-        self.portal = config.db_name_portal
+        self.p_cursor = p_cursor
         self.schema = config.scan_type
         self.geofences = config.geofences
         self.filters = config.filters
@@ -22,8 +22,8 @@ class create_queries():
 
     def get_portals(self, area):
         self.convert_area(area)
-        self.cursor.execute(f"SELECT external_id, lat, lon, name, url FROM {self.portal}.ingress_portals WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
-        portals = self.cursor.fetchall()
+        self.p_cursor.execute(f"SELECT external_id, lat, lon, name, url FROM ingress_portals WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+        portals = self.p_cursor.fetchall()
         return portals
 
     def get_stops(self, area):
@@ -109,13 +109,13 @@ class create_queries():
         return stops
 
     def get_portal_by_id(self, w_id):
-        self.cursor.execute(f"SELECT name, url FROM {self.portal}.ingress_portals WHERE external_id = '{w_id}';")
-        portals = self.cursor.fetchall()
+        self.p_cursor.execute(f"SELECT name, url FROM ingress_portals WHERE external_id = '{w_id}';")
+        portals = self.p_cursor.fetchall()
         return portals
 
     def get_full_portal_by_id(self, w_id):
-        self.cursor.execute(f"SELECT lat, lon, name, url FROM {self.portal}.ingress_portals WHERE external_id = '{w_id}';")
-        portal = self.cursor.fetchone()
+        self.p_cursor.execute(f"SELECT lat, lon, name, url FROM ingress_portals WHERE external_id = '{w_id}';")
+        portal = self.p_cursor.fetchone()
         return portal
     
     def get_full_stop_by_id(self, w_id):
@@ -179,8 +179,8 @@ class create_queries():
         return edit_list
 
     def static_portals(self, limit, lat, lon):
-        self.cursor.execute(f"SELECT lat, lon, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM {self.portal}.ingress_portals WHERE lat != {lat} AND lon != {lon} ORDER BY distance ASC LIMIT {limit};")
-        portals = self.cursor.fetchall()
+        self.p_cursor.execute(f"SELECT lat, lon, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM .ingress_portals WHERE lat != {lat} AND lon != {lon} ORDER BY distance ASC LIMIT {limit};")
+        portals = self.p_cursor.fetchall()
         return portals
 
     def static_waypoints(self, limit, lat, lon):
@@ -194,8 +194,8 @@ class create_queries():
     def get_deleted_portals(self, minutes, area):
         time = (datetime.utcnow() - timedelta(minutes = minutes)).timestamp()
         self.convert_area(area)
-        self.cursor.execute(f"SELECT external_id, lat, lon, name, url FROM {self.portal}.ingress_portals WHERE updated < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
-        portals = self.cursor.fetchall()
+        self.p_cursor.execute(f"SELECT external_id, lat, lon, name, url FROM ingress_portals WHERE updated < {time} AND ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({self.area}))'), point(lat, lon));")
+        portals = self.p_cursor.fetchall()
         return portals
 
     def get_deleted_stops(self, minutes, area):
@@ -226,7 +226,7 @@ class create_queries():
         elif self.schema == "rdm":
             self.cursor.execute(f"SELECT (SELECT COUNT(id) FROM pokestop WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon))), (SELECT COUNT(id) FROM gym WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon)));")
         count1 = self.cursor.fetchone()
-        self.cursor.execute(f"SELECT COUNT(id) FROM {self.portal}.ingress_portals WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon));")
-        count2 = self.cursor.fetchone()
+        self.p_cursor.execute(f"SELECT COUNT(id) FROM ingress_portals WHERE ST_CONTAINS(ST_GEOMFROMTEXT('POLYGON(({area}))'), point(lat, lon));")
+        count2 = self.p_cursor.fetchone()
 
         return count1 + count2
