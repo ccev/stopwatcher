@@ -179,7 +179,7 @@ class create_queries():
         return edit_list
 
     def static_portals(self, limit, lat, lon):
-        self.p_cursor.execute(f"SELECT lat, lon, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM .ingress_portals WHERE lat != {lat} AND lon != {lon} ORDER BY distance ASC LIMIT {limit};")
+        self.p_cursor.execute(f"SELECT lat, lon, POW(69.1 * (lat - {lat}), 2) + POW(69.1 * ({lon} - lon) * COS(lat / 57.3), 2) AS distance FROM ingress_portals WHERE lat != {lat} AND lon != {lon} ORDER BY distance ASC LIMIT {limit};")
         portals = self.p_cursor.fetchall()
         return portals
 
