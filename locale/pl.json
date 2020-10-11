@@ -30,5 +30,7 @@
     "cell_stays_occupied": "❌ Pozostaje zajęta",
     "gets_new_stop": "✅ Powstanie nowy Pokestop",
     "already_stop": "✅ Już jest Pokestopem",
-    "already_gym": "✅ Już jest Gymem"
+    "already_gym": "✅ Już jest Gymem",
+    "stop_disappears": "❌ Stop zniknie",
+    "x_stops_disapper": "❌ {x} Stopy znikną"
 }
