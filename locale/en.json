@@ -29,5 +29,7 @@
     "cell_stays_occupied": "❌ Stays occupied",
     "gets_new_stop": "✅ Gets a new Stop",
     "already_stop": "✅ Already a Stop",
-    "already_gym": "✅ Already a Gym"
+    "already_gym": "✅ Already a Gym",
+    "stop_disappears": "❌ Stop disappears",
+    "x_stops_disapper": "❌ {x} Stops disappear"
 }

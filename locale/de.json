@@ -29,5 +29,7 @@
     "cell_stays_occupied": "❌ Bleibt belegt",
     "gets_new_stop": "✅ Bekommt einen neuen Stop",
     "already_stop": "✅ Ist bereits ein Pokéstop",
-    "already_gym": "✅ Ist bereits eine Arena"
+    "already_gym": "✅ Ist bereits eine Arena",
+    "stop_disappears": "❌ Stop verschwindet",
+    "x_stops_disapper": "❌ {x} Stops verschwinden"
 }
