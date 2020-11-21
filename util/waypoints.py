@@ -158,9 +158,9 @@ class waypoint():
                                 text = f"{text}{self.locale['stays_no_stop']}"
                                 convert_time = ""
                         else:
-                            if stop_cell.stops == 2:
+                            if stop_cell.stops == 1:
                                 text = f"{text}{self.locale['stop_disappears']}"
-                            elif stop_cell.stops > 2:
+                            elif stop_cell.stops > 1:
                                 text = f"{text}{self.locale['x_stops_disapper'].format(x=stop_cell.stops-1)}"
                             else:
                                 text = f"{text}{self.locale['stays_stop']}"
