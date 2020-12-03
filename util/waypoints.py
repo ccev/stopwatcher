@@ -73,11 +73,11 @@ class waypoint():
         offset = now - utcnow
 
         day = self.locale["today"]
-        if utcnow >= 9:
+        if utcnow >= 14:
             day = self.locale["tomorrow"]
 
-        conv_time = (datetime(2020, 1, 1, 18, 0, 0) + timedelta(hours = offset)).strftime(self.locale["time_format"])
-        convert_time = (self.locale['when_convert']).format(day = day, time = conv_time)
+        conv_time = (datetime(2020, 1, 1, 19, 0, 0) + timedelta(hours=offset)).strftime(self.locale["time_format"])
+        convert_time = (self.locale['when_convert']).format(day=day, time=conv_time)
         return convert_time
 
     def send(self, fil, text = "", title = ""):     
