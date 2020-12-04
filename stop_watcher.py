@@ -137,7 +137,7 @@ def check_edits(fil, wp, w_type, w_id, w_lat, w_lon, w_name, w_img):
             _waypoint.send_location_edit(fil, w_lat, w_lon)
     if w_name is None or w_img is None or wp[2] is None or wp[3] is None:
         return
-    if w_name.replace(" ", "") != wp[2].replace(" ", ""):
+    if w_name.replace(" ", "").strip() != wp[2].replace(" ", "").strip():
         if "title" in fil["edit_types"]:
             _waypoint = waypoint(queries, config, w_type, w_id, wp[2], wp[3], wp[0], wp[1])
             _waypoint.send_name_edit(fil, w_name)
