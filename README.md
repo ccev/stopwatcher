@@ -22,7 +22,7 @@ Mapbox and tileserver static maps are the coolest ones. If you don't already hav
 To get working tileserver Static Maps, make sure you're on the latest version (>1.0.3 / March 4 2020), then copy stopwatcher.json to the `Templates` folder in your TileServer directory
 
 ### Ingress Portals
-Use [Intel Watcher](https://github.com/ccev/intelwatcher) for everything related to Portals. It'll scrape the Ingress Intel Map and put all Portals in your area in a database. Have it loop and put the restart delay in Stop Watcher's config.
+There's currently no way to get Portal data.
 
 ## Config files
 ### config.ini
