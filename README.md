@@ -1,4 +1,23 @@
+## This repo is no longer maintained
+
+Due to a lack of motivation and time, I've decided to archive most of my repos. At the time of writing this, it's still fully functional.
+
+### Improvements
+
+Possible improvements that I've thought of
+
+- Remove the weird "fancy" logging
+- Only support tileserver and remove the weird built-in templating as well as all the useless staticmap-related config options 
+- For location edits, show the old location on the map
+- Maybe not store everything in JSON files, there are better ways than this
+- Stop Watcher would work nicely as a MAD Plugin. Fuck RDM anyway
+- Implement a more central approach to geofences (i.e. using Spezus' geofenceHelper)
+- Stop Watcher should work without a portal database. It was actually designed this way but you still need an empty portal DB i think. Some kind of oversight. Idk
+- Static Maps should be smaller by default. Similiar in size to my "static map with a satellite part" gist
+
 # Stop Watcher
+
+
 Stop Watcher is an all-in-one package to stay updated on your local Waypoints. it can:
 - Send notifications about new Portals, Stops and Gyms to Discord and Telegram
 - Track location, title and photo edits, as well as removals of Portals, Stops and Gyms and send noticiations for them
