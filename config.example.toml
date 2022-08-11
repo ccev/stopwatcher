@@ -1,0 +1,32 @@
+[stopwatcher_db]
+username = ""
+password = ""
+host = ""
+port = 3306
+database = "stopwatcher"
+
+
+[data_input]
+
+[data_input.webhooks]
+enable = true
+host = "127.0.0.1"
+port = 9292
+username = "stopwatcher"
+password = "strongpass"
+
+
+[areas]
+
+[areas.example]
+
+[areas.example.discord.1]
+webhooks = ["https://discord.com/webhooks/1"]
+types = ["pokestop", "gym"]
+send = ["new", "new_details", "removed", "conversion", "edit_name", "edit_description", "edit_location", "edit_cover"]
+
+[areas.example.discord.this_value_doesnt_matter]
+webhooks = ["https://discord.com/webhooks/2"]
+types = ["portal", "lighship_poi"]
+send = ["new", "new_details", "removed", "conversion", "edit_name", "edit_description", "edit_location", "edit_cover"]
+
