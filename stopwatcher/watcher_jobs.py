@@ -33,13 +33,13 @@ class RemovedFortJob(_BaseWatcherJob):
 
 
 @dataclass
-class _BaseEditJob(_BaseWatcherJob):
+class BaseEditJob(_BaseWatcherJob):
     old: str
     new: str
 
 
 @dataclass
-class ChangedFortTypeJob(_BaseEditJob):
+class ChangedFortTypeJob(BaseEditJob):
     __key__ = "conversion"
 
     old: FortType
@@ -47,17 +47,17 @@ class ChangedFortTypeJob(_BaseEditJob):
 
 
 @dataclass
-class ChangedNameJob(_BaseEditJob):
+class ChangedNameJob(BaseEditJob):
     __key__ = "edit_name"
 
 
 @dataclass
-class ChangedDescriptionJob(_BaseEditJob):
+class ChangedDescriptionJob(BaseEditJob):
     __key__ = "edit_description"
 
 
 @dataclass
-class ChangedLocationJob(_BaseEditJob):
+class ChangedLocationJob(BaseEditJob):
     __key__ = "edit_location"
 
     old: Location
@@ -65,5 +65,5 @@ class ChangedLocationJob(_BaseEditJob):
 
 
 @dataclass
-class ChangedCoverImageJob(_BaseEditJob):
+class ChangedCoverImageJob(BaseEditJob):
     __key__ = "edit_cover"

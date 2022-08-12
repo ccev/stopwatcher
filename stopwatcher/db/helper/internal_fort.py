@@ -38,10 +38,7 @@ class FortHelper:
         return forts
 
     @staticmethod
-    async def insert_forts(accessor: DbAccessor, forts: list[Fort]) -> None:
-        if not forts:
-            return
-
+    async def insert_fort(accessor: DbAccessor, fort: Fort) -> None:
         query = (
             MySQLQuery()
             .into(fort_table)
@@ -55,10 +52,7 @@ class FortHelper:
                 fort_table.description,
                 fort_table.cover_image,
             )
-        )
-
-        for fort in forts:
-            query = query.insert(
+            .insert(
                 fort.id,
                 fort.game.value,
                 fort.type.value,
@@ -68,7 +62,33 @@ class FortHelper:
                 fort.description,
                 fort.cover_image,
             )
+        )
 
-        # TODO on duplicate key update
+        await accessor.commit_internal(query)
 
+    @staticmethod
+    async def delete_fort(accessor: DbAccessor, fort: Fort):
+        query = (
+            MySQLQuery()
+            .from_(fort_table)
+            .delete()
+            .where(fort_table.id == fort.id)
+            .where(fort_table.game_id == fort.game.value)
+        )
+        await accessor.commit_internal(query)
+
+    @staticmethod
+    async def update_fort(accessor: DbAccessor, fort: Fort):
+        query = (
+            MySQLQuery()
+            .update(fort_table)
+            .set(fort_table.type_id, fort.type.value)
+            .set(fort_table.name, fort.name)
+            .set(fort_table.description, fort.description)
+            .set(fort_table.lat, fort.location.lat)
+            .set(fort_table.lon, fort.location.lon)
+            .set(fort_table.cover_image, fort.cover_image)
+            .where(fort_table.id == fort.id)
+            .where(fort_table.game_id == fort.game.value)
+        )
         await accessor.commit_internal(query)

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
-import discord
-import aiohttp
 
-from .base_processor import BaseProcessor
+import aiohttp
+import discord
+
+from stopwatcher.config import poi_appearance
+from stopwatcher.tileserver import Tileserver, StaticMap
 from stopwatcher.watcher_jobs import (
-    AnyWatcherJob,
     NewFortJob,
     RemovedFortJob,
     ChangedFortTypeJob,
@@ -16,8 +17,7 @@ from stopwatcher.watcher_jobs import (
     ChangedCoverImageJob,
     NewFortDetailsJob,
 )
-from stopwatcher.config import poi_appearance
-from stopwatcher.tileserver import Tileserver, StaticMap
+from .base_processor import BaseProcessor
 
 if TYPE_CHECKING:
     from stopwatcher.config import DiscordWebhook as WebhookConfig
@@ -57,7 +57,7 @@ class DiscordSender(BaseProcessor):
             author = f"New {type_name}"
         elif check(NewFortDetailsJob):
             if NewFortJob.__key__ in self._config.send:
-                author = "Found Details"
+                author = f"{type_name} Details"
             else:
                 author = f"New {type_name}"
         elif check(RemovedFortJob):
@@ -67,12 +67,17 @@ class DiscordSender(BaseProcessor):
             author = f"{old_type_name} → {type_name}"
         elif check(ChangedNameJob):
             author = "New Name"
+            embed.description = f"Old: `{job.old}`\nNew: `{job.new}`"
         elif check(ChangedDescriptionJob):
             author = "New Description"
+            embed.description = f"Old: `{job.old}`\nNew: `{job.new}`"
         elif check(ChangedLocationJob):
             author = "New Location"
         elif check(ChangedCoverImageJob):
             author = "New Image"
+            image_embed = discord.Embed()
+            image_embed.set_image(url=job.fort.cover_image)
+            embeds.append(image_embed)
 
         if author:
             if self._tileserver is not None:
@@ -94,5 +99,6 @@ class DiscordSender(BaseProcessor):
                 else:
                     embed.description = extra_text
 
-            await self._send_webhook(user=username, avatar=type_icon, embeds=embeds)
+            # embed.set_author(name=author)
+            await self._send_webhook(user=author, avatar=type_icon, embeds=embeds)
 

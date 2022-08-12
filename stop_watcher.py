@@ -38,7 +38,7 @@ async def main():
     await db_accessor.connect(asyncio.get_running_loop())
 
     FortComparer(accessor=db_accessor, inbound_queue=processing_queue, outbound_queue=job_queue)
-    JobWorker(queue=job_queue, tileserver=tileserver)
+    JobWorker(queue=job_queue, tileserver=tileserver, accessor=db_accessor)
 
     await asyncio.Event().wait()
 

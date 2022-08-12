@@ -15,18 +15,20 @@ from .watcher_jobs import (
     ChangedCoverImageJob,
     NewFortDetailsJob,
 )
-from .processors import AnyProcessor, DiscordSender
+from .processors import AnyProcessor, DiscordSender, DbUpdater
 from .config import config
 
 if TYPE_CHECKING:
     from stopwatcher.tileserver import Tileserver
+    from stopwatcher.db.accessor import DbAccessor
 
 
 class JobWorker:
-    def __init__(self, queue: Queue, tileserver: Tileserver | None):
+    def __init__(self, queue: Queue, tileserver: Tileserver | None, accessor: DbAccessor):
         self._queue: "Queue[AnyWatcherJob]" = queue
 
         self._processors: list[AnyProcessor] = []
+        self._processors.append(DbUpdater(accessor))
         for area in config.areas:
             for webhook_config in area.discord:
                 self._processors.append(DiscordSender(config=webhook_config, tileserver=tileserver))
