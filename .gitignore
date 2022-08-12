@@ -1,4 +1,4 @@
-.config/
+.config/*
 .idea/*
 *__pycache__*
 test.py
