@@ -1,0 +1,12 @@
+[names]
+gym = "Gym"
+pokestop = "Pokestop"
+portal = "Portal"
+lightship_poi = "Lightship POI"
+
+
+[icons]
+gym = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/gym.png"
+pokestop = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/stop.png"
+portal = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/portal.png"
+lightship_poi = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/lightship.png"

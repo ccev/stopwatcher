@@ -1,11 +1,17 @@
 from __future__ import annotations
 
+from typing import Type, TypeVar
 import sys
+from os import path
 
 import rtoml
 from pydantic import BaseModel, ValidationError
 
 from .log import log
+from .fort import FortType
+
+
+T = TypeVar("T")
 
 
 class DbConnection(BaseModel):
@@ -39,26 +45,56 @@ class Area(BaseModel):
     discord: list[DiscordWebhook]
 
 
+class Tileserver(BaseModel):
+    enable: bool
+    url: str
+
+
 class Config(BaseModel):
     stopwatcher_db: DbConnection
+    tileserver: Tileserver
     data_input: DataInput
     areas: list[Area]
 
 
-with open("config.toml", mode="r") as config_file:
-    raw_config = rtoml.load(config_file)
+class PoiAppearancePart(BaseModel):
+    gym: str
+    pokestop: str
+    portal: str
+    lightship_poi: str
+
+    def get(self, fort_type: FortType) -> str:
+        return getattr(self, fort_type.name.lower(), "")
 
 
-raw_areas = list(raw_config.get("areas").items())
-raw_config["areas"] = []
-for area_name, area_config in raw_areas:
-    discord = area_config.pop("discord", {})
-    raw_config["areas"].append({"name": area_name, "discord": list(discord.values()), **area_config})
+class PoiAppearance(BaseModel):
+    names: PoiAppearancePart
+    icons: PoiAppearancePart
 
-try:
-    config = Config(**raw_config)
-except ValidationError as e:
-    log.error(f"Config validation error!\n{e}")
-    sys.exit(1)
 
-config = config
+def _get_raw_config(file: str):
+    config_path = path.join("config", file)
+    with open(config_path, mode="r") as _config_file:
+        raw_config = rtoml.load(_config_file)
+    return raw_config
+
+
+def _load_pyd_model(model: Type[T], raw: dict) -> T:
+    try:
+        constructed_model = model(**raw)
+    except ValidationError as e:
+        log.error(f"Config validation error!\n{e}")
+        sys.exit(1)
+
+    return constructed_model
+
+
+_raw_config = _get_raw_config("config.toml")
+_raw_areas = list(_raw_config.get("areas").items())
+_raw_config["areas"] = []
+for area_name, area_config in _raw_areas:
+    _discord = area_config.pop("discord", {})
+    _raw_config["areas"].append({"name": area_name, "discord": list(_discord.values()), **area_config})
+
+config: Config = _load_pyd_model(model=Config, raw=_raw_config)
+poi_appearance: PoiAppearance = _load_pyd_model(model=PoiAppearance, raw=_get_raw_config("pois.toml"))
