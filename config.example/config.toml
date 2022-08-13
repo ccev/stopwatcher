@@ -1,5 +1,6 @@
 [general]
 geofence_path = "config/geofences"
+init = true
 
 
 [stopwatcher_db]
@@ -24,9 +25,6 @@ scale = 1
 
 
 [data_input]
-
-[data_input.webhooks]
-enable = true
 host = "127.0.0.1"
 port = 9292
 username = "stopwatcher"

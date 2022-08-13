@@ -1,5 +1,5 @@
 [pokestop]
-name = "Pokéstop"
+name = "Pok\u00E9stop"
 icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/stop.png"
 
 [pokestop.map.primary]
