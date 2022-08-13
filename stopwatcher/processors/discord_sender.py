@@ -18,17 +18,20 @@ from stopwatcher.watcher_jobs import (
     NewFortDetailsJob,
 )
 from .base_processor import BaseProcessor
+from stopwatcher.db.helper.internal_fort import FortHelper
 
 if TYPE_CHECKING:
     from stopwatcher.config import DiscordWebhook as WebhookConfig
     from stopwatcher.watcher_jobs import AnyWatcherJob
+    from stopwatcher.db.accessor import DbAccessor
 
 
 class DiscordSender(BaseProcessor):
-    def __init__(self, wh_config: WebhookConfig, tileserver: Tileserver | None):
+    def __init__(self, wh_config: WebhookConfig, tileserver: Tileserver | None, accessor: DbAccessor):
         self._config: WebhookConfig = wh_config
         self._session = aiohttp.ClientSession()
         self._tileserver: Tileserver | None = tileserver
+        self._db_accessor: DbAccessor = accessor
 
         self._webhooks: list[discord.Webhook] = [
             discord.Webhook.from_url(url=w, session=self._session) for w in self._config.webhooks
@@ -89,6 +92,20 @@ class DiscordSender(BaseProcessor):
                     height=visual.height,
                     scale=visual.scale,
                 )
+
+                if job.fort.type.name.lower() in config.tileserver.visual.nearby_forts:
+                    bounds = staticmap.get_bounds()
+                    sec_forts = await FortHelper.get_forts_in_bounds(
+                        self._db_accessor, bounds=bounds, game=job.fort.game
+                    )
+
+                    for sec_fort in sec_forts:
+                        if sec_fort.id == job.fort.id:
+                            continue
+                            
+                        sec_appear = poi_appearance.get(sec_fort.type)
+                        staticmap.add_fort(location=sec_fort.location, fort_appear=sec_appear.map.secondary)
+
                 staticmap.add_fort(location=job.fort.location, fort_appear=appear.map.primary)
                 map_url = await self._tileserver.pregenerate_staticmap(staticmap)
                 embed.set_image(url=map_url)

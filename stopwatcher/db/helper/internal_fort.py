@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING, Any
 from pypika import MySQLQuery
 
 from stopwatcher.db.model.internal import fort_table
-from stopwatcher.fort import Fort, FortType
+from stopwatcher.fort import Fort, FortType, Game
 from stopwatcher.log import log
 
 if TYPE_CHECKING:
     from stopwatcher.db.accessor import DbAccessor
+    from stopwatcher.tileserver.staticmap import Bounds
 
 
 class FortHelper:
@@ -24,18 +25,20 @@ class FortHelper:
         return Fort.from_db(data=data, fort_type=fort_type)
 
     @staticmethod
+    def __fort_list_from_data(result: list[dict[str, Any]]) -> list[Fort]:
+        forts = []
+        for raw_fort in result:
+            fort = FortHelper.__fort_from_data(raw_fort)
+            if fort is not None:
+                forts.append(fort)
+
+        return forts
+
+    @staticmethod
     async def get_forts_from_id(accessor: DbAccessor, id_: str) -> list[Fort]:
         query = MySQLQuery().from_(fort_table).select("*").where(fort_table.id == id_)
         result = await accessor.select_internal(query)
-
-        if not result:
-            return []
-
-        forts = []
-        for raw_fort in result:
-            forts.append(FortHelper.__fort_from_data(raw_fort))
-
-        return forts
+        return FortHelper.__fort_list_from_data(result)
 
     @staticmethod
     async def insert_fort(accessor: DbAccessor, fort: Fort) -> None:
@@ -95,3 +98,15 @@ class FortHelper:
         if fort.cover_image is not None:
             query = query.set(fort_table.cover_image, fort.cover_image)
         await accessor.commit_internal(query)
+
+    @staticmethod
+    async def get_forts_in_bounds(accessor: DbAccessor, bounds: Bounds, game: Game) -> list[Fort]:
+        query = (
+            MySQLQuery()
+            .from_(fort_table)
+            .select("*")
+            .where(fort_table.lat[bounds.min.lat : bounds.max.lat])
+            .where(fort_table.lon[bounds.min.lon : bounds.max.lon])
+        )
+        result = await accessor.select_internal(query)
+        return FortHelper.__fort_list_from_data(result)
