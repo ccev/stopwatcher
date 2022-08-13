@@ -1,9 +1,18 @@
+[general]
+geofence_path = "config/geofences"
+
+
 [stopwatcher_db]
 username = ""
 password = ""
 host = ""
 port = 3306
 database = "stopwatcher"
+
+
+[tileserver]
+enable = true
+url = "https://tiles.domain.com"
 
 
 [data_input]

@@ -2,13 +2,14 @@ from __future__ import annotations
 
 from typing import Type, TypeVar
 import sys
-from os import path
+import os
 
 import rtoml
 from pydantic import BaseModel, ValidationError
 
 from .log import log
 from .fort import FortType
+from .geo import Geofence, Location
 
 
 T = TypeVar("T")
@@ -43,6 +44,7 @@ class DiscordWebhook(BaseModel):
 class Area(BaseModel):
     name: str
     discord: list[DiscordWebhook]
+    geofence: Geofence | None = None
 
 
 class Tileserver(BaseModel):
@@ -50,7 +52,12 @@ class Tileserver(BaseModel):
     url: str
 
 
+class General(BaseModel):
+    geofence_path: str
+
+
 class Config(BaseModel):
+    general: General
     stopwatcher_db: DbConnection
     tileserver: Tileserver
     data_input: DataInput
@@ -73,7 +80,7 @@ class PoiAppearance(BaseModel):
 
 
 def _get_raw_config(file: str):
-    config_path = path.join("config", file)
+    config_path = os.path.join("config", file)
     with open(config_path, mode="r") as _config_file:
         raw_config = rtoml.load(_config_file)
     return raw_config
@@ -98,3 +105,22 @@ for area_name, area_config in _raw_areas:
 
 config: Config = _load_pyd_model(model=Config, raw=_raw_config)
 poi_appearance: PoiAppearance = _load_pyd_model(model=PoiAppearance, raw=_get_raw_config("pois.toml"))
+
+
+_geofences: dict[str, Geofence] = {}
+for file in os.listdir(config.general.geofence_path):
+    if not file.endswith(".txt"):
+        continue
+
+    with open(os.path.join(config.general.geofence_path, file), mode="r") as fence_file:
+        _raw_fence = fence_file.read()
+
+    if _raw_fence.startswith("[") and "]" in _raw_fence:
+        _fence_name = _raw_fence.split("[", 1)[1].split("]")[0]
+    else:
+        _fence_name = file[:-4]
+
+    _geofences[_fence_name] = Geofence(_raw_fence)
+
+for _area in config.areas:
+    _area.geofence = _geofences.get(_area.name)
