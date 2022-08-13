@@ -1,14 +1,24 @@
 from __future__ import annotations
 
 from asyncio import Queue
+import base64
 
 from aiohttp import web
 from aiohttp.web_request import Request
 from aiohttp_basicauth_middleware import basic_auth_middleware
 from pydantic import BaseModel, ValidationError
+from protos import (
+    Method,
+    GetMapObjectsOutProto,
+    FortDetailsOutProto,
+    GymGetInfoOutProto,
+    ClientMapCellProto,
+    PokemonFortProto,
+)
 
 from .fort import FortType, Fort
 from .log import log
+from .config import config
 
 
 class FortRequest(BaseModel):
@@ -22,16 +32,75 @@ class FortRequest(BaseModel):
 
 
 class DataAccepter:
-    def __init__(self, process_queue: Queue, username: str, password: str):
+    def __init__(self, process_queue: Queue):
         self.app = web.Application(logger=log)
         self.queue: Queue = process_queue
 
-        routes = []
-        for route, method in [("forts", self.accept_webhooks)]:
-            routes.append(web.post(f"/{route}", method))
+        routes = [web.post("/forts", self.accept_webhooks), web.post("/protos", self.accept_protos)]
+        self.app.middlewares.append(
+            basic_auth_middleware(  # type: ignore
+                urls=("/forts",), auth_dict={config.data_input.username: config.data_input.password}
+            )
+        )
+
         self.app.add_routes(routes)
 
-        self.app.middlewares.append(basic_auth_middleware(urls=("/",), auth_dict={username: password}))  # type: ignore
+        self._proto_map = {
+            Method.METHOD_GET_MAP_OBJECTS: GetMapObjectsOutProto,
+            Method.METHOD_GYM_GET_INFO: GymGetInfoOutProto,
+            Method.METHOD_FORT_DETAILS: FortDetailsOutProto,
+        }
+
+    async def accept_protos(self, request: Request):
+        log.debug(f"Received message from {request.remote}")
+
+        if not request.can_read_body:
+            log.warning(f"Couldn't read body of incoming request")
+            return web.Response(status=400)
+
+        data = await request.json()
+        forts = []
+
+        for raw_proto in data.get("contents", []):
+            method_id: int = raw_proto.get("type", 0)
+
+            message = self._proto_map.get(method_id)
+            if message is None:
+                continue
+
+            payload = raw_proto.get("payload")
+
+            if not payload:
+                log.warning(f"Empty paylod in {raw_proto}")
+                continue
+
+            try:
+                decoded = base64.b64decode(payload)
+            except Exception as e:
+                log.warning(f"Couldn't decode {payload} in {raw_proto}")
+                continue
+
+            try:
+                proto = message()
+                proto.ParseFromString(decoded)
+            except Exception as e:
+                log.exception(f"Unknown error while parsing proto {raw_proto}", e)
+                continue
+
+            if isinstance(proto, GetMapObjectsOutProto):
+                for cell in proto.map_cell:
+                    cell: ClientMapCellProto
+                    for fort in cell.fort:
+                        fort: PokemonFortProto
+                        # forts.append(Fort.from_fort_proto(fort))
+
+            elif isinstance(proto, FortDetailsOutProto):
+                forts.append(Fort.from_fort_details_proto(proto))
+
+        if forts:
+            self.queue.put_nowait(forts)
+
+        return web.Response()
 
     async def accept_webhooks(self, request: Request):
         log.debug(f"Received message from {request.remote}")

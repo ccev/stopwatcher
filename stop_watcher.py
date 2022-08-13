@@ -9,30 +9,28 @@ from stopwatcher.config import config
 from stopwatcher.db.accessor import DbAccessor
 from stopwatcher.job_worker import JobWorker
 from stopwatcher.tileserver import Tileserver
+from stopwatcher.watcher_jobs import SetQueue
 
 
 async def main():
     processing_queue = Queue()
-    job_queue = Queue()
+    job_queue = SetQueue()
 
     if config.tileserver.enable:
         tileserver = Tileserver(config.tileserver.url)
     else:
         tileserver = None
 
-    wh_config = config.data_input.webhooks
-    if wh_config.enable:
-        accepter = DataAccepter(
-            process_queue=processing_queue, username=wh_config.username, password=wh_config.password
-        )
+    accepter = DataAccepter(process_queue=processing_queue)
 
-        asyncio.create_task(
-            web._run_app(
-                app=accepter.app,
-                host=wh_config.host,
-                port=wh_config.port,
-            )
+    asyncio.create_task(
+        web._run_app(
+            app=accepter.app,
+            host=config.data_input.host,
+            port=config.data_input.port,
+            access_log=None
         )
+    )
 
     db_accessor = DbAccessor()
     await db_accessor.connect(asyncio.get_running_loop())

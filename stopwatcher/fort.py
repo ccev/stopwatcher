@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from enum import Enum
 from typing import TYPE_CHECKING, Any
+from protos import PokemonFortProto, FortType as ProtoFortType, FortDetailsOutProto
 
 from .db.model.internal import fort_table
 from .geo import Location
@@ -23,6 +24,12 @@ class FortType(Enum):
     POKESTOP = 15
     PORTAL = 20
     LIGHTSHIP_POI = 30
+
+    @classmethod
+    def from_proto_type(cls, proto: ProtoFortType):
+        if proto == ProtoFortType.GYM:
+            return FortType.GYM
+        return FortType.POKESTOP
 
 
 class Fort:
@@ -73,6 +80,27 @@ class Fort:
             name=data.get(fort_table.name.name),
             description=data.get(fort_table.description.name),
             cover_image=data.get(fort_table.cover_image.name),
+        )
+
+    @classmethod
+    def from_fort_proto(cls, proto: PokemonFortProto):
+        return cls(
+            id_=proto.fort_id,
+            lat=proto.latitude,
+            lon=proto.longitude,
+            type_=FortType.from_proto_type(proto.fort_type)
+        )
+
+    @classmethod
+    def from_fort_details_proto(cls, proto: FortDetailsOutProto):
+        return cls(
+            id_=proto.id,
+            lat=proto.latitude,
+            lon=proto.longitude,
+            type_=FortType.from_proto_type(proto.fort_type),
+            name=proto.name if proto.name else None,
+            description=proto.description if proto.description else None,
+            cover_image=proto.image_url[0] if proto.image_url else None
         )
 
     @staticmethod

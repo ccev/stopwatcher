@@ -15,6 +15,7 @@ from .watcher_jobs import (
     ChangedLocationJob,
     ChangedCoverImageJob,
     NewFortDetailsJob,
+    SetQueue
 )
 
 if TYPE_CHECKING:
@@ -22,10 +23,10 @@ if TYPE_CHECKING:
 
 
 class FortComparer:
-    def __init__(self, accessor: DbAccessor, inbound_queue: Queue, outbound_queue: Queue):
+    def __init__(self, accessor: DbAccessor, inbound_queue: Queue, outbound_queue: SetQueue):
         self._db_accessor: DbAccessor = accessor
         self._in_queue: "Queue[list[Fort]]" = inbound_queue
-        self._out_queue: "Queue[AnyWatcherJob]" = outbound_queue
+        self._out_queue: "SetQueue[AnyWatcherJob]" = outbound_queue
         asyncio.create_task(self.compare())
 
     def _add_job(self, job: AnyWatcherJob):
@@ -55,14 +56,21 @@ class FortComparer:
                 if same_fort.name is None and fort.name is not None:
                     self._add_job(NewFortDetailsJob(fort))
 
-                if same_fort.name is not None and fort.name is not None and same_fort.name.strip() != fort.name.strip():
+                def compare_str(attr: str):
+                    return (
+                        getattr(same_fort, attr) is not None
+                        and getattr(fort, attr) is not None
+                        and getattr(same_fort, attr).strip() != getattr(fort, attr).strip()
+                    )
+
+                if compare_str("name"):
                     self._add_job(ChangedNameJob(fort, old=same_fort.name, new=fort.name))
 
-                if fort.description != same_fort.description:
+                if compare_str("description"):
                     self._add_job(ChangedDescriptionJob(fort, old=same_fort.description, new=fort.description))
 
                 if fort.location != same_fort.location:
                     self._add_job(ChangedLocationJob(fort, old=same_fort.location, new=fort.location))
 
-                if fort.cover_image != same_fort.cover_image:
+                if compare_str("cover_image"):
                     self._add_job(ChangedCoverImageJob(fort, old=same_fort.cover_image, new=fort.cover_image))

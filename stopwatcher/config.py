@@ -23,16 +23,11 @@ class DbConnection(BaseModel):
     database: str
 
 
-class Webhooks(BaseModel):
-    enable: bool
+class DataInput(BaseModel):
     host: str
     port: int
     username: str
     password: str
-
-
-class DataInput(BaseModel):
-    webhooks: Webhooks = Webhooks(enable=False, host="", port=0, username="", password="")
 
 
 class DiscordWebhook(BaseModel):
@@ -75,6 +70,7 @@ class Tileserver(BaseModel):
 
 class General(BaseModel):
     geofence_path: str
+    init: bool
 
 
 class Config(BaseModel):

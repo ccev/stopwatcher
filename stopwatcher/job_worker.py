@@ -14,6 +14,7 @@ from .watcher_jobs import (
     ChangedLocationJob,
     ChangedCoverImageJob,
     NewFortDetailsJob,
+    SetQueue
 )
 from .processors import AnyProcessor, DiscordSender, DbUpdater, AreaProcessor
 from .config import config
@@ -24,18 +25,19 @@ if TYPE_CHECKING:
 
 
 class JobWorker:
-    def __init__(self, queue: Queue, tileserver: Tileserver | None, accessor: DbAccessor):
-        self._queue: "Queue[AnyWatcherJob]" = queue
+    def __init__(self, queue: SetQueue, tileserver: Tileserver | None, accessor: DbAccessor):
+        self._queue: "SetQueue[AnyWatcherJob]" = queue
 
         self._processors: list[AnyProcessor] = []
         self._processors.append(DbUpdater(accessor))
 
-        for area in config.areas:
-            if area.geofence is None:
-                log.warning(f"Area {area.name} doesn't have a geofence defined. Not processing anything there")
-                continue
+        if not config.general.init:
+            for area in config.areas:
+                if area.geofence is None:
+                    log.warning(f"Area {area.name} doesn't have a geofence defined. Not processing anything there")
+                    continue
 
-            self._processors.append(AreaProcessor(config=area, accessor=accessor, tileserver=tileserver))
+                self._processors.append(AreaProcessor(config=area, accessor=accessor, tileserver=tileserver))
 
         asyncio.create_task(self.process_queue())
 
