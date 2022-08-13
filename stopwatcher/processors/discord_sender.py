@@ -79,12 +79,12 @@ class DiscordSender(BaseProcessor):
         def check(job_type: Type[AnyWatcherJob]) -> bool:
             return isinstance(job, job_type) and job.__key__ in self._config.send
 
-        embed = discord.Embed()
-        embeds = [embed]
-
         appear = poi_appearance.get(job.fort.type)
         author: str = ""
         webhook_kwargs = {}
+
+        embed = discord.Embed(color=appear.color)
+        embeds = [embed]
 
         visual = config.tileserver.visual
         staticmap = StaticMap(
@@ -138,7 +138,7 @@ class DiscordSender(BaseProcessor):
                 extra_image.save(image_binary, "PNG")
                 image_binary.seek(0)
                 file = discord.File(fp=image_binary, filename=name)
-            image_embed = discord.Embed()
+            image_embed = discord.Embed(color=appear.color)
             image_embed.set_image(url=f"attachment://{name}")
             embeds.append(image_embed)
             webhook_kwargs["file"] = file

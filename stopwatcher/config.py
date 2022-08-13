@@ -95,6 +95,7 @@ class FortAppearancePartMap(BaseModel):
 class FortAppearancePart(BaseModel):
     name: str
     icon: str
+    color: int
     map: FortAppearancePartMap
 
 

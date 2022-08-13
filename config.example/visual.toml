@@ -1,6 +1,7 @@
 [pokestop]
 name = "Pok\u00E9stop"
 icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/stop.png"
+color = 1216493
 
 [pokestop.map.primary]
 icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/stop_normal.png"
@@ -18,6 +19,7 @@ x_offset = 0
 [gym]
 name = "Gym"
 icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/gym.png"
+color = 12239045
 
 [gym.map.primary]
 icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/gym_normal.png"
@@ -35,6 +37,7 @@ x_offset = 0
 [portal]
 name = "Portal"
 icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/portal.png"
+color = 12609532
 
 [portal.map.primary]
 icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/portal_normal.png"
@@ -52,6 +55,7 @@ x_offset = 0
 [lightship_poi]
 name = "Lightship POI"
 icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/lightship.png"
+color = 3489140
 
 [lightship_poi.map.primary]
 icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/portal_normal.png"
