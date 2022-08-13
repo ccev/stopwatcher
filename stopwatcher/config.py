@@ -47,9 +47,30 @@ class Area(BaseModel):
     geofence: Geofence | None = None
 
 
+class _VisualModelWithSize(BaseModel):
+    size: str
+
+    @property
+    def width(self) -> int:
+        return int(self.size.split("x")[0])
+
+    @property
+    def height(self) -> int:
+        return int(self.size.split("x")[1])
+
+
+class TileserverVisual(_VisualModelWithSize):
+    style: str
+    cells: list[str]
+    nearby_forts: list[str]
+    zoom: float
+    scale: int
+
+
 class Tileserver(BaseModel):
     enable: bool
     url: str
+    visual: TileserverVisual
 
 
 class General(BaseModel):
@@ -64,23 +85,35 @@ class Config(BaseModel):
     areas: list[Area]
 
 
-class PoiAppearancePart(BaseModel):
-    gym: str
-    pokestop: str
-    portal: str
-    lightship_poi: str
-
-    def get(self, fort_type: FortType) -> str:
-        return getattr(self, fort_type.name.lower(), "")
+class FortAppearancePartMapPart(_VisualModelWithSize):
+    icon: str
+    y_offset: int
+    x_offset: int
 
 
-class PoiAppearance(BaseModel):
-    names: PoiAppearancePart
-    icons: PoiAppearancePart
+class FortAppearancePartMap(BaseModel):
+    primary: FortAppearancePartMapPart
+    secondary: FortAppearancePartMapPart
 
 
-def _get_raw_config(file: str):
-    config_path = os.path.join("config", file)
+class FortAppearancePart(BaseModel):
+    name: str
+    icon: str
+    map: FortAppearancePartMap
+
+
+class FortAppearance(BaseModel):
+    pokestop: FortAppearancePart
+    gym: FortAppearancePart
+    portal: FortAppearancePart
+    lightship_poi: FortAppearancePart
+
+    def get(self, fort_type: FortType) -> FortAppearancePart:
+        return getattr(self, fort_type.name.lower())
+
+
+def _get_raw_config(_config_file_name: str):
+    config_path = os.path.join("config", _config_file_name)
     with open(config_path, mode="r") as _config_file:
         raw_config = rtoml.load(_config_file)
     return raw_config
@@ -104,7 +137,7 @@ for area_name, area_config in _raw_areas:
     _raw_config["areas"].append({"name": area_name, "discord": list(_discord.values()), **area_config})
 
 config: Config = _load_pyd_model(model=Config, raw=_raw_config)
-poi_appearance: PoiAppearance = _load_pyd_model(model=PoiAppearance, raw=_get_raw_config("pois.toml"))
+poi_appearance: FortAppearance = _load_pyd_model(model=FortAppearance, raw=_get_raw_config("visual.toml"))
 
 
 _geofences: dict[str, Geofence] = {}

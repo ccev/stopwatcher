@@ -19,7 +19,7 @@ class AreaProcessor(BaseProcessor):
 
         self._processors: list[AnyProcessor] = []
         for webhook_config in config.discord:
-            self._processors.append(DiscordSender(config=webhook_config, tileserver=tileserver))
+            self._processors.append(DiscordSender(wh_config=webhook_config, tileserver=tileserver))
 
     async def process(self, job: AnyWatcherJob) -> None:
         if isinstance(job, ChangedLocationJob):

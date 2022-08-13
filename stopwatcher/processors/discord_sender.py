@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Type
 import aiohttp
 import discord
 
-from stopwatcher.config import poi_appearance
+from stopwatcher.config import poi_appearance, config
 from stopwatcher.tileserver import Tileserver, StaticMap
 from stopwatcher.watcher_jobs import (
     NewFortJob,
@@ -25,8 +25,8 @@ if TYPE_CHECKING:
 
 
 class DiscordSender(BaseProcessor):
-    def __init__(self, config: WebhookConfig, tileserver: Tileserver | None):
-        self._config: WebhookConfig = config
+    def __init__(self, wh_config: WebhookConfig, tileserver: Tileserver | None):
+        self._config: WebhookConfig = wh_config
         self._session = aiohttp.ClientSession()
         self._tileserver: Tileserver | None = tileserver
 
@@ -48,43 +48,48 @@ class DiscordSender(BaseProcessor):
         embed = discord.Embed()
         embeds = [embed]
 
-        type_name = poi_appearance.names.get(job.fort.type)
-        type_icon = poi_appearance.icons.get(job.fort.type)
-
+        appear = poi_appearance.get(job.fort.type)
         author: str = ""
 
         if check(NewFortJob):
-            author = f"New {type_name}"
+            author = f"New {appear.name}"
         elif check(NewFortDetailsJob):
             if NewFortJob.__key__ in self._config.send:
-                author = f"{type_name} Details"
+                author = f"{appear.name} Details"
             else:
-                author = f"New {type_name}"
+                author = f"New {appear.name}"
         elif check(RemovedFortJob):
-            author = "Removed"
+            author = f"{appear.name} Removed"
         elif check(ChangedFortTypeJob):
-            old_type_name = poi_appearance.names.get(job.old)
-            author = f"{old_type_name} → {type_name}"
+            old_appear = poi_appearance.get(job.old)
+            author = f"{old_appear.name} → {appear.name}"
         elif check(ChangedNameJob):
-            author = "New Name"
-            embed.description = f"Old: `{job.old}`\nNew: `{job.new}`"
+            author = f"New {appear.name} Name"
+            embed.description = f"Old: **`{job.old}`**\nNew: **`{job.new}`**"
         elif check(ChangedDescriptionJob):
-            author = "New Description"
-            embed.description = f"Old: `{job.old}`\nNew: `{job.new}`"
+            author = f"New {appear.name} Description"
+            embed.description = f"Old: **`{job.old}`**\nNew: **`{job.new}`**"
         elif check(ChangedLocationJob):
-            author = "New Location"
+            author = f"New {appear.name} Location"
         elif check(ChangedCoverImageJob):
-            author = "New Image"
+            author = f"New {appear.name} Image"
             image_embed = discord.Embed()
             image_embed.set_image(url=job.fort.cover_image)
             embeds.append(image_embed)
 
         if author:
             if self._tileserver is not None:
+                visual = config.tileserver.visual
+
                 staticmap = StaticMap(
-                    style="osm-bright", location=job.fort.location, zoom=17.5, width=800, height=500, scale=1
+                    style=visual.style,
+                    location=job.fort.location,
+                    zoom=visual.zoom,
+                    width=visual.width,
+                    height=visual.height,
+                    scale=visual.scale,
                 )
-                staticmap.add_marker(location=job.fort.location, url=type_icon)
+                staticmap.add_fort(location=job.fort.location, fort_appear=appear.map.primary)
                 map_url = await self._tileserver.pregenerate_staticmap(staticmap)
                 embed.set_image(url=map_url)
 
@@ -100,5 +105,4 @@ class DiscordSender(BaseProcessor):
                     embed.description = extra_text
 
             # embed.set_author(name=author)
-            await self._send_webhook(user=author, avatar=type_icon, embeds=embeds)
-
+            await self._send_webhook(user=author, avatar=appear.icon, embeds=embeds)

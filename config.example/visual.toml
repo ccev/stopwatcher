@@ -1,0 +1,66 @@
+[pokestop]
+name = "Pokéstop"
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/stop.png"
+
+[pokestop.map.primary]
+icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/stop_normal.png"
+size = "64x64"
+y_offset = -32
+x_offset = 0
+
+[pokestop.map.secondary]
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/stop_gray.png"
+size = "48x48"
+y_offset = -24
+x_offset = 0
+
+
+[gym]
+name = "Gym"
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/gym.png"
+
+[gym.map.primary]
+icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/gym_normal.png"
+size = "64x64"
+y_offset = -32
+x_offset = 0
+
+[gym.map.secondary]
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/gym_gray.png"
+size = "48x48"
+y_offset = -24
+x_offset = 0
+
+
+[portal]
+name = "Portal"
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/portal.png"
+
+[portal.map.primary]
+icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/portal_normal.png"
+size = "64x64"
+y_offset = 0
+x_offset = 0
+
+[portal.map.secondary]
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/portal_gray.png"
+size = "48x48"
+y_offset = 0
+x_offset = 0
+
+
+[lightship_poi]
+name = "Lightship POI"
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/lightship.png"
+
+[lightship_poi.map.primary]
+icon = "https://github.com/ccev/stopwatcher-icons/raw/master/tileserver/portal_normal.png"
+size = "64x64"
+y_offset = 0
+x_offset = 0
+
+[lightship_poi.map.secondary]
+icon = "https://raw.githubusercontent.com/ccev/stopwatcher-icons/master/tileserver/portal_gray.png"
+size = "48x48"
+y_offset = 0
+x_offset = 0

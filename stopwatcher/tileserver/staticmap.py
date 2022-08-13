@@ -4,6 +4,9 @@ from typing import TypeVar, TYPE_CHECKING
 from stopwatcher.geo import Location
 from dataclasses import dataclass
 
+if TYPE_CHECKING:
+    from stopwatcher.config import FortAppearancePartMapPart as FortAppearance
+
 
 @dataclass
 class _MapObject:
@@ -105,6 +108,16 @@ class StaticMap:
     ):
         self._markers.append(
             Marker(location=location, url=url, height=height, width=width, x_offset=x_offset, y_offset=y_offset)
+        )
+
+    def add_fort(self, location: Location, fort_appear: FortAppearance):
+        self.add_marker(
+            location=location,
+            url=fort_appear.icon,
+            height=fort_appear.height,
+            width=fort_appear.width,
+            x_offset=fort_appear.x_offset,
+            y_offset=fort_appear.y_offset
         )
 
     def add_circle(

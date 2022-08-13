@@ -14,6 +14,14 @@ database = "stopwatcher"
 enable = true
 url = "https://tiles.domain.com"
 
+[tileserver.visual]
+style = "osm-bright"
+cells = ["portal", "lightship_poi"]
+nearby_forts = ["pokestop", "gym", "portal", "lightship_poi"]
+zoom = 17.5
+size = "800x500"  # width x height
+scale = 1
+
 
 [data_input]
 
