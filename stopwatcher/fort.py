@@ -112,3 +112,8 @@ class Fort:
         if fort_type.value >= 10:
             return Game.POGO
         return Game.UNKNOWN
+
+    def add_other_fort(self, fort: Fort):
+        for attr in ("name", "description", "cover_image"):
+            if getattr(self, attr) is None and getattr(fort, attr) is not None:
+                setattr(self, attr, getattr(fort, attr))

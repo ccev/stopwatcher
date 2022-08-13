@@ -15,7 +15,7 @@ from .watcher_jobs import (
     ChangedLocationJob,
     ChangedCoverImageJob,
     NewFortDetailsJob,
-    SetQueue
+    SetQueue,
 )
 
 if TYPE_CHECKING:
@@ -49,28 +49,31 @@ class FortComparer:
                     if same_game_fort is None:
                         self._add_job(NewFortJob(fort))
                     else:
+                        fort.add_other_fort(same_game_fort)
                         self._add_job(ChangedFortTypeJob(fort, old=same_game_fort.type, new=fort.type))
 
                     continue
 
                 if same_fort.name is None and fort.name is not None:
                     self._add_job(NewFortDetailsJob(fort))
+                else:
+                    fort.add_other_fort(same_fort)
 
-                def compare_str(attr: str):
-                    return (
-                        getattr(same_fort, attr) is not None
-                        and getattr(fort, attr) is not None
-                        and getattr(same_fort, attr).strip() != getattr(fort, attr).strip()
-                    )
+                    def compare_str(attr: str):
+                        return (getattr(same_fort, attr) is None and getattr(fort, attr) is not None) or (
+                            getattr(fort, attr) is not None
+                            and getattr(same_fort, attr) is not None
+                            and getattr(same_fort, attr).strip() != getattr(fort, attr).strip()
+                        )
 
-                if compare_str("name"):
-                    self._add_job(ChangedNameJob(fort, old=same_fort.name, new=fort.name))
+                    if compare_str("name"):
+                        self._add_job(ChangedNameJob(fort, old=same_fort.name, new=fort.name))
 
-                if compare_str("description"):
-                    self._add_job(ChangedDescriptionJob(fort, old=same_fort.description, new=fort.description))
+                    if compare_str("description"):
+                        self._add_job(ChangedDescriptionJob(fort, old=same_fort.description, new=fort.description))
 
-                if fort.location != same_fort.location:
-                    self._add_job(ChangedLocationJob(fort, old=same_fort.location, new=fort.location))
+                    if fort.location != same_fort.location:
+                        self._add_job(ChangedLocationJob(fort, old=same_fort.location, new=fort.location))
 
-                if compare_str("cover_image"):
-                    self._add_job(ChangedCoverImageJob(fort, old=same_fort.cover_image, new=fort.cover_image))
+                    if compare_str("cover_image"):
+                        self._add_job(ChangedCoverImageJob(fort, old=same_fort.cover_image, new=fort.cover_image))

@@ -83,12 +83,15 @@ class FortHelper:
             MySQLQuery()
             .update(fort_table)
             .set(fort_table.type_id, fort.type.value)
-            .set(fort_table.name, fort.name)
-            .set(fort_table.description, fort.description)
             .set(fort_table.lat, fort.location.lat)
             .set(fort_table.lon, fort.location.lon)
-            .set(fort_table.cover_image, fort.cover_image)
             .where(fort_table.id == fort.id)
             .where(fort_table.game_id == fort.game.value)
         )
+        if fort.name is not None:
+            query = query.set(fort_table.name, fort.name)
+        if fort.description is not None:
+            query = query.set(fort_table.description, fort.description)
+        if fort.cover_image is not None:
+            query = query.set(fort_table.cover_image, fort.cover_image)
         await accessor.commit_internal(query)

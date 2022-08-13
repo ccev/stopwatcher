@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from asyncio import Queue
 import base64
+from json.decoder import JSONDecodeError
 
 from aiohttp import web
 from aiohttp.web_request import Request
@@ -109,7 +110,11 @@ class DataAccepter:
             log.warning(f"Couldn't read body of incoming request")
             return web.Response(status=400)
 
-        data = await request.json()
+        try:
+            data = await request.json()
+        except JSONDecodeError:
+            return web.Response(status=400, text="malformed json")
+
         forts = []
 
         for raw_fort in data:

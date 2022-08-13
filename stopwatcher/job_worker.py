@@ -44,7 +44,7 @@ class JobWorker:
     async def process_queue(self):
         while True:
             job: AnyWatcherJob = await self._queue.get()
-            log.info(f"Working on {job.__class__.__name__} for {job.fort}")
+            # log.info(f"Working on {job.__class__.__name__} for {job.fort}")
 
             for processor in self._processors:
                 processor: AnyProcessor
