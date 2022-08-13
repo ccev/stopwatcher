@@ -19,6 +19,8 @@ from stopwatcher.watcher_jobs import (
 )
 from .base_processor import BaseProcessor
 from stopwatcher.db.helper.internal_fort import FortHelper
+from stopwatcher.geo import Location
+from stopwatcher.log import log
 
 if TYPE_CHECKING:
     from stopwatcher.config import DiscordWebhook as WebhookConfig
@@ -54,6 +56,16 @@ class DiscordSender(BaseProcessor):
         appear = poi_appearance.get(job.fort.type)
         author: str = ""
 
+        visual = config.tileserver.visual
+        staticmap = StaticMap(
+            style=visual.style,
+            location=job.fort.location,
+            zoom=visual.zoom,
+            width=visual.width,
+            height=visual.height,
+            scale=visual.scale,
+        )
+
         if check(NewFortJob):
             author = f"New {appear.name}"
         elif check(NewFortDetailsJob):
@@ -73,7 +85,15 @@ class DiscordSender(BaseProcessor):
             author = f"New {appear.name} Description"
             embed.description = f"Old: **`{job.old}`**\nNew: **`{job.new}`**"
         elif check(ChangedLocationJob):
+            job: ChangedLocationJob
             author = f"New {appear.name} Location"
+
+            if self._tileserver is not None:
+                staticmap.location = Location.middle(job.old, job.new)
+                staticmap.add_fort(location=job.old, fort_appear=appear.map.secondary)
+                staticmap.add_fort(location=job.new, fort_appear=appear.map.primary)
+                staticmap.auto_zoom()
+
         elif check(ChangedCoverImageJob):
             author = f"New {appear.name} Image"
             image_embed = discord.Embed()
@@ -81,32 +101,24 @@ class DiscordSender(BaseProcessor):
             embeds.append(image_embed)
 
         if author:
+            log.info(f"Sending Discord notification for {job}")
             if self._tileserver is not None:
-                visual = config.tileserver.visual
+                if not isinstance(job, ChangedLocationJob):
+                    if job.fort.type.name.lower() in config.tileserver.visual.nearby_forts:
+                        bounds = staticmap.get_bounds()
+                        sec_forts = await FortHelper.get_forts_in_bounds(
+                            self._db_accessor, bounds=bounds, game=job.fort.game
+                        )
 
-                staticmap = StaticMap(
-                    style=visual.style,
-                    location=job.fort.location,
-                    zoom=visual.zoom,
-                    width=visual.width,
-                    height=visual.height,
-                    scale=visual.scale,
-                )
+                        for sec_fort in sec_forts:
+                            if sec_fort.id == job.fort.id:
+                                continue
 
-                if job.fort.type.name.lower() in config.tileserver.visual.nearby_forts:
-                    bounds = staticmap.get_bounds()
-                    sec_forts = await FortHelper.get_forts_in_bounds(
-                        self._db_accessor, bounds=bounds, game=job.fort.game
-                    )
+                            sec_appear = poi_appearance.get(sec_fort.type)
+                            staticmap.add_fort(location=sec_fort.location, fort_appear=sec_appear.map.secondary)
 
-                    for sec_fort in sec_forts:
-                        if sec_fort.id == job.fort.id:
-                            continue
-                            
-                        sec_appear = poi_appearance.get(sec_fort.type)
-                        staticmap.add_fort(location=sec_fort.location, fort_appear=sec_appear.map.secondary)
+                    staticmap.add_fort(location=job.fort.location, fort_appear=appear.map.primary)
 
-                staticmap.add_fort(location=job.fort.location, fort_appear=appear.map.primary)
                 map_url = await self._tileserver.pregenerate_staticmap(staticmap)
                 embed.set_image(url=map_url)
 

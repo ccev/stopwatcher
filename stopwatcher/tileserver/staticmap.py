@@ -138,6 +138,55 @@ class StaticMap:
             min=Location(lat=min(lat_1, lat_2), lon=min(lon_1, lon_2))
         )
 
+    def auto_zoom(self, margin: float = 1.7):
+        lats = []
+        lons = []
+
+        def add_locations(objs_with_location):
+            for _obj in objs_with_location:
+                lats.append(_obj.location.lat)
+                lons.append(_obj.location.lon)
+
+        add_locations(self._markers)
+        add_locations(self._circles)
+        for _poly in self._polygons:
+            for _location in _poly.path:
+                lats.append(_location.lat)
+                lons.append(_location.lon)
+
+        min_lat = min(lats)
+        max_lat = max(lats)
+        min_lon = min(lons)
+        max_lon = max(lons)
+
+        ne = [max_lat, max_lon]
+        sw = [min_lat, min_lon]
+
+        ne = [c * margin for c in ne]
+        sw = [c * margin for c in sw]
+
+        if ne == sw:
+            return
+
+        def lat_rad(lat):
+            sin = math.sin(lat * math.pi / 180)
+            rad = math.log((1 + sin) / (1 - sin)) / 2
+            return max(min(rad, math.pi), -math.pi) / 2
+
+        def zoom(px, fraction):
+            if fraction == 0:
+                return 20
+            return round(math.log((px / 256 / fraction), 2), 2)
+
+        lat_fraction = (lat_rad(ne[0]) - lat_rad(sw[0])) / math.pi
+
+        angle = ne[1] - sw[1]
+        if angle < 0:
+            angle += 360
+        lon_fraction = angle / 360
+
+        self.zoom = min(zoom(self.height, lat_fraction), zoom(self.width, lon_fraction))
+
     def add_marker(
         self, location: Location, url: str, height: int = 32, width: int = 32, x_offset: int = 0, y_offset: int = 0
     ):
