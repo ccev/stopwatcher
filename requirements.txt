@@ -6,3 +6,4 @@ pypika~=0.48.9
 git+https://github.com/Rapptz/discord.py.git#egg=discord.py
 shapely~=1.8.2
 protobuf==3.19.4
+Pillow~=9.2.0

@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Type
+from io import BytesIO
 
 import aiohttp
 import discord
+import asyncio
+from PIL import Image, ImageDraw
 
 from stopwatcher.config import poi_appearance, config
 from stopwatcher.tileserver import Tileserver, StaticMap
@@ -39,9 +42,35 @@ class DiscordSender(BaseProcessor):
             discord.Webhook.from_url(url=w, session=self._session) for w in self._config.webhooks
         ]
 
-    async def _send_webhook(self, user: str, avatar: str, embeds: list[discord.Embed]):
+    @staticmethod
+    async def __download_image(url: str) -> Image.Image:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                result = await resp.read()
+
+        with BytesIO(result) as stream:
+            image = Image.open(stream).copy()
+            image = image.convert("RGBA")
+        return image
+
+    @staticmethod
+    def __make_cover_change_image_(old: Image.Image, new: Image.Image) -> Image.Image:
+        old_width, old_height = old.size
+        new_width, new_height = new.size
+        border_width = (old_width + new_width) // 30
+        bg_height = max(old_height, new_height)
+
+        background = Image.new(
+            "RGBA", (old_width + new_width + border_width, bg_height), (255, 0, 0, 0)
+        )
+        background.paste(old, (0, (bg_height - old_height) // 2))
+        background.paste(new, (old_width + border_width, (bg_height - new_height) // 2))
+
+        return background
+
+    async def _send_webhook(self, user: str, avatar: str, embeds: list[discord.Embed], **kwargs):
         for webhook in self._webhooks:
-            await webhook.send(embeds=embeds, username=user, avatar_url=avatar)
+            await webhook.send(embeds=embeds, username=user, avatar_url=avatar, **kwargs)
 
     async def process(self, job: AnyWatcherJob) -> None:
         if job.fort.type.name.lower() not in self._config.types:
@@ -55,6 +84,7 @@ class DiscordSender(BaseProcessor):
 
         appear = poi_appearance.get(job.fort.type)
         author: str = ""
+        webhook_kwargs = {}
 
         visual = config.tileserver.visual
         staticmap = StaticMap(
@@ -96,9 +126,22 @@ class DiscordSender(BaseProcessor):
 
         elif check(ChangedCoverImageJob):
             author = f"New {appear.name} Image"
+
+            old_cover = await self.__download_image(job.old)
+            new_cover = await self.__download_image(job.new)
+
+            loop = asyncio.get_running_loop()
+            extra_image = await loop.run_in_executor(None, self.__make_cover_change_image_, old_cover, new_cover)
+
+            name = "changed_cover.png"
+            with BytesIO() as image_binary:
+                extra_image.save(image_binary, "PNG")
+                image_binary.seek(0)
+                file = discord.File(fp=image_binary, filename=name)
             image_embed = discord.Embed()
-            image_embed.set_image(url=job.fort.cover_image)
+            image_embed.set_image(url=f"attachment://{name}")
             embeds.append(image_embed)
+            webhook_kwargs["file"] = file
 
         if author:
             log.info(f"Sending Discord notification for {job}")
@@ -134,4 +177,4 @@ class DiscordSender(BaseProcessor):
                     embed.description = extra_text
 
             # embed.set_author(name=author)
-            await self._send_webhook(user=author, avatar=appear.icon, embeds=embeds)
+            await self._send_webhook(user=author, avatar=appear.icon, embeds=embeds, **webhook_kwargs)
