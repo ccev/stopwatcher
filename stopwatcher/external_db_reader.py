@@ -5,6 +5,8 @@ from time import time
 from typing import TYPE_CHECKING
 
 from .db.helper.external_input import ExternalInputHelper
+from .log import log
+from .config import config
 
 if TYPE_CHECKING:
     from .db.accessor import DbAccessor
@@ -19,9 +21,10 @@ class ExternalDbReader:
 
     async def read(self):
         while True:
+            log.info(f"Querying external databases")
             new_time = int(time())
             forts = await ExternalInputHelper.get_forts_since(self._db_accessor, since=self._last_time)
             self._last_time = new_time
 
             self._out_queue.put_nowait(forts)
-            await asyncio.sleep(500)
+            await asyncio.sleep(config.data_input.database_config.query_every)

@@ -6,7 +6,7 @@ init = true
 [stopwatcher_db]
 username = ""
 password = ""
-host = ""
+host = "0.0.0.0"
 port = 3306
 database = "stopwatcher"
 
@@ -25,10 +25,24 @@ scale = 1
 
 
 [data_input]
+
+[data_input.webhooks]
 host = "127.0.0.1"
 port = 9292
 username = "stopwatcher"
 password = "strongpass"
+
+[data_input.database_config]
+query_every = 300  # seconds
+difference_threshold = 20  # when a missing X forts are detected, they're copied directly without processing
+
+[data_input.database.1]
+db_schema = "rdm"  # rdm or mad
+username = ""
+password = ""
+host = "0.0.0.0"
+port = 3306
+database = "rdmrb"
 
 
 [areas]

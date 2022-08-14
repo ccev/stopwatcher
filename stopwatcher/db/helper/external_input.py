@@ -1,18 +1,16 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Callable
+from typing import TYPE_CHECKING, Callable
 
-from pypika import MySQLQuery
-
-from stopwatcher.db.model.rdm import get_forts as rdm_get
+from stopwatcher.config import config
 from stopwatcher.db.model.mad import get_forts as mad_get
-from stopwatcher.fort import Fort, FortType, Game
+from stopwatcher.db.model.rdm import get_forts as rdm_get
+from stopwatcher.fort import Fort, Game
 from stopwatcher.log import log
 from .internal_fort import FortHelper
 
 if TYPE_CHECKING:
     from stopwatcher.db.accessor import DbAccessor
-    from stopwatcher.tileserver.staticmap import Bounds
     from stopwatcher.db.model.base import ExternalInputDefinition
 
 
@@ -44,7 +42,7 @@ class ExternalInputHelper:
             game = GAMES[external.schema]
             existing_count = await FortHelper.get_fort_count_for_id(accessor, game=game, ids=fort_ids)
             missing_forts = len(fort_ids) - existing_count
-            if missing_forts > 20:
+            if missing_forts > config.data_input.database_config.difference_threshold:
                 log.warning(
                     f"There are {missing_forts} forts in an external database that would be processed. "
                     f"Instead, they will be skipped and copied directly"

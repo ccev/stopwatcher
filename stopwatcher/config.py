@@ -27,6 +27,11 @@ class ExternalDbConnection(DbConnection):
     db_schema: str
 
 
+class DataInputDbConfig(BaseModel):
+    query_every: int
+    difference_threshold: int
+
+
 class Webhooks(BaseModel):
     enable: bool
     host: str
@@ -37,6 +42,7 @@ class Webhooks(BaseModel):
 
 class DataInput(BaseModel):
     webhooks: Webhooks
+    database_config: DataInputDbConfig
     database: list[ExternalDbConnection]
 
 
