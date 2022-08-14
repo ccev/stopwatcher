@@ -21,10 +21,10 @@ class ExternalDbReader:
 
     async def read(self):
         while True:
-            new_time = int(time())
-            forts = await ExternalInputHelper.get_forts_since(self._db_accessor, since=self._last_time)
-            log.info(f"Queried {len(forts)} Forts from external database")
-            self._last_time = new_time
+            needed_time = self._last_time - 20  # -20 to adjust for different delays that may happen
+            self._last_time = int(time())
+            forts = await ExternalInputHelper.get_forts_since(self._db_accessor, since=needed_time)
+            log.info(f"Queried {len(forts)} Forts from external databases")
 
             self._out_queue.put_nowait(forts)
             await asyncio.sleep(config.data_input.database_config.query_every)
