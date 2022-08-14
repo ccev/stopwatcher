@@ -1,9 +1,16 @@
 [general]
 geofence_path = "config/geofences"
+# for the format geofence format, refer to the readme.
+# You can choose to read geofence files from any other directory, if you like
+
 init = true
+# if you're only using databases as your data input, you keep this to false.
+# Else, make sure to set to true on your first run or whenever you're scanning a new area
+
 
 
 [stopwatcher_db]
+# the database used by Stop Watcher to compare incoming Forts to
 username = ""
 password = ""
 host = "0.0.0.0"
@@ -11,51 +18,79 @@ port = 3306
 database = "stopwatcher"
 
 
+
 [tileserver]
+# Flo's Tileserver can be used to display Forts on a map in notifications
 enable = true
 url = "https://tiles.domain.com"
 
 [tileserver.visual]
 style = "osm-bright"
 cells = ["portal", "lightship_poi"]
+# maps for these types of Forts will show Level 17 cells
+
 nearby_forts = ["pokestop", "gym", "portal", "lightship_poi"]
+# maps for these types of Forts will show surrounding Forts on the map.
+# Notifications for location changes are an exception
+
 zoom = 17.5
 size = "800x500"  # width x height
 scale = 1
 
 
+
 [data_input]
 
 [data_input.webhooks]
+enable = true
 host = "127.0.0.1"
 port = 9292
+
 username = "stopwatcher"
 password = "strongpass"
+# basic http auth needed by incoming requests
 
 [data_input.database_config]
 query_every = 300  # seconds
-difference_threshold = 20  # when a missing X forts are detected, they're copied directly without processing
+difference_threshold = 20
+# when reading from the db, it checks how many of these Forts are missing from the internal database.
+# If this number is higher than <difference_threshold>, they're copied over directly without processing
 
 [data_input.database.1]
-db_schema = "rdm"  # rdm or mad
+db_schema = "rdm"  # "rdm", "mad" or "intelwatcher"
 username = ""
 password = ""
 host = "0.0.0.0"
 port = 3306
 database = "rdmrb"
 
+[data_input.database.this_value_doesnt_matter]
+db_schema = "intelwatcher"
+username = ""
+password = ""
+host = "0.0.0.0"
+port = 3306
+database = "manualdb"
+
+
 
 [areas]
 
-[areas.example]
+[areas.example]  # "example" has to match a geofence name
 
 [areas.example.discord.1]
 webhooks = ["https://discord.com/webhooks/1"]
 types = ["pokestop", "gym"]
+
 send = ["new", "new_details", "removed", "conversion", "edit_name", "edit_description", "edit_location", "edit_cover"]
+# new = Any new Fort
+# new_details = When a Fort didn't have a name before and now does. This option can replace or run alongside "new"
+# removed = When a removed Fort is detected (may not be perfectly accurate)
+# conversion = when the Fort Type changes within a game (i.e. Pokestop -> Gym or Gym -> Pokestop)
+# edit_x = when the name/description/location/cover image changes
 
 [areas.example.discord.this_value_doesnt_matter]
-webhooks = ["https://discord.com/webhooks/2"]
+webhooks = ["https://discord.com/webhooks/2", "https://discord.com/webhooks/3"]
 types = ["portal", "lighship_poi"]
 send = ["new", "new_details", "removed", "conversion", "edit_name", "edit_description", "edit_location", "edit_cover"]
 
