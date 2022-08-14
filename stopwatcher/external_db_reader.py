@@ -21,9 +21,9 @@ class ExternalDbReader:
 
     async def read(self):
         while True:
-            log.info(f"Querying external databases")
             new_time = int(time())
             forts = await ExternalInputHelper.get_forts_since(self._db_accessor, since=self._last_time)
+            log.info(f"Queried {len(forts)} Forts from external database")
             self._last_time = new_time
 
             self._out_queue.put_nowait(forts)
