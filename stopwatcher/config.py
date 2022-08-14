@@ -23,11 +23,21 @@ class DbConnection(BaseModel):
     database: str
 
 
-class DataInput(BaseModel):
+class ExternalDbConnection(DbConnection):
+    db_schema: str
+
+
+class Webhooks(BaseModel):
+    enable: bool
     host: str
     port: int
     username: str
     password: str
+
+
+class DataInput(BaseModel):
+    webhooks: Webhooks
+    database: list[ExternalDbConnection]
 
 
 class DiscordWebhook(BaseModel):
@@ -127,6 +137,8 @@ def _load_pyd_model(model: Type[T], raw: dict) -> T:
 
 
 _raw_config = _get_raw_config("config.toml")
+
+_raw_config["data_input"]["database"] = list(_raw_config["data_input"]["database"].values())
 _raw_areas = list(_raw_config.get("areas").items())
 _raw_config["areas"] = []
 for area_name, area_config in _raw_areas:

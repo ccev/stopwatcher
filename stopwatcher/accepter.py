@@ -40,7 +40,7 @@ class DataAccepter:
         routes = [web.post("/forts", self.accept_webhooks), web.post("/protos", self.accept_protos)]
         self.app.middlewares.append(
             basic_auth_middleware(  # type: ignore
-                urls=("/forts",), auth_dict={config.data_input.username: config.data_input.password}
+                urls=("/forts",), auth_dict={config.data_input.webhooks.username: config.data_input.webhooks.password}
             )
         )
 

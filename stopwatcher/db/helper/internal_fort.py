@@ -17,12 +17,12 @@ class FortHelper:
     @staticmethod
     def __fort_from_data(data: dict[str, Any]) -> Fort | None:
         try:
-            fort_type = FortType(data.get(fort_table.type_id, 0))
+            fort_type = FortType(data.get(fort_table.type_id.name, 0))
         except ValueError:
             log.error(f"Unknown type id in your db. Entry: {data}")
             return None
 
-        return Fort.from_db(data=data, fort_type=fort_type)
+        return Fort.from_db(table=fort_table, fort_type=fort_type, data=data)
 
     @staticmethod
     def __fort_list_from_data(result: list[dict[str, Any]]) -> list[Fort]:

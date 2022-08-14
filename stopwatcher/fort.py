@@ -4,11 +4,11 @@ from enum import Enum
 from typing import TYPE_CHECKING, Any
 from protos import PokemonFortProto, FortType as ProtoFortType, FortDetailsOutProto
 
-from .db.model.internal import fort_table
 from .geo import Location
 
 if TYPE_CHECKING:
     from .accepter import FortRequest
+    from stopwatcher.db.model.base import AnyFortTable
 
 
 class Game(Enum):
@@ -71,15 +71,15 @@ class Fort:
         )
 
     @classmethod
-    def from_db(cls, data: dict[str, Any], fort_type: FortType):
+    def from_db(cls, table: AnyFortTable, fort_type: FortType, data: dict[str, Any]):
         return cls(
-            id_=data[fort_table.id.name],
-            lat=data[fort_table.lat.name],
-            lon=data[fort_table.lon.name],
+            id_=data[table.id.name],
+            lat=data[table.lat.name],
+            lon=data[table.lon.name],
             type_=fort_type,
-            name=data.get(fort_table.name.name),
-            description=data.get(fort_table.description.name),
-            cover_image=data.get(fort_table.cover_image.name),
+            name=data.get(table.name.name),
+            description=data.get(table.description.name),
+            cover_image=data.get(table.cover_image.name),
         )
 
     @classmethod

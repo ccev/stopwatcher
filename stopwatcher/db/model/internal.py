@@ -1,9 +1,9 @@
 from pypika import Field
 
-from .base import Base
+from .base import FortBase
 
 
-class FortTable(Base):
+class FortTable(FortBase):
     __table__ = "sw_fort"
 
     id = Field("id")
