@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Type, TypeVar
+from typing import Type, TypeVar, List, Optional
 import sys
 import os
 
@@ -43,19 +43,22 @@ class Webhooks(BaseModel):
 class DataInput(BaseModel):
     webhooks: Webhooks
     database_config: DataInputDbConfig
-    database: list[ExternalDbConnection]
+    database: List[ExternalDbConnection]
 
 
 class DiscordWebhook(BaseModel):
-    webhooks: list[str]
-    types: list[str]
-    send: list[str]
+    webhooks: List[str]
+    types: List[str]
+    send: List[str]
 
 
 class Area(BaseModel):
     name: str
-    discord: list[DiscordWebhook]
-    geofence: Geofence | None = None
+    discord: List[DiscordWebhook]
+    geofence: Optional[Geofence] = None
+
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class _VisualModelWithSize(BaseModel):
@@ -72,8 +75,8 @@ class _VisualModelWithSize(BaseModel):
 
 class TileserverVisual(_VisualModelWithSize):
     style: str
-    cells: list[str]
-    nearby_forts: list[str]
+    cells: List[str]
+    nearby_forts: List[str]
     zoom: float
     scale: int
 
@@ -94,7 +97,7 @@ class Config(BaseModel):
     stopwatcher_db: DbConnection
     tileserver: Tileserver
     data_input: DataInput
-    areas: list[Area]
+    areas: List[Area]
 
 
 class FortAppearancePartMapPart(_VisualModelWithSize):

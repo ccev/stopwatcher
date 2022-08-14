@@ -7,3 +7,6 @@ git+https://github.com/Rapptz/discord.py.git#egg=discord.py
 shapely~=1.8.2
 protobuf==3.19.4
 Pillow~=9.2.0
+aiohttp-basicauth-middleware~=1.2.0
+pydantic~=1.9.1
+rtoml~=0.8.0

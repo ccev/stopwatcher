@@ -22,7 +22,6 @@ class Location:
         return cls(lat=_middle(loc_1.lat, loc_2.lat), lon=_middle(loc_1.lon, loc_2.lon))
 
 
-@dataclass
 class Geofence:
     def __init__(self, raw_fence: str):
         bounds = []

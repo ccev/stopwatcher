@@ -29,9 +29,8 @@ that's always kept updated
 `pip install -r requirements.txt`
 - Run the file(s) in `sql/` on any MySQL database you like
 - Fill out `config/config.toml`
-- Run the project using `python stop_watcher.py`. Note that I'm not sure which 
-Python version is required. I think 3.6 should work. It's made in 3.10. As of writing, 
-one dependancy is not compatible with 3.11 on Windows
+- Run the project using `python stop_watcher.py`. Due to dependancy limitations, 
+Python 3.8-3.10 is required. 3.11 may work on Linux
 
 ### Geofence format
 

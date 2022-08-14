@@ -3,6 +3,7 @@ from __future__ import annotations
 from asyncio import Queue
 import base64
 from json.decoder import JSONDecodeError
+from typing import Optional
 
 from aiohttp import web
 from aiohttp.web_request import Request
@@ -27,9 +28,9 @@ class FortRequest(BaseModel):
     type: str
     lat: float
     lon: float
-    name: str | None = None
-    description: str | None = None
-    cover_image: str | None = None
+    name: Optional[str] = None
+    description: Optional[str] = None
+    cover_image: Optional[str] = None
 
 
 class DataAccepter:
