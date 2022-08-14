@@ -38,6 +38,9 @@ class ExternalInputHelper:
                 for raw_fort in result:
                     this_forts.append(definition.fort_factory(raw_fort))
 
+            if not this_forts:
+                continue
+
             fort_ids = [f.id for f in this_forts]
             game = GAMES[external.schema]
             existing_count = await FortHelper.get_fort_count_for_id(accessor, game=game, ids=fort_ids)
