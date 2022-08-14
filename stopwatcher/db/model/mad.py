@@ -7,6 +7,7 @@ from stopwatcher.fort import Fort, FortType
 
 
 UnixTimestamp = CustomFunction("UNIX_TIMESTAMP", ("datetime",))
+ConvertTz = CustomFunction("CONVERT_TZ", ("dateime", "old_tz", "new_tz"))
 
 
 class MadPokestop(FortBase):
@@ -73,7 +74,7 @@ class MadSchema:
             fort_factory=MadSchema._pokestop_factory,
             query=MySQLQuery.from_(mad_pokestop)
             .select("*")
-            .where(UnixTimestamp(mad_pokestop.last_modified) > since),
+            .where(UnixTimestamp(ConvertTz(mad_pokestop.last_modified, "UTC", "@@global.time_zone")) > since),
         )
         gyms = ExternalInputDefinition(
             fort_factory=MadSchema._gym_factory,
@@ -82,7 +83,7 @@ class MadSchema:
             .left_join(mad_gymdetails)
             .on(mad_gym.id == mad_gymdetails.id)  # type: ignore
             .select(mad_gym.star, mad_gymdetails.star)
-            .where(UnixTimestamp(mad_gym.last_modified) > since)
+            .where(UnixTimestamp(ConvertTz(mad_gym.last_modified, "UTC", "@@global.time_zone")) > since)
         )
         return [stops, gyms]
 
