@@ -32,6 +32,7 @@ class DbAccessor:
             "user": connection.username,
             "password": connection.password,
             "db": connection.database,
+            "autocommit": True
         }
 
     async def connect(self, loop: asyncio.AbstractEventLoop):

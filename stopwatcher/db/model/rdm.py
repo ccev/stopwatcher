@@ -16,7 +16,7 @@ class RdmPokestop(FortBase):
     name = Field("name")
     description = Field("description")
     cover_image = Field("url")
-    last_modified = Field("last_modified_timestamp")
+    updated = Field("updated")
 
 
 rdm_pokestop = RdmPokestop()
@@ -31,7 +31,7 @@ class RdmGym(FortBase):
     name = Field("name")
     description = Field("description")
     cover_image = Field("url")
-    last_modified = Field("last_modified_timestamp")
+    updated = Field("updated")
 
 
 rdm_gym = RdmGym()
@@ -50,11 +50,11 @@ class RdmSchema:
     def get_forts(since: int) -> list[ExternalInputDefinition]:
         stops = ExternalInputDefinition(
             fort_factory=RdmSchema._pokestop_factory,
-            query=MySQLQuery.from_(rdm_pokestop).select("*").where(rdm_pokestop.last_modified > since)
+            query=MySQLQuery.from_(rdm_pokestop).select("*").where(rdm_pokestop.updated > since)
         )
         gyms = ExternalInputDefinition(
             fort_factory=RdmSchema._gym_factory,
-            query=MySQLQuery.from_(rdm_gym).select("*").where(rdm_gym.last_modified > since)
+            query=MySQLQuery.from_(rdm_gym).select("*").where(rdm_gym.updated > since)
         )
         return [stops, gyms]
 

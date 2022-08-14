@@ -51,7 +51,7 @@ password = "strongpass"
 # basic http auth needed by incoming requests
 
 [data_input.database_config]
-query_every = 300  # seconds
+query_every = 300  # seconds. Don't set below 60
 difference_threshold = 20
 # when reading from the db, it checks how many of these Forts are missing from the internal database.
 # If this number is higher than <difference_threshold>, they're copied over directly without processing

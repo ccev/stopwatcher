@@ -19,7 +19,7 @@ class MadPokestop(FortBase):
     name = Field("name")
     description = Field("description")
     cover_image = Field("url")
-    last_modified = Field("last_modified")
+    updated = Field("last_updated")
 
 
 mad_pokestop = MadPokestop()
@@ -31,7 +31,7 @@ class MadGym(Base):
     id = Field("gym_id")
     lat = Field("latitude")
     lon = Field("longitude")
-    last_modified = Field("last_modified")
+    updated = Field("last_scanned")
 
 
 class MadGymDetails(Base):
@@ -74,7 +74,7 @@ class MadSchema:
             fort_factory=MadSchema._pokestop_factory,
             query=MySQLQuery.from_(mad_pokestop)
             .select("*")
-            .where(UnixTimestamp(ConvertTz(mad_pokestop.last_modified, "UTC", "@@global.time_zone")) > since),
+            .where(UnixTimestamp(ConvertTz(mad_pokestop.updated, "UTC", "@@global.time_zone")) > since),
         )
         gyms = ExternalInputDefinition(
             fort_factory=MadSchema._gym_factory,
@@ -83,7 +83,7 @@ class MadSchema:
             .left_join(mad_gymdetails)
             .on(mad_gym.id == mad_gymdetails.id)  # type: ignore
             .select(mad_gym.star, mad_gymdetails.star)
-            .where(UnixTimestamp(ConvertTz(mad_gym.last_modified, "UTC", "@@global.time_zone")) > since)
+            .where(UnixTimestamp(ConvertTz(mad_gym.updated, "UTC", "@@global.time_zone")) > since)
         )
         return [stops, gyms]
 
