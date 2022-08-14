@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from pypika import MySQLQuery
+from pypika.functions import Count
 
 from stopwatcher.db.model.internal import fort_table
 from stopwatcher.fort import Fort, FortType, Game
@@ -42,6 +43,16 @@ class FortHelper:
 
     @staticmethod
     async def insert_fort(accessor: DbAccessor, fort: Fort) -> None:
+        await FortHelper.insert_forts(accessor, [fort])
+
+    @staticmethod
+    def __pypika_sql_injection(arg: str | None):
+        if arg is None:
+            return None
+        return arg.replace("\\'", "'")
+
+    @staticmethod
+    async def insert_forts(accessor: DbAccessor, forts: list[Fort], insert_ignore: bool = False):
         query = (
             MySQLQuery()
             .into(fort_table)
@@ -55,17 +66,22 @@ class FortHelper:
                 fort_table.description,
                 fort_table.cover_image,
             )
-            .insert(
+        )
+
+        if insert_ignore:
+            query = query.ignore()
+
+        for fort in forts:
+            query = query.insert(
                 fort.id,
                 fort.game.value,
                 fort.type.value,
                 fort.location.lat,
                 fort.location.lon,
-                fort.name,
-                fort.description,
+                FortHelper.__pypika_sql_injection(fort.name),
+                FortHelper.__pypika_sql_injection(fort.description),
                 fort.cover_image,
             )
-        )
 
         await accessor.commit_internal(query)
 
@@ -107,6 +123,20 @@ class FortHelper:
             .select("*")
             .where(fort_table.lat[bounds.min.lat : bounds.max.lat])
             .where(fort_table.lon[bounds.min.lon : bounds.max.lon])
+            .where(fort_table.game_id == game.value)
         )
         result = await accessor.select_internal(query)
         return FortHelper.__fort_list_from_data(result)
+
+    @staticmethod
+    async def get_fort_count_for_id(accessor: DbAccessor, game: Game, ids: list[str]) -> int:
+        query = (
+            MySQLQuery()
+            .from_(fort_table)
+            .select(Count("*"))
+            .where(fort_table.game_id == game.value)
+            .where(fort_table.id.isin(ids))
+        )
+        result = await accessor.select_internal(query)
+        _, count = result[0].popitem()
+        return count

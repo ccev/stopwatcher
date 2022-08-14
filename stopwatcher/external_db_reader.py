@@ -1,9 +1,10 @@
 from __future__ import annotations
+
+import asyncio
+from time import time
 from typing import TYPE_CHECKING
 
 from .db.helper.external_input import ExternalInputHelper
-from time import time
-import asyncio
 
 if TYPE_CHECKING:
     from .db.accessor import DbAccessor

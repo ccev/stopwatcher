@@ -8,6 +8,7 @@ from stopwatcher.db.model.rdm import get_forts as rdm_get
 from stopwatcher.db.model.mad import get_forts as mad_get
 from stopwatcher.fort import Fort, FortType, Game
 from stopwatcher.log import log
+from .internal_fort import FortHelper
 
 if TYPE_CHECKING:
     from stopwatcher.db.accessor import DbAccessor
@@ -15,10 +16,9 @@ if TYPE_CHECKING:
     from stopwatcher.db.model.base import ExternalInputDefinition
 
 
-SCHEMAS: dict[str, Callable[[int], list[ExternalInputDefinition]]] = {
-    "rdm": rdm_get,
-    "mad": mad_get
-}
+SCHEMAS: dict[str, Callable[[int], list[ExternalInputDefinition]]] = {"rdm": rdm_get, "mad": mad_get}
+
+GAMES: dict[str, Game] = {"rdm": Game.POGO, "mad": Game.POGO}
 
 
 class ExternalInputHelper:
@@ -33,9 +33,25 @@ class ExternalInputHelper:
                 continue
 
             definitions = get_method(since)
+            this_forts: list[Fort] = []
             for definition in definitions:
                 result = await accessor.select_any(definition.query, external.pool)
+
                 for raw_fort in result:
-                    forts.append(definition.fort_factory(raw_fort))
+                    this_forts.append(definition.fort_factory(raw_fort))
+
+            fort_ids = [f.id for f in this_forts]
+            game = GAMES[external.schema]
+            existing_count = await FortHelper.get_fort_count_for_id(accessor, game=game, ids=fort_ids)
+            missing_forts = len(fort_ids) - existing_count
+            if missing_forts > 20:
+                log.warning(
+                    f"There are {missing_forts} forts in an external database that would be processed. "
+                    f"Instead, they will be skipped and copied directly"
+                )
+
+                await FortHelper.insert_forts(accessor, this_forts, insert_ignore=True)
+            else:
+                forts += this_forts
 
         return forts
