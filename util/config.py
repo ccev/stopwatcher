@@ -21,6 +21,7 @@ class create_config:
         self.map_url = config_file.get("Maps", "map_url")
         self.map_provider = config_file.get("Maps", "frontend").lower()
         self.map_name = config_file.get("Maps", "map_name")
+        self.geojson = config_file.getboolean("Maps", "geojson")
 
         self.use_geocoding = config_file.getboolean("Maps", "geocoding")
         self.geocoding_provider = config_file.get("Maps", "geocoding_provider").lower()
