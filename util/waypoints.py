@@ -205,7 +205,7 @@ class waypoint():
                 elif self.type == "stop":
                     map_url = f"{self.config.map_url}id/pokestops/{self.id}"
                 elif self.type == "gym":
-                    map_url = f"{self.config.map_url}/id/gyms/{self.id}"
+                    map_url = f"{self.config.map_url}id/gyms/{self.id}"
             elif self.config.map_provider == "rmad":
                 map_url = f"{self.config.map_url}?lat={self.lat}&lon={self.lon}&zoom=18"
             links = f"{links} \\| [{self.config.map_name}]({map_url})"
