@@ -113,7 +113,14 @@ class DiscordSender(BaseProcessor):
             embed.description = f"Old: **`{job.old}`**\nNew: **`{job.new}`**"
         elif check(ChangedDescriptionJob):
             author = f"New {appear.name} Description"
-            embed.description = f"Old: **`{job.old}`**\nNew: **`{job.new}`**"
+
+            def _get_formatted_text(raw: str | None) -> str:
+                if raw is None:
+                    return "[No description]"
+                return "> " + "\n> ".join(raw.split("\n"))
+
+            embed.description = f"Old\n{_get_formatted_text(job.old)}\nNew:\n{_get_formatted_text(job.new)}"
+
         elif check(ChangedLocationJob):
             job: ChangedLocationJob
             author = f"New {appear.name} Location"
