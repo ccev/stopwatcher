@@ -68,9 +68,9 @@ class FortComparer:
                     fort.add_other_fort(same_fort)
 
                     def compare_str(attr: str):
-                        return (not getattr(same_fort, attr) and not getattr(fort, attr)) or (
-                            not getattr(fort, attr)
-                            and not getattr(same_fort, attr)
+                        return (not getattr(same_fort, attr) and getattr(fort, attr)) or (
+                            getattr(fort, attr)
+                            and getattr(same_fort, attr)
                             and getattr(same_fort, attr).strip() != getattr(fort, attr).strip()
                         )
 

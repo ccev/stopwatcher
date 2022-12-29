@@ -13,7 +13,6 @@ if TYPE_CHECKING:
     from stopwatcher.fort import Fort
 
 
-@dataclass
 class TrackedFort:
     def __init__(self, fort: Fort, now: float):
         self.fort: Fort = fort
@@ -69,7 +68,6 @@ class ProtoCell(Region):
         if not self.current_session:
             return []
 
-        self.current_session.clear()
         self.updated = now = time()
         for fort in self.current_session:
             # if not self.cell.contains(fort.location):
@@ -81,6 +79,7 @@ class ProtoCell(Region):
             else:
                 existing_fort.add_other_fort(fort, now)
 
+        self.current_session.clear()
         removed_forts: list[Fort] = []
         bad_forts: list[TrackedFort] = [f for f in self.tracked.values() if f.updated < now]
         for bad_fort in bad_forts:

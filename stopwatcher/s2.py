@@ -9,6 +9,17 @@ def get_cell_id_from_location(location: Location, level: int = 15) -> s2sphere.C
     return base_cell.parent(level)
 
 
+def get_cell_vertices(location: Location) -> list[Location]:
+    cell_id = get_cell_id_from_location(location, level=17)
+    cell = s2sphere.Cell(cell_id)
+    path: list[Location] = []
+
+    for v in range(4):
+        vertex = s2sphere.LatLng.from_point(cell.get_vertex(v))
+        path.append(Location(vertex.lat().degrees, vertex.lng().degrees))
+    return path
+
+
 class Cell:
     def __init__(self, cell_id: s2sphere.CellId):
         self.cell: s2sphere.Cell = s2sphere.Cell(cell_id)

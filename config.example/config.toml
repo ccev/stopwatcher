@@ -1,10 +1,10 @@
 [general]
 geofence_path = "config/geofences"
-# for the format geofence format, refer to the readme.
+# for the geofence format, refer to the readme.
 # You can choose to read geofence files from any other directory, if you like
 
 init = true
-# if you're only using databases as your data input, you keep this to false.
+# if you're only using databases as your data input, you keep this false.
 # Else, make sure to set to true on your first run or whenever you're scanning a new area
 
 
@@ -52,9 +52,10 @@ password = "strongpass"
 
 [data_input.database_config]
 query_every = 300  # seconds. Don't set below 60
-difference_threshold = 20
+difference_threshold = 40
 # when reading from the db, it checks how many of these Forts are missing from the internal database.
-# If this number is higher than <difference_threshold>, they're copied over directly without processing
+# If this number is higher than <difference_threshold>, they're copied over directly without processing.
+# This is to prevent notification spam after covering a new area
 
 [data_input.database.1]
 db_schema = "rdm"  # "rdm", "mad" or "intelwatcher"
@@ -62,7 +63,7 @@ username = ""
 password = ""
 host = "0.0.0.0"
 port = 3306
-database = "rdmrb"
+database = "rdmdb"
 
 [data_input.database.this_value_doesnt_matter]
 db_schema = "intelwatcher"

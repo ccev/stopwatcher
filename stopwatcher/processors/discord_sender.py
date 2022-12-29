@@ -21,6 +21,7 @@ from stopwatcher.watcher_jobs import (
     NewFortDetailsJob,
 )
 from .base_processor import BaseProcessor
+from stopwatcher.s2 import get_cell_vertices
 from stopwatcher.db.helper.internal_fort import FortHelper
 from stopwatcher.geo import Location
 from stopwatcher.log import log
@@ -155,6 +156,14 @@ class DiscordSender(BaseProcessor):
             log.info(f"Sending Discord notification for {job}")
             if self._tileserver is not None:
                 if not isinstance(job, ChangedLocationJob):
+                    if job.fort.type.name.lower() in config.tileserver.visual.nearby_forts:
+                        staticmap.add_polygon(
+                            path=get_cell_vertices(job.fort.location),
+                            fill_color="#ffffff60",
+                            stroke_width=2,
+                            stroke_color="#c7c7c790"
+                        )
+
                     if job.fort.type.name.lower() in config.tileserver.visual.nearby_forts:
                         bounds = staticmap.get_bounds()
                         sec_forts = await FortHelper.get_forts_in_bounds(
