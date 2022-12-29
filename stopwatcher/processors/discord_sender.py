@@ -115,11 +115,12 @@ class DiscordSender(BaseProcessor):
             author = f"New {appear.name} Description"
 
             def _get_formatted_text(raw: str | None) -> str:
-                if raw is None:
+                if not raw:
                     return "[No description]"
                 return "> " + "\n> ".join(raw.split("\n"))
 
-            embed.description = f"Old\n{_get_formatted_text(job.old)}\nNew:\n{_get_formatted_text(job.new)}"
+            embed.add_field(name="Old", value=_get_formatted_text(job.old), inline=False)
+            embed.add_field(name="New", value=_get_formatted_text(job.new), inline=False)
 
         elif check(ChangedLocationJob):
             job: ChangedLocationJob
@@ -176,7 +177,7 @@ class DiscordSender(BaseProcessor):
                 embed.title = job.fort.name
             if job.fort.cover_image is not None:
                 embed.set_thumbnail(url=job.fort.cover_image)
-            if job.fort.description is not None:
+            if job.fort.description:
                 extra_text = f"*{job.fort.description}*"
                 if embed.description:
                     embed.description = f"{extra_text}\n\n{embed.description}"

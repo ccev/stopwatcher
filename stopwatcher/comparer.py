@@ -16,7 +16,7 @@ from .watcher_jobs import (
     ChangedCoverImageJob,
     NewFortDetailsJob,
     SetQueue,
-    RemovedFortJob
+    RemovedFortJob,
 )
 from .s2 import Cell
 from .removal.removal_checker import RemovalChecker
@@ -68,9 +68,9 @@ class FortComparer:
                     fort.add_other_fort(same_fort)
 
                     def compare_str(attr: str):
-                        return (getattr(same_fort, attr) is None and getattr(fort, attr) is not None) or (
-                            getattr(fort, attr) is not None
-                            and getattr(same_fort, attr) is not None
+                        return (not getattr(same_fort, attr) and not getattr(fort, attr)) or (
+                            not getattr(fort, attr)
+                            and not getattr(same_fort, attr)
                             and getattr(same_fort, attr).strip() != getattr(fort, attr).strip()
                         )
 
