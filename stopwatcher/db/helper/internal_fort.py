@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from pypika import MySQLQuery
+from pypika.terms import Values
 from pypika.functions import Count
 
 from stopwatcher.db.model.internal import fort_table
@@ -12,6 +13,7 @@ from stopwatcher.log import log
 if TYPE_CHECKING:
     from stopwatcher.db.accessor import DbAccessor
     from stopwatcher.tileserver.staticmap import Bounds
+    from stopwatcher.geo import Geofence
 
 
 class FortHelper:
@@ -68,9 +70,6 @@ class FortHelper:
             )
         )
 
-        if insert_ignore:
-            query = query.ignore()
-
         for fort in forts:
             query = query.insert(
                 fort.id,
@@ -82,6 +81,10 @@ class FortHelper:
                 FortHelper.__pypika_sql_injection(fort.description),
                 fort.cover_image,
             )
+
+        if insert_ignore:
+            query = query.ignore()
+            query = query.on_duplicate_key_update(fort_table.id, Values(fort_table.id))
 
         await accessor.commit_internal(query)
 
@@ -140,3 +143,22 @@ class FortHelper:
         result = await accessor.select_internal(query)
         _, count = result[0].popitem()
         return count
+
+    @staticmethod
+    async def get_forts_from_geofence(accessor: DbAccessor, game: Game, geofence: Geofence) -> list[Fort]:
+        bounds = geofence.bounds()
+        query = (
+            MySQLQuery()
+            .from_(fort_table)
+            .select("*")
+            .where(fort_table.game_id == game.value)
+            .where(fort_table.lat[bounds.min.lat:bounds.max.lat])
+            .where(fort_table.lon[bounds.min.lon:bounds.max.lon])
+        )
+        result = await accessor.select_internal(query)
+        forts = []
+
+        for fort in FortHelper.__fort_list_from_data(result):
+            if geofence.contains(fort.location):
+                forts.append(fort)
+        return forts

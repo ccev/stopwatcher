@@ -94,7 +94,7 @@ class DataAccepter:
                     cell: ClientMapCellProto
                     for fort in cell.fort:
                         fort: PokemonFortProto
-                        # forts.append(Fort.from_fort_proto(fort))
+                        forts.append(Fort.from_fort_proto(fort, cell_id=cell.s2_cell_id))
 
             elif isinstance(proto, FortDetailsOutProto):
                 forts.append(Fort.from_fort_details_proto(proto))

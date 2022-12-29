@@ -4,7 +4,7 @@ import math
 from dataclasses import dataclass
 from typing import TypeVar, TYPE_CHECKING
 
-from stopwatcher.geo import Location
+from stopwatcher.geo import Location, Bounds
 
 if TYPE_CHECKING:
     from stopwatcher.config import FortAppearancePartMapPart as FortAppearance
@@ -72,12 +72,6 @@ class Polygon(_MapObject):
             "stroke_width": self.stroke_width,
             "path": [[loc.lat, loc.lon] for loc in self.path]
         }
-
-
-@dataclass
-class Bounds:
-    min: Location
-    max: Location
 
 
 class StaticMap:

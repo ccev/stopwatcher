@@ -1,24 +1,25 @@
 from __future__ import annotations
 
-from enum import Enum
+from enum import IntEnum
 from typing import TYPE_CHECKING, Any
 from protos import PokemonFortProto, FortType as ProtoFortType, FortDetailsOutProto
 
 from .geo import Location
+from .s2 import get_cell_id_from_location
 
 if TYPE_CHECKING:
     from .accepter import FortRequest
     from stopwatcher.db.model.base import AnyFortTable
 
 
-class Game(Enum):
+class Game(IntEnum):
     UNKNOWN = 0
     POGO = 10
     INGRESS = 20
     LIGHTSHIP = 30
 
 
-class FortType(Enum):
+class FortType(IntEnum):
     UNKNOWN = 0
     GYM = 10
     POKESTOP = 15
@@ -42,6 +43,7 @@ class Fort:
         name: str | None = None,
         description: str | None = None,
         cover_image: str | None = None,
+        region_id: int | None = None,
     ):
         self.id: str = id_
         self.location: Location = Location(lat=lat, lon=lon)
@@ -51,6 +53,8 @@ class Fort:
         self.name: str | None = name
         self.description: str | None = description
         self.cover_image: str | None = cover_image
+
+        self.region_id: int | None = region_id if region_id is not None else self.get_region_id()
 
     def __repr__(self):
         rep = f"{self.type.name.title()}("
@@ -83,12 +87,13 @@ class Fort:
         )
 
     @classmethod
-    def from_fort_proto(cls, proto: PokemonFortProto):
+    def from_fort_proto(cls, proto: PokemonFortProto, cell_id: int):
         return cls(
             id_=proto.fort_id,
             lat=proto.latitude,
             lon=proto.longitude,
-            type_=FortType.from_proto_type(proto.fort_type)
+            type_=FortType.from_proto_type(proto.fort_type),
+            region_id=cell_id
         )
 
     @classmethod
@@ -112,6 +117,12 @@ class Fort:
         if fort_type.value >= 10:
             return Game.POGO
         return Game.UNKNOWN
+
+    def get_region_id(self) -> int | None:
+        if self.game == Game.POGO:
+            cell = get_cell_id_from_location(self.location)
+            return cell.id()
+        return None
 
     def add_other_fort(self, fort: Fort):
         for attr in ("name", "description", "cover_image"):

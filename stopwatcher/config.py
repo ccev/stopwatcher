@@ -171,7 +171,7 @@ for file in os.listdir(config.general.geofence_path):
     else:
         _fence_name = file[:-4]
 
-    _geofences[_fence_name] = Geofence(_raw_fence)
+    _geofences[_fence_name] = Geofence.from_raw(_raw_fence)
 
 for _area in config.areas:
     _area.geofence = _geofences.get(_area.name)

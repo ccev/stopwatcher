@@ -18,12 +18,16 @@ class ExternalDbReader:
         self._out_queue: asyncio.Queue = process_queue
         asyncio.create_task(self.read())
 
+    async def _query_since(self, since: int):
+        forts = await ExternalInputHelper.get_forts_since(self._db_accessor, since=since)
+        log.info(f"Queried {len(forts)} Forts from external databases")
+        self._out_queue.put_nowait(forts)
+
     async def read(self):
         delay = config.data_input.database_config.query_every
-        while True:
-            needed_time = int(time()) - delay - 20  # -20 to adjust for different delays that may happen
-            forts = await ExternalInputHelper.get_forts_since(self._db_accessor, since=needed_time)
-            log.info(f"Queried {len(forts)} Forts from external databases")
+        await self._query_since(0)
 
-            self._out_queue.put_nowait(forts)
+        while True:
             await asyncio.sleep(delay)
+            needed_time = int(time()) - delay - 20  # -20 to adjust for different delays that may happen
+            await self._query_since(needed_time)

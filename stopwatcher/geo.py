@@ -23,7 +23,11 @@ class Location:
 
 
 class Geofence:
-    def __init__(self, raw_fence: str):
+    def __init__(self, bounds: list[tuple[float, float]]):
+        self.polygon = Polygon(bounds)
+
+    @classmethod
+    def from_raw(cls, raw_fence: str):
         bounds = []
         for line in raw_fence.splitlines():
             try:
@@ -34,7 +38,17 @@ class Geofence:
 
             bounds.append((lat, lon))
 
-        self.polygon = Polygon(bounds)
+        return cls(bounds)
 
     def contains(self, location: Location) -> bool:
         return self.polygon.contains(Point(location.lat, location.lon))
+
+    def bounds(self) -> Bounds:
+        min_lat, min_lon, max_lat, max_lon = self.polygon.bounds
+        return Bounds(min=Location(min_lat, min_lon), max=Location(max_lat, max_lon))
+
+
+@dataclass
+class Bounds:
+    min: Location
+    max: Location
