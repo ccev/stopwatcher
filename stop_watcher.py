@@ -352,6 +352,7 @@ if any("edits" in i for i in config.filters):
 
 cursor.close()
 mydb.close()
+mydb_p.close()
 
 with open("config/cache/edits.json", "w", encoding="utf-8") as f:
     f.write(json.dumps(edit_list, indent=4))
