@@ -19,7 +19,7 @@ config.console.log("Initializing...")
 with open("config/filters.json", encoding="utf-8") as f:
     config.filters = json.load(f)
 
-with open("config/geofence.json", encoding="utf-8") as f:
+with open("config/areas.json" if config.geojson else "config/geofence.json", encoding="utf-8") as f:
     config.geofences = json.load(f)
 
 with open("config/templates.json", encoding="utf-8") as f:

@@ -1,5 +1,5 @@
 from pymysql import connect
-from datetime import datetime, timedelta 
+from datetime import datetime, timedelta
 
 class create_queries():
     def __init__(self, config, cursor, p_cursor):
@@ -7,17 +7,28 @@ class create_queries():
         self.p_cursor = p_cursor
         self.schema = config.scan_type
         self.geofences = config.geofences
+        self.geojson = config.geojson
         self.filters = config.filters
         self.area = ""
 
     def convert_area(self, area_name):
         stringfence = "-200 -200, -200 200, 200 200, 200 -200, -200 -200"
-        for area in self.geofences:
-            if area['name'].lower() == area_name.lower():
-                stringfence = ""
-                for coordinates in area['path']:
-                    stringfence = f"{stringfence}{coordinates[0]} {coordinates[1]},"
-                stringfence = f"{stringfence}{area['path'][0][0]} {area['path'][0][1]}"
+
+        if self.geojson:
+            for area in self.geofences["features"]:
+                if area["properties"]["name"].lower() == area_name.lower():
+                    stringfence = ""
+                    for coordinates in area["geometry"]["coordinates"][0]:
+                        stringfence = f"{stringfence}{coordinates[1]} {coordinates[0]},"
+                    stringfence = f"{stringfence}{area['geometry']['coordinates'][0][0][1]} {area['geometry']['coordinates'][0][0][0]}"
+        else:
+            for area in self.geofences:
+                if area['name'].lower() == area_name.lower():
+                    stringfence = ""
+                    for coordinates in area['path']:
+                        stringfence = f"{stringfence}{coordinates[0]} {coordinates[1]},"
+                    stringfence = f"{stringfence}{area['path'][0][0]} {area['path'][0][1]}"
+
         self.area = stringfence
 
     def get_portals(self, area):
