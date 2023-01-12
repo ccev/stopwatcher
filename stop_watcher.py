@@ -187,7 +187,7 @@ for fil in config.filters:
     deleted_max_portals = 5
     deleted_timespan_portals = ((4*config.scraper_wait) / 60)
     deleted_max_stops = 5
-    deleted_timespan_stops = 300
+    deleted_timespan_stops = ((4*config.removed_wait) / 60)
     if "deleted" in fil:
         if "max" in fil["deleted"]:
             if "scraper" in fil["deleted"]["max"]:
