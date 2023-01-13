@@ -8,7 +8,7 @@ class create_config:
 
         self.language = config_file.get("Config", "language").lower()
         self.scraper_wait = config_file.getint("Config", "portal_scraper_interval")
-        self.removed_wait = config_file.getint("Config", "removed_stop_wait", fallback=3600)
+        self.removed_wait = config_file.getint("Config", "removed_stop_wait", fallback=18000)
 
         self.use_static_map = config_file.getboolean("Maps", "static_map")
         self.static_provider = config_file.get("Maps", "static_map_provider").lower()
